@@ -512,6 +512,7 @@ CL("aeromancer", {
       name: "Wind Master", kind: "key",
       cost: null, range: null, keywords: [], requires: null,
       grantsAbility: "glide",
+      grants: { mastery: "Wind" },
       refund: { overlapsWith: ["Windbringer", "Zephyr Warder"], amount: "MISSING",
                 note: "Page says a refund is possible and that Windbringer and Zephyr Warder also grant this. Amount not captured." },
       summary: [
@@ -17264,6 +17265,24 @@ LC.bonuses = [
   { source: "class:magitechnician", ability: "advanced-artificing-key", type: "note", text: "The +1 Burden must be spent on an artifice." }
 ];
 
+// ---------------- Mystic Eyes ----------------
+// You normally have 2 Mystic Eye slots (the 8 Eyes breakthrough raises it to 8). Each of these classes'
+// key ability turns one of your eyes into a Mystic Eye ("One of your eyes becomes ..."), using a slot.
+LC.mysticEyes = {
+  baseSlots: 2,
+  classes: ["evil-eye", "faerie-light-eyes", "mystic-eyes-of-destruction", "mystic-eyes-of-domination",
+            "mystic-eyes-of-petrification", "shinigami-eyes", "wave-palm-style"]
+};
+
+// ---------------- Element mastery gained when you MASTER a class ----------------
+// (Key-ability masteries like Mage's Arcane are in classes.js grants.)
+LC.masteryOnMastery = {
+  "acolyte":  { text: "Elemental Mastery in your Divine's element (Holy if you follow only a human deity).",
+                options: ["Holy", "Astra", "Arcane", "Water", "Fire", "Physical", "Lightning", "Earth"] },
+  "sorcerer": { text: "Master one more element of your choice.",
+                options: ["Fire", "Water", "Earth", "Wind", "Lightning", "Frost", "Arcane", "Holy", "Dark"] }
+};
+
 </script>
 </head>
 <body>
@@ -17417,6 +17436,33 @@ function creationRace(){
 function raceIds(){ // every race id this character counts as
   var a = []; if (B.race) a.push(B.race); if (B.subrace) a.push(B.subrace); return a;
 }
+// Hybrid race breakthrough (Human-Chimera / Faerie-Chimera), if taken.
+function hybrid(){
+  var b = B.bts.filter(function(x){ var r = BTS[x.id]; return r && r.grants && r.grants.hybrid; })[0];
+  if (!b) return null;
+  var h = (LC.raceHybrids || []).filter(function(x){ return x.id === BTS[b.id].grants.hybrid; })[0];
+  if (!h) return null;
+  var cfg = h.configs.filter(function(c){ return c.primary === B.race; })[0];
+  return cfg ? { h: h, cfg: cfg } : null;
+}
+// Sub-races you can pick: your race's own, or the other race's with a hybrid breakthrough.
+function subraceChoices(){
+  var hy = hybrid(), r = raceRec();
+  if (hy) return (RACES[hy.cfg.subraceFrom] || {}).subraces || [];
+  return (r && r.subraces) || [];
+}
+// Human Ambition (+100 EXP) - lost with the Human-Chimera hybrid.
+function humanBonus(){
+  if (B.race !== "human") return 0;
+  var hy = hybrid(); return hy && hy.h.id === "human-chimera-hybrid" ? 0 : 100;
+}
+// Demon clans you have: your clan, plus one more from Mixed House.
+function demonClans(){
+  if (B.race !== "demon") return [];
+  var a = B.raceChoice.clan ? [B.raceChoice.clan] : [];
+  B.bts.forEach(function(b){ if (b.id === "mixed-house-demon" && b.pick && b.pick.clan && a.indexOf(b.pick.clan) < 0) a.push(b.pick.clan); });
+  return a;
+}
 function hasBt(id){ return B.bts.some(function(b){ return b.id === id; }); }
 function btGrants(key){ return B.bts.map(function(b){ var r = BTS[b.id]; return r && r.grants ? {g:r.grants, b:b} : null; })
   .filter(function(x){ return x && x.g[key] !== undefined; }); }
@@ -17426,7 +17472,7 @@ function isMastered(c){ return c.owned.every(Boolean); }
 // Free class levels given by race / clan (e.g. Demon clan Wi = Saboteur at level 1).
 function raceUnlock(classId){
   var srcs = raceIds().map(function(r){ return "race:" + r; });
-  if (B.race === "demon" && B.raceChoice.clan) srcs.push("clan:" + B.raceChoice.clan);
+  demonClans().forEach(function(k){ srcs.push("clan:" + k); });
   var best = null;
   UNLOCKS.forEach(function(u){ if (u.classId === classId && srcs.indexOf(u.source) >= 0) best = u; });
   return best;
@@ -17551,7 +17597,7 @@ function calc(){
   });
   var btExp = 0, seen = {};
   B.bts.forEach(function(b){ var n = seen[b.id] || 0; btExp += btCostAt(b.id, n); seen[b.id] = n + 1; });
-  var human = raceIds().indexOf("human") >= 0 ? 100 : 0;
+  var human = humanBonus();
   var startClassExp = 1000 + btGrants("startingClassExp").reduce(function(t, x){ return t + x.g.startingClassExp; }, 0);
   C.exp = {
     startClass: startClassExp,
@@ -17695,6 +17741,10 @@ function skillSources(C){
     out.push({ id: "race", label: cr.name + " (race)", points: cr.skills.points, options: skillOptions(cr.skills.options),
                note: "Race skill points" + (cr.skills.pick === "UNCLEAR" ? " (the page doesn't say how they split - see ISSUES.md)." : ".") });
   }
+  if (B.race === "demon" && B.raceChoice.demonPick === "skill") {
+    out.push({ id: "demon-clan", label: "Demon clan skill", points: 5, options: skillOptions("ANY_NON_CRAFTING_NON_GATHERING"),
+               note: "+5 skill points in a skill relating to your demon clan (the page doesn't say which skill - pick the one that fits your clan)." });
+  }
   B.classes.forEach(function(c){
     var rec = CLASSES[c.id]; if (!rec) return;
     rec.steps.forEach(function(s, i){
@@ -17817,12 +17867,24 @@ function condCheck(c, C){
     return false;
   }
   if (c.proficiency) return profCheck(c.proficiency, C);
-  return null; // mystic eye slots and anything new: check yourself
+  if (c.mysticEyeSlot) { var me = mysticEyes(); return me.slots - me.used >= c.mysticEyeSlot; }
+  return null; // anything new: check yourself
+}
+// Mystic Eye slots: 2 normally (8 with the 8 Eyes breakthrough); each Mystic Eye class you've learned uses one.
+function mysticEyes(){
+  var cfg = LC.mysticEyes || { baseSlots: 2, classes: [] }, slots = cfg.baseSlots;
+  btGrants("mysticEyeSlots").forEach(function(x){ slots = Math.max(slots, x.g.mysticEyeSlots); });
+  var used = B.classes.filter(function(c){ return cfg.classes.indexOf(c.id) >= 0 && c.owned[0]; }).length;
+  return { slots: slots, used: used };
 }
 function earlyAscension(){ return hasBt("early-ascension") ? 1 : 0; }
 function elementMasteries(){
   var a = [];
   if (C && C.grants) C.grants.forEach(function(x){ if (x.g.mastery && a.indexOf(x.g.mastery) < 0) a.push(x.g.mastery); });
+  B.classes.forEach(function(c){
+    var m = (LC.masteryOnMastery || {})[c.id], pick = c.picks && c.picks.mastery;
+    if (m && pick && isMastered(c) && a.indexOf(pick) < 0) a.push(pick);
+  });
   B.bts.forEach(function(b){ if (b.id === "elemental-affinity" && b.pick && b.pick.element) a.push(b.pick.element); });
   if (B.subrace === "ryujin" && B.raceChoice.element) a.push(B.raceChoice.element);
   return a;
@@ -17870,9 +17932,11 @@ function renderIdentity(){
        mains.map(function(x){ return '<option value="' + x.id + '"' + (B.race === x.id ? " selected" : "") + ">" + esc(x.name) + "</option>"; }).join("") + "</select>" +
        (B.race ? '<button class="ibtn" data-info="race:' + B.race + '" title="Race details">ⓘ</button>' : "") +
        '<button class="ibtn" data-info="races:" title="Browse all races">Browse</button></div>';
-  if (r && r.subraces && r.subraces.length) {
+  var subs = subraceChoices();
+  if (B.subrace && subs.indexOf(B.subrace) < 0) B.subrace = "";   // hybrid removed etc.
+  if (subs.length) {
     h += '<div class="field"><label>Sub-race</label><select id="inSub"><option value="">— choose —</option>' +
-      r.subraces.map(function(id){ return RACES[id]; }).filter(Boolean).sort(sortByName).map(function(x){
+      subs.map(function(id){ return RACES[id]; }).filter(Boolean).sort(sortByName).map(function(x){
         var lock = genderLock(x);
         return '<option value="' + x.id + '"' + (B.subrace === x.id ? " selected" : "") + (lock ? " disabled" : "") + ">" + esc(x.name) + (lock ? " (" + lock + ")" : "") + "</option>";
       }).join("") + "</select>" + (B.subrace ? '<button class="ibtn" data-info="race:' + B.subrace + '" title="Sub-race details">ⓘ</button>' : "") +
@@ -17886,6 +17950,11 @@ function renderIdentity(){
   if (r && r.options) {
     h += '<div class="field"><label>Clan</label><select id="rcClan"><option value="">— choose —</option>' +
       r.options.choices.map(function(c){ return '<option value="' + esc(c.code) + '"' + (B.raceChoice.clan === c.code ? " selected" : "") + ">" + esc(c.code + " - " + c.name) + "</option>"; }).join("") + "</select></div>";
+    if (B.race === "demon") {
+      h += '<div class="field"><label>Demon choice</label><select id="rcDemon">' +
+        '<option value="prof"' + (B.raceChoice.demonPick !== "skill" ? " selected" : "") + '>Proficiency in one common weapon</option>' +
+        '<option value="skill"' + (B.raceChoice.demonPick === "skill" ? " selected" : "") + '>+5 skill points in a clan skill</option></select></div>';
+    }
   }
   var s = subRec();
   if (s && s.options) {
@@ -17894,6 +17963,8 @@ function renderIdentity(){
   var gl = s && genderLock(s);
   if (gl) h += '<div class="errbox">' + esc(s.name) + " is " + esc(gl) + "</div>";
   if (r && r.subraces && r.subraces.length && !B.subrace) h += '<div class="warnbox">' + esc(r.name) + " needs a sub-race.</div>";
+  var hy = hybrid();
+  if (hy) h += '<div class="note"><b>' + esc(hy.h.name) + ":</b> " + esc(hy.cfg.summary) + "</div>";
   if (cr) {
     var bits = [];
     if (cr.stats) for (var k in cr.stats) if (k !== "choice") bits.push(sign(cr.stats[k]) + " " + k);
@@ -17913,6 +17984,7 @@ function renderIdentity(){
   if ($("rcMain")) $("rcMain").onchange = function(){ B.raceChoice.main = this.value; render(); };
   if ($("rcSub")) $("rcSub").onchange = function(){ B.raceChoice.sub = this.value; render(); };
   if ($("rcClan")) $("rcClan").onchange = function(){ B.raceChoice.clan = this.value; render(); };
+  if ($("rcDemon")) $("rcDemon").onchange = function(){ B.raceChoice.demonPick = this.value; render(); };
   if ($("rcElem")) $("rcElem").onchange = function(){ B.raceChoice.element = this.value; render(); };
   $("inCanon").onchange = function(){ B.canon = this.checked; render(); };
 }
@@ -18027,7 +18099,12 @@ function classBlock(c, idx){
         var left = C.srcLeft["cls:" + c.id];
         body += ' <button class="small" data-goskills="cls:' + c.id + '">' + (left > 0 ? "Spend " + fmt(left) + " left" : "Edit") + "</button>";
       }
-      if (s.type === "special") body += '<div class="note">' + esc(s.summary || "") + "</div>";
+      if (s.type === "special") {
+        var dp = (c.picks || {})[s.level] || "";
+        body += ' <select data-cls="' + idx + '" data-pick="' + s.level + '"' + (owned ? "" : " disabled") + '><option value="">— discipline —</option>' +
+          SKILLS.filter(function(k){ return k.kind === "craft"; }).map(function(k){ return "<option" + (k.name === dp ? " selected" : "") + ">" + esc(k.name) + "</option>"; }).join("") + "</select>" +
+          '<div class="note">' + esc(s.summary || "") + "</div>";
+      }
     } else if (s.type === "heart" || s.type === "soul") {
       var p = (c.picks || {})[s.level] || "";
       body += ": +" + (s.amount || 1) + " " + '<select data-cls="' + idx + '" data-pick="' + s.level + '"' + (owned ? "" : " disabled") + '><option value="">— pick —</option>' +
@@ -18038,6 +18115,14 @@ function classBlock(c, idx){
       '<input type="checkbox" data-cls="' + idx + '" data-step="' + i + '"' + (owned ? " checked" : "") + (i === 0 || (!owned && !canBuy) ? " disabled" : "") + ">" +
       '<div class="body">' + body + "</div><span class=\"cost\">" + (cost ? cost + " EXP" : "free") + "</span></div>";
   });
+  var mom = (LC.masteryOnMastery || {})[c.id];
+  if (mom) {
+    var mp = (c.picks || {}).mastery || "";
+    h += '<div class="step' + (isMastered(c) ? " owned" : "") + '"><span class="lv">★</span><div class="body"><span class="nm">On mastery</span>: ' + esc(mom.text) + " " +
+      '<select data-cls="' + idx + '" data-pick="mastery"' + (isMastered(c) ? "" : " disabled") + '><option value="">— element —</option>' +
+      mom.options.map(function(o){ return "<option" + (o === mp ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>" +
+      (isMastered(c) && !mp ? ' <span class="warn small">pick one</span>' : "") + "</div></div>";
+  }
   return h + "</div>";
 }
 function abilityMeta(a){
@@ -18113,7 +18198,7 @@ function roadmap(){
   }
   B.order = items.map(function(x){ return x.key; });
   // running totals
-  var classExp = 0, btExp = 0, ipUsed = 0, btSeen = {}, human = raceIds().indexOf("human") >= 0 ? 100 : 0;
+  var classExp = 0, btExp = 0, ipUsed = 0, btSeen = {}, human = humanBonus();
   var startClass = C.exp.startClass, rows = [];
   items.forEach(function(x){
     var cost = 0, ip = 0, label = "", sub = "", tag = "";
@@ -18305,6 +18390,7 @@ function btPickHtml(r, b, i){
   if (g.mainStatChoice) h += sel("main", MAIN, "+1 main stat");
   if (g.subStatChoice) h += sel("sub", SUB, "+1 sub stat");
   if (r.options && r.options.list === "LC.divines") h += sel("divine", (LC.divines || []).map(function(d){ return d.name; }), "Divine");
+  if (g.extraDemonClan) h += sel("clan", ((RACES.demon || {}).options || { choices: [] }).choices.map(function(c){ return c.code; }).filter(function(c){ return c !== B.raceChoice.clan; }), "Extra clan");
   if (g.mastery === "CHOICE") h += sel("element", ["Fire","Water","Earth","Wind","Lightning","Frost","Arcane","Holy","Dark"], "Element");
   if (g.proficiency) h += '<div class="note">Pick the proficiency in the Proficiencies section.</div>';
   if (g.language === "CHOICE") {
@@ -18410,6 +18496,8 @@ function renderLive(){
   h += '<div class="kv"><span>Spirit Core</span><b>' + e.spiritCore.toLocaleString() + "</b></div>";
   h += '<div class="kv"><span>EXP earned since creation</span><input type="number" id="inExp" min="0" step="25" value="' + num(B.expEarned) + '"></div>';
   if (e.human) h += '<div class="note">Includes Human Ambition +100 EXP.</div>';
+  else if (B.race === "human" && hybrid()) h += '<div class="note">Human-Chimera hybrid: no Human Ambition +100 EXP.</div>';
+  if (hasBt("slow-starter")) h += '<div class="note">Slow Starter: you get double EXP until you\'ve received 500 (1,000 doubled). Enter the EXP you actually received (already doubled). Its -200 creation class EXP is applied.</div>';
   h += '<div class="kv"><span>IP left</span><b class="' + (C.ip.left < 0 ? "bad" : "") + '">' + C.ip.left + " / " + C.ip.total + "</b></div>";
   h += '<div class="kv"><span>IP earned since creation</span><input type="number" id="inIp" min="0" value="' + num(B.ipEarned) + '"></div>';
   h += '<div class="kv"><span>Clim left</span><b class="' + (C.clim.left < 0 ? "bad" : "") + '">' + C.clim.left.toLocaleString() + "</b></div>";
@@ -18494,8 +18582,11 @@ function renderAbil(){
     var list = Object.keys(x.abilities);
     if (x.id === "demon" && x.options) { // show base demon abilities + the chosen clan's only
       var clanAbs = x.options.choices.map(function(c){ return c.ability; });
-      var mine = (x.options.choices.filter(function(c){ return c.code === B.raceChoice.clan; })[0] || {}).ability;
-      list = list.filter(function(id){ return clanAbs.indexOf(id) < 0 || id === mine; });
+      var clans = demonClans(), mine = x.options.choices.filter(function(c){ return clans.indexOf(c.code) >= 0; }).map(function(c){ return c.ability; });
+      list = list.filter(function(id){ return clanAbs.indexOf(id) < 0 || mine.indexOf(id) >= 0; });
+    }
+    if (x.id === "human" && hybrid()) { // Human-Chimera hybrid loses Human Adaptability
+      list = list.filter(function(id){ return id !== "human-adaptability"; });
     }
     groups.push({ title: x.name + (x.kind === "subrace" ? " (sub-race)" : " (race)"), abs: list.map(function(id){ return x.abilities[id]; }) });
   });
@@ -18534,8 +18625,9 @@ function activeProfGrants(){
   var out = [], ids = raceIds();
   PROF.grants.forEach(function(g){
     var p = g.source.split(":"), t = p[0], id = p[1];
-    if (t === "race" && ids.indexOf(id) >= 0) out.push({ g: g, key: g.source, label: (RACES[id] || {}).name + " (race)" });
-    if (t === "clan" && B.race === "demon" && B.raceChoice.clan === id) out.push({ g: g, key: g.source, label: "Demon clan " + id });
+    if (t === "race" && ids.indexOf(id) >= 0 && !(id === "demon" && B.raceChoice.demonPick === "skill"))
+      out.push({ g: g, key: g.source, label: (RACES[id] || {}).name + " (race)" });
+    if (t === "clan" && demonClans().indexOf(id) >= 0) out.push({ g: g, key: g.source, label: "Demon clan " + id });
     if (t === "class") {
       B.classes.forEach(function(c){
         var rec = CLASSES[c.id]; if (c.id !== id || !rec) return;
@@ -18771,7 +18863,7 @@ function openDetail(spec){
       if (k === "item") { var e = B.items.filter(function(x){ return x.id === v; })[0]; if (e) e.qty++; else B.items.push({ id: v, qty: 1, equipped: false }); }
       if (k === "race") {
         var rr = RACES[v];
-        if (rr.kind === "subrace") { B.race = rr.parent; B.subrace = v; B.raceChoice.element = ""; }
+        if (rr.kind === "subrace") { if (subraceChoices().indexOf(v) < 0) B.race = rr.parent; B.subrace = v; B.raceChoice.element = ""; }
         else { B.race = v; B.subrace = ""; B.raceChoice = { clan: "", element: "", main: "", sub: "" }; }
       }
       render(); openDetail(detailNow);  // refresh the window so it shows the new state
@@ -18855,7 +18947,7 @@ function buildSummary(){
     B.classes.forEach(function(c){
       var rec = CLASSES[c.id]; if (!rec) return;
       var n = c.owned.filter(Boolean).length;
-      var picks = rec.steps.filter(function(st, i){ return c.owned[i] && (st.type === "heart" || st.type === "soul") && c.picks && c.picks[st.level]; })
+      var picks = rec.steps.filter(function(st, i){ return c.owned[i] && (st.type === "heart" || st.type === "soul" || st.type === "special") && c.picks && c.picks[st.level]; })
         .map(function(st){ return st.label + " " + c.picks[st.level]; });
       L.push("- " + rec.name + " (T" + rec.tier + ") " + (n === 8 ? "MASTERED" : n + "/8") + (picks.length ? " [" + picks.join(", ") + "]" : ""));
     });

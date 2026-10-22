@@ -83,3 +83,21 @@ LC.bonuses = [
   { source: "class:great-berserker", ability: "giant-strength", type: "note", text: "In Rage Stance: count as one size larger and +5 to Fitness checks." },
   { source: "class:magitechnician", ability: "advanced-artificing-key", type: "note", text: "The +1 Burden must be spent on an artifice." }
 ];
+
+// ---------------- Mystic Eyes ----------------
+// You normally have 2 Mystic Eye slots (the 8 Eyes breakthrough raises it to 8). Each of these classes'
+// key ability turns one of your eyes into a Mystic Eye ("One of your eyes becomes ..."), using a slot.
+LC.mysticEyes = {
+  baseSlots: 2,
+  classes: ["evil-eye", "faerie-light-eyes", "mystic-eyes-of-destruction", "mystic-eyes-of-domination",
+            "mystic-eyes-of-petrification", "shinigami-eyes", "wave-palm-style"]
+};
+
+// ---------------- Element mastery gained when you MASTER a class ----------------
+// (Key-ability masteries like Mage's Arcane are in classes.js grants.)
+LC.masteryOnMastery = {
+  "acolyte":  { text: "Elemental Mastery in your Divine's element (Holy if you follow only a human deity).",
+                options: ["Holy", "Astra", "Arcane", "Water", "Fire", "Physical", "Lightning", "Earth"] },
+  "sorcerer": { text: "Master one more element of your choice.",
+                options: ["Fire", "Water", "Earth", "Wind", "Lightning", "Frost", "Arcane", "Holy", "Dark"] }
+};

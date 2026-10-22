@@ -1513,22 +1513,25 @@ When the site version changes, recheck classes already entered.
 # PLANNER (planner.html)
 
 ## Planner - not done yet
+- [x] Mixed House (Demon): pick your extra clan; its ability, class unlock and proficiency apply.
 - [x] Roadmap view and build sharing (text summary + build code) added 2026-10-22.
 - [x] Ability bonuses are now added to the Combat numbers (classes.js grants + data/bonuses.js), with tap-to-see breakdowns and toggles for situational ones.
-- [ ] Race hybrids (Faerie-Chimera, 200 EXP, creation only) can't be picked yet.
+- [x] Race hybrids (Human-Chimera, Faerie-Chimera) work: take the breakthrough, then pick the other race's sub-race.
 - [x] Weapon/armor proficiencies are now tracked (data/proficiencies.js) and checked for class requirements and equipped armor.
-- [ ] Mystic Eye slots aren't tracked. Element masteries from class key abilities ARE tracked now; "extra element on mastering the class" (Acolyte, Sorcerer) is not.
+- [x] Mystic Eye slots tracked (2 normal, 8 with 8 Eyes; each eye class uses one). Element masteries tracked from class keys, Elemental Affinity, Ryujin, and Acolyte/Sorcerer on mastery.
+- [ ] Element mastery requirements still show "check" (not "locked") when no tracked source gives the element, in case a race ability or something untracked gives it.
+- [ ] Aeromancer's Wind Master grant (Wind Mastery) was missing from classes.js; added 2026-10-22 after re-checking the page.
 - [x] Canon campaign starting Clim: +1,000 on top of the normal 3,000 (confirmed by user 2026-10-21).
 - [ ] "Any tier 2 class mastered" is counted as tier 2 or higher. Confirm whether a tier 3 mastery counts.
-- [ ] Transmuter/Alkahest "Transmuter points" are shown as text only, not tracked as a pool.
-- [ ] Slow Starter's 2x EXP after creation isn't applied (only its -200 starting class EXP is).
+- [x] Transmuter/Alkahest: pick the crafting discipline for your Transmuter points on the class step.
+- [x] Slow Starter: -200 creation class EXP applied; enter EXP already doubled (note shown in Pools).
 
 ## Proficiencies (data/proficiencies.js)
 - [ ] Which groups count as "common" vs "specialized" comes from the rulebook's weapon list (Thrown, Set of Missiles, Bow, Crossbow, Musket, Sling are treated as common ranged). Confirm Musket isn't specialized.
 - [ ] "Basic weapon" (Alchemist, Transmuter, Magitechnician) is treated as the same thing as "common weapon".
 - [ ] "Any melee weapon" requirements count common melee, artisan weapons, Lances, Whips, Gauntlets, Saboteur daggers and Staves. Unarmed proficiency is not counted.
 - [ ] "Smithing weapon" (Blacksmith, Forgemaster) = weapon groups crafted with Blacksmithing in items.js.
-- [ ] Demon: the race page offers a common weapon proficiency OR +5 clan skill points. The planner shows the weapon pick; the +5 skill point option isn't a skill source yet.
+- [x] Demon: choose weapon proficiency OR +5 clan skill points in Identity. The page doesn't say which skill each clan uses, so any normal skill is allowed.
 - [ ] Non-proficient armor/shield penalty: the planner warns but doesn't change the numbers (exact penalty wording to confirm in the rulebook).
 
 ## Keywords (data/keywords.js)

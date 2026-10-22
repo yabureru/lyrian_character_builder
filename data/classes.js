@@ -361,6 +361,7 @@ CL("aeromancer", {
       name: "Wind Master", kind: "key",
       cost: null, range: null, keywords: [], requires: null,
       grantsAbility: "glide",
+      grants: { mastery: "Wind" },
       refund: { overlapsWith: ["Windbringer", "Zephyr Warder"], amount: "MISSING",
                 note: "Page says a refund is possible and that Windbringer and Zephyr Warder also grant this. Amount not captured." },
       summary: [
