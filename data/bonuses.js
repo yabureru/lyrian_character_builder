@@ -16,6 +16,8 @@
 //   type    - "always", "toggle" or "note"
 //   mods    - numbers to add: hp, mana, ap, rp, guard, block, evasion, dodge, init, speed, burden,
 //             Power, Focus, Agility, Toughness, Fitness, Cunning, Reason, Awareness, Presence
+//   replaces - "<source>/<ability>" of another bonus this one takes the place of (it is hidden while this applies)
+//   set     - numbers that are REPLACED, not added (e.g. { guard: 0 } = Guard becomes 0)
 //   baseSpeed / walkSpeed - replaces the normal 20ft base speed
 //   expertise - flat expertise bonus { skill, name, amount }
 //   text    - what to show (own words)
@@ -51,8 +53,20 @@ LC.bonuses = [
     text: "Divine Release: +5 speed and flight, +1 AP at the start of your turn, Block gives +5 more Guard. Upkeep 11 HP (16 at or below 0 HP)." },
   { source: "race:nio", ability: "statue-form", type: "toggle", mods: { guard: 5 },
     text: "Statue Form: +5 Guard; Block is your only action." },
+  { source: "race:cait-sith", ability: "cat-form", type: "toggle", mods: { evasion: 3, dodge: 6 }, set: { guard: 0 },
+    text: "Cat Form: Guard becomes 0, +3 Evasion, +6 Dodge, size Tiny; only Light Melee Attacks." },
   { source: "race:cu-sith", ability: "dog-form", type: "toggle", mods: { guard: -2, block: -4, evasion: 1, dodge: 1 },
     text: "Dog Form: -2 Guard, -4 Block, +1 Size bonus to Evasion and Dodge; melee unarmed attacks only." },
+
+  // ---------------- Breakthroughs: always on ----------------
+  { source: "bt:mystic-eyes-of-faerie-light-fae", ability: "", type: "always", expertise: { skill: "Perception", name: "Spot illusions", amount: 10 },
+    text: "Mystic Eyes of Faerie Light: +10 to Perception checks to tell if something is an illusion (not immune)." },
+  { source: "bt:bully", ability: "", type: "note", text: "Bully: +5 to Intimidation checks against targets with lower Fitness than you." },
+
+  // ---------------- Breakthroughs: toggles ----------------
+  { source: "bt:small-doggy-cu-sith", ability: "dog-form", type: "toggle", replaces: "race:cu-sith/dog-form",
+    mods: { guard: -4, block: -8, evasion: 2, dodge: 2 },
+    text: "Dog Form with Small Doggy: -4 Guard, -8 Block, +2 Size bonus to Evasion and Dodge (replaces the normal Dog Form numbers)." },
 
   // ---------------- Classes: toggles ----------------
   { source: "class:adventurer", ability: "steel-aura", type: "toggle", mods: { guard: 3 },

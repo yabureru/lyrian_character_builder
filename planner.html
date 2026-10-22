@@ -433,7 +433,9 @@ function activeBonuses(C){
     var key = b.source + "/" + (b.ability || "");
     out.push({ b: b, key: key, on: b.type === "always" || (b.type === "toggle" && !!(B.toggles || {})[key]) });
   });
-  return out;
+  // a bonus with "replaces" (e.g. Small Doggy's bigger Dog Form) hides the one it replaces
+  var gone = {}; out.forEach(function(x){ if (x.b.replaces) gone[x.b.replaces] = true; });
+  return out.filter(function(x){ return !gone[x.key]; });
 }
 
 function calc(){
@@ -531,6 +533,13 @@ function calc(){
   var canonClim = B.canon ? 1000 : 0;  // canon campaign: +1000 starting Clim
   C.clim = { start: num(B.startClim), added: num(B.climAdded), bonus: richClim, canon: canonClim, spent: climSpent, unknown: unknownCost };
   C.clim.left = C.clim.start + C.clim.added + C.clim.bonus + C.clim.canon - climSpent;
+  // Kit Expert breakthrough: one kit costs 2 less Burden. The planner uses your heaviest kit.
+  C.kitExpert = null;
+  if (hasBt("kit-expert")) {
+    var bestKit = null;
+    B.items.forEach(function(e){ var it = ITEMS[e.id]; if (it && it.tag === "Kit" && (!bestKit || itemBurden(it) > itemBurden(bestKit))) bestKit = it; });
+    if (bestKit) { var cut = Math.min(2, itemBurden(bestKit)); burden -= cut; C.kitExpert = { name: bestKit.name, cut: cut }; }
+  }
   C.burden = burden;
   if (unknownCost.length) C.warn.push("Price not a plain number, not counted: " + unknownCost.join(", "));
   if (C.clim.left < 0) C.warn.push("You're " + (-C.clim.left).toLocaleString() + " Clim over budget.");
@@ -616,6 +625,11 @@ function calcDerived(C){
   C.bon.forEach(function(x){
     if (!x.on || !x.b.mods) return;
     for (var k in x.b.mods) if (map[k]) P(map[k], bonusLabel(x) + (x.b.type === "toggle" ? " (toggle)" : ""), x.b.mods[k]);
+  });
+  // "set" bonuses replace a number outright (e.g. Cat Form: Guard becomes 0). Done last so they win.
+  C.bon.forEach(function(x){
+    if (!x.on || !x.b.set) return;
+    for (var k in x.b.set) if (map[k]) P(map[k], bonusLabel(x) + " (sets it to " + x.b.set[k] + ")", x.b.set[k] - sum(map[k]));
   });
 
   C.parts = parts;
@@ -1539,7 +1553,8 @@ function renderLive(){
     if (need && !C.profs[need]) eq += ' <span class="tag bad" title="You are not proficient with ' + esc(need) + '">not proficient</span>';
     h += '<div class="kv"><span>' + esc(it.name) + " " + eq + '</span><span class="pm"><button class="small" data-q="' + i + '" data-d="-1">−</button><b>' + e.qty + '</b><button class="small" data-q="' + i + '" data-d="1">+</button></span></div>';
   });
-  h += '<div class="kv"><span>Burden</span><b class="bdv ' + (C.burden > C.d.burdenMax ? "bad" : "") + '" data-bd="burden" data-bdlabel="Burden limit">' + C.burden + " / " + C.d.burdenMax + "</b></div></div>";
+  h += '<div class="kv"><span>Burden</span><b class="bdv ' + (C.burden > C.d.burdenMax ? "bad" : "") + '" data-bd="burden" data-bdlabel="Burden limit">' + C.burden + " / " + C.d.burdenMax + "</b></div>" +
+    (C.kitExpert ? '<div class="small">Kit Expert: ' + esc(C.kitExpert.name) + " counts " + C.kitExpert.cut + " less Burden.</div>" : "") + "</div>";
   $("paneLive").innerHTML = h;
 
   function bindNum(id, key){ $(id).onchange = function(){ B[key] = num(this.value); render(); }; }
