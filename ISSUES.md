@@ -7,7 +7,7 @@ Site version when data was collected: **0.13.2** (shown at the bottom of every c
 When the site version changes, recheck classes already entered.
 
 ## General
-- [ ] **Data source:** lyrian.splatpass.net is an unofficial static copy (found by Grok), not the official site. The official site is https://rpg.angelssword.com/ (a JavaScript app that can't be read by page fetch). All data was checked against the static copy (v0.13.2), so spot-check against the official site when you can.
+- [x] **Data source:** lyrian.splatpass.net is an unofficial static copy (found by Grok). The official site https://rpg.angelssword.com/ is readable through the browser extension (2026-10-22): it is the same version (0.13.2) with the same 185 classes. It fills in five class steps the copy left blank (Botanist 8, Jonin 4, Ninja 8, Shadowbringer 2, Warding Mage 4 - now set), and it lists all 206 items.
 
 - [ ] **Rules text is own-words summaries, not official wording.** My page tools won't copy the
       site's rules text word for word, so every ability's `summary` is written in plain English.
@@ -1483,12 +1483,13 @@ When the site version changes, recheck classes already entered.
 # ITEMS (data/items.js)
 
 ## Items - General
-- [ ] The site says 206 items, but only 155 are in items.js. The static items list page stops partway (its text is cut off by the site itself), and its Type filters/sort only work with JavaScript, so the rest can't be listed from here. 155 were found from the list plus guessed page addresses.
-- [ ] The visible list was not a complete A-to-P run either (e.g. Hori, Pickaxe, Sickle, Shielding/Speed Potion, Smoke Flask were all missing from it), so the ~51 missing items could be anywhere in the alphabet.
-- [ ] **Easiest fix:** on the site's Items page, use the Type filter (Adventuring Essentials, Alchemy, Artifice, Astra Relic, Crafting, Divine Arms, Equipment, Mount, Talisman) and screenshot each filtered list. Then I can fetch each page directly.
-- [ ] Types with almost nothing found so far: Astra Relic (0), Divine Arms (1: Ghostblade), Talisman (1: Locking Seal), Mount (8).
-- [ ] Addresses tried that don't exist (so the item has another name or isn't on the site): greatshield, great-shield, greatshield-two-handed, tower-shield, sling, sling-one-handed, sling-two-handed, thrown-weapon(-one-handed), throwing-weapon(s)-one-handed, magic-staff-two-handed, large-shell, mana-potion, superior-healing-potion, tent, glittershards, glittershard-flask, sleeping-poison, toad/owl/snake/spider/troll/lion/gorilla/ox/fox/raven/tiger/wolf-elixir, smithing-kit.
-- [ ] Rulebook lists a Greatshield, a Sling and Thrown weapons, but their item pages weren't found. Needed for the planner's weapon/shield choices.
+- [x] All 206 items are now in items.js (2026-10-22). The 51 that the static copy couldn't list were read from the OFFICIAL site (rpg.angelssword.com, v0.13.2) through the browser; their records link to the official pages.
+- [x] Found the Greatshield ("Shield (Great)"), Shepherd's Sling, Thrown (One/Two-Handed), Wand (Two-Handed), Pickaxe and Smith's Hammer (Two-Handed). Greatshield now works in the planner (+1 Guard, +8 Block while blocking, -1 Initiative, -2 Evasion/Dodge).
+- [x] The four "Universal ... Mods" pages are mod lists, not items: shown for reference in the item list (no Buy button), with A/B/C/Frame/Alloy/Flamellon mods in the details.
+- [x] Relics (Polaris Pair, Timeworn Katana) have no price; the planner counts them as 0 Clim instead of warning.
+- [ ] The official site is v0.13.2, the same version as the static copy, so the older 155 records still match it. Its homepage says "181 classes" but its class list shows 185 - the same 185 the planner has.
+- [ ] Shell Converter is tagged "Basic" on the site but says it "counts as a kit for Burden"; the planner tags it Kit so Kit Expert can use it.
+- [ ] Shepherd's Sling: A mods say "Soon" (none yet). Timeworn Katana: page doesn't say one- or two-handed (treated as one-handed).
 - [ ] The rulebook calls the staff a "Magic Staff"; the site's item pages are "Staff (One-Handed)" and "Staff (Two-Handed)".
 
 ## Items - specific

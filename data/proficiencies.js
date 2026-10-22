@@ -65,13 +65,14 @@ LC.itemGroupMap = {
   "Katanas": "Katanas", "Light Swords": "Light Swords", "Longswords": "Longswords", "Muskets": "Muskets",
   "Pistols": "Pistols", "Polearms": "Polearms", "Saboteur Thread Daggers": "Saboteur Thread Daggers",
   "Scythes": "Scythes", "Shotguns": "Shotguns", "Small Weapons": "Small Weapons", "Sniper Rifles": "Sniper Rifles",
-  "Staves": "Staves", "Thrown (Missiles)": "Sets of Missiles", "Twinblades": "Twinblades", "Wands": "Wands", "Whips": "Whips"
+  "Slings": "Slings", "Staves": "Staves", "Thrown Weapons": "Thrown Weapons", "Thrown (Missiles)": "Sets of Missiles", "Twinblades": "Twinblades", "Wands": "Wands", "Whips": "Whips"
 };
 // Some items are their own proficiency (by item id).
 LC.itemProfById = {
   "lance-one-handed": "Lances", "pickaxe-one-handed": "Pickaxes", "sickle": "Sickles", "hori": "Hori",
   "smiths-hammer-one-handed": "Smith's Hammers", "armor-light": "Light Armor", "armor-medium": "Medium Armor",
-  "armor-heavy": "Heavy Armor", "shield": "Shields"
+  "armor-heavy": "Heavy Armor", "shield": "Shields",
+  "shield-great": "Greatshields", "pickaxe-two-handed": "Pickaxes", "smiths-hammer-two-handed": "Smith's Hammers"
 };
 
 (function(){

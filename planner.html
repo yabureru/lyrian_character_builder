@@ -431,7 +431,7 @@ function btCostAt(id, nth){ // nth = 0 for the first time you take it
   return num(r.cost);
 }
 
-function itemCost(it){ return typeof it.cost === "number" ? it.cost : null; }
+function itemCost(it){ return typeof it.cost === "number" ? it.cost : (it.cost === null || it.cost === undefined) ? 0 : null; } // no price (relics etc.) = 0
 function itemBurden(it){ return typeof it.burden === "number" ? it.burden : 0; }
 
 // Every class ability you own: bought steps, plus abilities those grant (e.g. Rogue's Journey -> Feint).
@@ -613,6 +613,11 @@ function calcDerived(C){
       var sv = num(String(it.armor.block).replace("+", ""));
       P("blockGuard", it.name + " (shield, while Blocking)", sv);
       if (noProf) P("blockGuard", it.name + " not proficient", -1);
+      // Greatshields also give Guard all the time, and lower Initiative/Evasion/Dodge
+      if (num(it.armor.guard)) { P("guard", it.name, num(it.armor.guard)); if (noProf) P("guard", it.name + " not proficient", -1); }
+      if (num(it.armor.evasion)) P("evasion", it.name, num(it.armor.evasion));
+      if (num(it.armor.dodge)) P("dodge", it.name, num(it.armor.dodge));
+      if (num(it.armor.initiative)) P("init", it.name, num(it.armor.initiative));
       return;
     }
     if (num(it.armor.guard)) P("guard", it.name, num(it.armor.guard));
@@ -1502,12 +1507,14 @@ function itemDetail(it){
   if (it.crafting) bits.push("Crafting: " + [it.crafting.points, it.crafting.discipline, it.crafting.materials].filter(function(x){ return x !== undefined && x !== null; }).join(" · "));
   var h = '<div class="small dim">' + bits.map(esc).join("<br>") + "</div>" + listHtml(it.summary);
   if (it.mods) {
-    ["A", "B", "Frame"].forEach(function(t){
+    ["A", "B", "C", "Frame", "Alloy", "Flamellon"].forEach(function(t){
       if (it.mods[t] && it.mods[t].length) h += '<div class="small"><b>' + t + " mods:</b> " +
         it.mods[t].map(function(x){ return esc(x.name) + " (" + x.points + ") — " + esc(x.summary); }).join("<br>") + "</div>";
     });
+    if (it.mods.note) h += '<div class="small dim">' + esc(it.mods.note) + "</div>";
   }
-  return h + '<div class="small"><a href="' + esc(it.url) + '" target="_blank" rel="noopener">View on static copy (unofficial)</a></div>';
+  var official = /angelssword\.com/.test(it.url || "");
+  return h + '<div class="small"><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + (official ? "View on the official site" : "View on static copy (unofficial)") + "</a></div>";
 }
 function drawItemList(){
   var q = ui.itemSearch.trim().toLowerCase(), h = "";
@@ -1516,8 +1523,9 @@ function drawItemList(){
     if (q && (it.name + " " + it.tag + " " + (it.summary || []).join(" ")).toLowerCase().indexOf(q) < 0) return;
     var c = itemCost(it);
     h += '<div class="li"><div class="top"><span class="name" data-info="item:' + it.id + '">' + esc(it.name) + '</span><span class="tag">' + esc(it.category) + (it.tag && it.tag !== it.category ? " · " + esc(it.tag) : "") + "</span>" +
-      '<span class="grow"></span><span class="dim small">' + (c !== null ? c.toLocaleString() + " Clim" : esc(it.cost)) + " · burden " + esc(it.burden == null ? "?" : it.burden) + "</span>" +
-      ' <button class="small" data-buy="' + it.id + '">Buy</button></div><details><summary>Details</summary>' + itemDetail(it) + "</details></div>";
+      '<span class="grow"></span>' + (it.reference ? '<span class="dim small">mod list (reference)</span>' :
+      '<span class="dim small">' + (c !== null ? c.toLocaleString() + " Clim" : esc(it.cost == null ? "no price" : it.cost)) + " · burden " + esc(it.burden == null ? "?" : it.burden) + "</span>" +
+      ' <button class="small" data-buy="' + it.id + '">Buy</button>') + '</div><details><summary>Details</summary>' + itemDetail(it) + "</details></div>";
   });
   $("itList").innerHTML = h || '<div class="li dim">No matches.</div>';
   document.querySelectorAll("[data-buy]").forEach(function(b){

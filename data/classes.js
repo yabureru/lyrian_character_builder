@@ -2512,7 +2512,7 @@ CL("botanist", {
     { level: 5, type: "heart",    label: "Heart", amount: 1, options: ["Fitness", "Reason", "Awareness"] },
     { level: 6, type: "ability",  label: "Ability 3",            ability: "stalks-of-comparison" },
     { level: 7, type: "soul",     label: "Soul",  amount: 1, options: ["Focus", "Toughness", "Agility"] },
-    { level: 8, type: "ultimate", label: "Ultimate ability",     ability: null, missing: "MISSING - Level 8 is blank on the site" }
+    { level: 8, type: "ultimate", label: "Ultimate ability",     ability: "foragers-eye", sourceNote: "Step confirmed on the official site (rpg.angelssword.com) 2026-10-22; blank on the static copy." }
   ],
   abilities: {
     "botany-study": {
@@ -2547,8 +2547,8 @@ CL("botanist", {
       summary: [ "Make a gathering check toward Node Points or Lucky Points. If the raw roll beats your previous roll this session, add a bonus equal to your Foraging skill (max +10)." ]
     },
     "foragers-eye": {
-      name: "Forager's Eye", kind: "unlisted",
-      note: "Listed under Abilities unlocked but NOT in the progression - how it's gained is unknown.",
+      name: "Forager's Eye", kind: "ultimate",
+      note: "Confirmed as this class's step on the official site (2026-10-22); the static copy left the step blank.",
       cost: "1 AP", range: "120ft", keywords: ["Combo"],
       requires: "Can see or hear the target category.",
       summary: [
@@ -6689,7 +6689,7 @@ CL("jonin", {
     { level: 3, type: "skills",   label: "Skills", points: 5, expertiseTrade: true,
       options: ["Athletics", "Stealth", "Deception", "Roguecraft", "Perception", "Insight", "Negotiation", "Intimidation", "Common Knowledge"],
       summary: "+5 skill points among the listed skills. Any point can be traded for 2 expertise points, spent in those same skills." },
-    { level: 4, type: "ability",  label: "Ability 2",            ability: null, missing: "MISSING - Level 4 is blank on the site (En-dama is listed under abilities and may belong here)" },
+    { level: 4, type: "ability",  label: "Ability 2",            ability: "en-dama", sourceNote: "Step confirmed on the official site (rpg.angelssword.com) 2026-10-22; blank on the static copy." },
     { level: 5, type: "heart",    label: "Heart", amount: 1, options: ["Cunning"] },
     { level: 6, type: "ability",  label: "Ability 3",            ability: "kage-bunshin-kyomei" },
     { level: 7, type: "soul",     label: "Soul",  amount: 1, options: ["Focus", "Power", "Agility"] },
@@ -6718,8 +6718,8 @@ CL("jonin", {
       summary: [ "Light attack against the target." ]
     },
     "en-dama": {
-      name: "En-dama", kind: "unlisted",
-      note: "Listed under Abilities unlocked, but the Level 4 step is blank - probably the Level 4 ability. Confirm.",
+      name: "En-dama", kind: "ability",
+      note: "Confirmed as this class's step on the official site (2026-10-22); the static copy left the step blank.",
       cost: "2 AP, 1 MP", range: "5ft", keywords: ["Hiding", "Stealth"], requires: null,
       summary: [
         "Throw a smoke bomb in range: blocks line of sight in a 5ft radius (15x15 total). Creatures inside or within 5ft can only see 5ft into or out of it. If you're inside when it's thrown, you gain Hiding from anyone you have cover or concealment from.",
@@ -8358,7 +8358,7 @@ CL("ninja", {
     { level: 5, type: "heart",    label: "Heart", amount: 1, options: ["Cunning"] },
     { level: 6, type: "ability",  label: "Ability 3",            ability: "bunshin-tai-no-jutsu" },
     { level: 7, type: "soul",     label: "Soul",  amount: 1, options: ["Focus", "Agility"] },
-    { level: 8, type: "ultimate", label: "Ultimate ability",     ability: null, missing: "MISSING - Level 8 is blank on the site (Kage Shuriken no Jutsu is listed under abilities and may belong here)" }
+    { level: 8, type: "ultimate", label: "Ultimate ability",     ability: "kage-shuriken-no-jutsu", sourceNote: "Step confirmed on the official site (rpg.angelssword.com) 2026-10-22; blank on the static copy." }
   ],
   abilities: {
     "ninja-style": {
@@ -8397,8 +8397,8 @@ CL("ninja", {
       ]
     },
     "kage-shuriken-no-jutsu": {
-      name: "Kage Shuriken no Jutsu", kind: "unlisted",
-      note: "Listed under Abilities unlocked, but the Level 8 step is blank - probably the Level 8 ability. Confirm.",
+      name: "Kage Shuriken no Jutsu", kind: "ultimate",
+      note: "Confirmed as this class's step on the official site (2026-10-22); the static copy left the step blank.",
       cost: "2 AP", range: "Weapon Range", keywords: ["Ninjutsu"],
       requires: "Set of Missiles, Throwing Weapon, or a Thrown attack with a small weapon only.",
       summary: [ "Throw two weapons at one target, each a Light Attack. If the first accuracy roll fails, the second gains Sure Hit." ]
@@ -9745,8 +9745,8 @@ CL("shadowbringer", {
   requires: "Shadow Thief mastered.",
   steps: [
     { level: 1, type: "key",      label: "Unlock - Key ability", ability: "shared-darkness" },
-    { level: 2, type: "ability",  label: "Ability 1",            ability: null,
-      missing: "MISSING - page shows 'Ability 1' with no ability named. Hide in Shadows is listed under abilities but not tied to a step (likely this slot - unconfirmed)." },
+    { level: 2, type: "ability",  label: "Ability 1",            ability: "hide-in-shadows",
+     sourceNote: "Step confirmed on the official site (rpg.angelssword.com) 2026-10-22; blank on the static copy." },
     { level: 3, type: "skills",   label: "Skills", points: 5, expertiseTrade: true,
       options: ["Athletics", "Stealth", "Deception", "Roguecraft", "Perception", "Insight", "Intimidation", "Common Knowledge"],
       summary: "+5 skill points among the listed skills. Any point can be traded for 2 expertise points, spent in those same skills." },
@@ -9773,9 +9773,9 @@ CL("shadowbringer", {
       summary: [ "Share your darkvision with a touched ally until the encounter ends (see up to 60ft in darkness)." ]
     },
     "hide-in-shadows": {
-      name: "Hide in Shadows", kind: "unlisted",
+      name: "Hide in Shadows", kind: "ability",
       cost: "2 AP, 2 MP", range: "40ft", keywords: ["Teleport", "Full Pierce", "Stealth"], requires: "Must be day.",
-      note: "Listed under abilities but not tied to a progression step (Level 2 is blank).",
+      note: "Confirmed as this class's step on the official site (2026-10-22); the static copy left the step blank.",
       summary: [
         "Jump into a target's shadow. If you were hidden you stay hidden; otherwise enemies may attack the shadow as if it were you. Taking damage forces you out.",
         "While inside you move with the target (including teleports) and can only exit. Exit for 0 RP; if you were hidden, your next basic attack on that target gains Full Pierce."
@@ -12036,8 +12036,8 @@ CL("warding-mage", {
     { level: 3, type: "skills",   label: "Skills", points: 5, expertiseTrade: true,
       options: ["Stealth", "Magic", "Perception", "Insight", "Common Knowledge"],
       summary: "+5 skill points in Stealth, Magic, Perception or Insight, or Common Knowledge. Any point can be traded for 2 expertise points, spent in those same skills." },
-    { level: 4, type: "ability",  label: "Ability 2",            ability: null,
-      missing: "MISSING - page shows Level 4 'Ability 2' with no ability named. Hidden Wards is listed under abilities but not tied to a step (likely this slot - unconfirmed)." },
+    { level: 4, type: "ability",  label: "Ability 2",            ability: "hidden-wards",
+     sourceNote: "Step confirmed on the official site (rpg.angelssword.com) 2026-10-22; blank on the static copy." },
     { level: 5, type: "heart",    label: "Heart", amount: 1, options: ["Cunning", "Reason", "Awareness"] },
     { level: 6, type: "ability",  label: "Ability 3",            ability: "explosive-ward" },
     { level: 7, type: "soul",     label: "Soul",  amount: 1, options: ["Focus", "Power", "Agility", "Toughness"] },
@@ -12061,9 +12061,9 @@ CL("warding-mage", {
       ]
     },
     "hidden-wards": {
-      name: "Hidden Wards", kind: "unlisted",
+      name: "Hidden Wards", kind: "ability",
       cost: "No listed cost", range: "-", keywords: [], requires: null,
-      note: "Listed under abilities but not tied to a progression step (Level 4 is blank).",
+      note: "Confirmed as this class's step on the official site (2026-10-22); the static copy left the step blank.",
       summary: [ "When casting a Bounded Field you can hide it with a Stealth check (the ward uses that result). Sense Magic can't see it without a successful Perception or Insight check." ]
     },
     "explosive-ward": {
