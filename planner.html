@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lyrian Chronicles Planner</title>
+<!--
+  Lyrian Chronicles Character Planner (offline). Open license, community tool.
+  HOW IT WORKS
+  - Keep this file next to the "data" folder. Open it in any browser (double-click). No internet needed.
+  - All game data lives in data/*.js. Update those files when the game updates; this page reads them.
+  - Your build saves automatically in this browser. Use Save to download a .json copy, Load to open one.
+-->
+<style>
+:root{
+  --bg:#1b1d22; --panel:#252830; --panel2:#2d3039; --line:#3a3e49; --text:#e6e3db; --dim:#9da1ab;
+  --gold:#c9a24a; --gold2:#e2c072; --good:#6fbf73; --bad:#e06c5e; --warn:#e0b24e; --blue:#79a8d8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer}
+button:hover:not(:disabled){border-color:var(--gold)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.gold{background:var(--gold);color:#1b1d22;border-color:var(--gold);font-weight:600}
+button.small{padding:1px 7px;font-size:12px}
+button.danger{border-color:#6b3a35}
+input[type=text],input[type=number],input[type=search],select{background:#1f2128;border:1px solid var(--line);border-radius:6px;padding:4px 7px}
+input[type=number]{width:80px}
+input:focus,select:focus{outline:1px solid var(--gold)}
+h1{font-size:18px;margin:0;color:var(--gold2);letter-spacing:.5px}
+h2{font-size:15px;margin:0 0 10px;color:var(--gold2);text-transform:uppercase;letter-spacing:1px}
+h3{font-size:14px;margin:12px 0 6px;color:var(--gold)}
+a{color:var(--blue)}
+.dim{color:var(--dim)} .good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+.small{font-size:12px}
+
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);background:#16181c;position:sticky;top:0;z-index:5}
+header .spacer{flex:1}
+header .reset{margin-left:18px}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px 360px;gap:14px;padding:14px 16px;align-items:start}
+.pane{position:sticky;top:62px;max-height:calc(100vh - 76px);overflow:auto}
+@media (max-width:1250px){.layout{grid-template-columns:minmax(0,1fr) 300px}.pane.abil{grid-column:1 / -1;position:static;max-height:none}}
+@media (max-width:820px){.layout{grid-template-columns:minmax(0,1fr);padding:10px}.pane{position:static;max-height:none}header{position:static}}
+.scrollx{overflow-x:auto;max-width:100%}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:820px){.row2{grid-template-columns:1fr}}
+.field{display:flex;align-items:center;gap:8px;margin:5px 0}
+.field label{min-width:92px;color:var(--dim)}
+.field select,.field input[type=text]{flex:1;min-width:0}
+.note{font-size:12px;color:var(--dim);margin:4px 0}
+.tag{display:inline-block;font-size:11px;padding:0 6px;border-radius:9px;border:1px solid var(--line);color:var(--dim);margin-left:4px;white-space:nowrap}
+.tag.gold{border-color:var(--gold);color:var(--gold2)}
+.tag.bad{border-color:#6b3a35;color:var(--bad)}
+.tag.warn{border-color:#6b5a30;color:var(--warn)}
+.tag.good{border-color:#365e38;color:var(--good)}
+
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:3px 6px;border-bottom:1px solid #30333c;vertical-align:top}
+th{color:var(--dim);font-weight:500;font-size:12px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+
+.statgrid td:first-child{width:90px}
+.statgrid select{width:58px}
+.final{font-weight:700;color:var(--gold2);font-size:15px}
+
+.list{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.li{padding:7px 9px;border-bottom:1px solid #30333c}
+.li:last-child{border-bottom:none}
+.li .top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.li .name{font-weight:600}
+.li .grow{flex:1}
+.li details{margin-top:4px}
+.li summary{cursor:pointer;color:var(--dim);font-size:12px}
+.li ul{margin:4px 0 0 0;padding-left:18px}
+.li.locked .name{color:var(--dim)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.toolbar input[type=search]{flex:1;min-width:160px}
+
+.cls{border:1px solid var(--line);border-radius:8px;margin-bottom:10px;background:var(--panel2)}
+.cls .head{display:flex;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.cls .head .name{font-weight:700;color:var(--gold2)}
+.step{display:flex;gap:8px;align-items:flex-start;padding:5px 10px;border-bottom:1px solid #383c47}
+.step:last-child{border-bottom:none}
+.step .lv{width:22px;color:var(--dim);text-align:right}
+.step .body{flex:1}
+.step .cost{color:var(--dim);font-size:12px;white-space:nowrap}
+.step.owned .body .nm{color:var(--text)}
+.step:not(.owned) .body{color:var(--dim)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{border:1px solid var(--line);border-radius:14px;padding:3px 10px;cursor:pointer;background:#1f2128;font-size:12px}
+.chip.on{border-color:var(--gold);color:var(--gold2)}
+.chip .left{font-weight:700;margin-left:4px}
+.chip.alert{box-shadow:0 0 0 1px var(--warn) inset}
+.pm{display:inline-flex;gap:3px}
+tr.off td{color:#6c707a}
+tr.can td:first-child{color:var(--gold2)}
+
+.pane .card{padding:12px}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px dashed #33363f}
+.kv:last-child{border-bottom:none}
+.kv b{font-variant-numeric:tabular-nums}
+.big{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.big div{background:#1f2128;border:1px solid var(--line);border-radius:8px;padding:5px;text-align:center}
+.big b{display:block;font-size:18px;color:var(--gold2)}
+.big span{font-size:11px;color:var(--dim)}
+.inv .kv{align-items:center}
+
+.ab{border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin-bottom:7px;background:var(--panel2)}
+.ab .t{font-weight:600}
+.ab .meta{font-size:12px;color:var(--dim)}
+.ab ul{margin:4px 0 0;padding-left:18px}
+.ab .src{font-size:11px;color:var(--gold)}
+.warnbox{border:1px solid #6b5a30;background:#2c2717;color:var(--warn);border-radius:8px;padding:6px 9px;font-size:12px;margin:6px 0}
+.tag.kw{border-color:#4a5468;color:#b9c3d6;cursor:help}
+.tag.kw:hover{border-color:var(--gold);color:var(--gold2)}
+header .hlink{font-size:13px;color:var(--blue);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:3px 9px}
+header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
+[data-info]{cursor:pointer}
+.name[data-info]:hover{color:var(--gold2);text-decoration:underline}
+.ibtn{padding:1px 8px;font-size:13px;line-height:1.3}
+#detail{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.55);display:none;align-items:flex-start;justify-content:center;padding:40px 16px}
+#detail.open{display:flex}
+#detail .box{background:var(--panel);border:1px solid var(--gold);border-radius:12px;width:100%;max-width:720px;max-height:calc(100vh - 80px);display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+#detail .dh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
+#detail .dh .t{font-size:17px;font-weight:700;color:var(--gold2)}
+#detail .db{padding:12px 14px;overflow:auto}
+#detail .df{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line)}
+#detail .stp{border-left:2px solid var(--line);padding:4px 0 6px 10px;margin:6px 0}
+#detail .stp .lbl{font-size:12px;color:var(--dim)}
+@media (max-width:820px){#detail{padding:0}#detail .box{max-height:100vh;height:100vh;border-radius:0;max-width:none}}
+#kwPop{position:fixed;z-index:40;max-width:320px;background:#16181c;border:1px solid var(--gold);border-radius:8px;padding:8px 10px;
+  font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.5);display:none}
+#kwPop b{color:var(--gold2)}
+#kwPop ul{margin:4px 0 0;padding-left:18px}
+.errbox{border:1px solid #6b3a35;background:#2c1b19;color:var(--bad);border-radius:8px;padding:6px 9px;font-size:12px;margin:6px 0}
+</style>
+
+<!-- Game data (edit these files, not this page, when the game updates) -->
+<script src="data/classes.js"></script>
+<script src="data/races.js"></script>
+<script src="data/breakthroughs.js"></script>
+<script src="data/requirements.js"></script>
+<script src="data/items.js"></script>
+<script src="data/keywords.js"></script>
+<script src="data/proficiencies.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>Lyrian Chronicles Planner</h1>
+  <span id="hdrName" class="dim"></span>
+  <a class="hlink" href="https://rpg.angelssword.com/" target="_blank" rel="noopener">Official site</a>
+  <a class="hlink" href="https://lyrian.splatpass.net/" target="_blank" rel="noopener" title="Unofficial static copy of the rules. The planner's data was checked against it (v0.13.2).">Static copy (unofficial)</a>
+  <span class="spacer"></span>
+  <span id="dataVer" class="dim small"></span>
+  <button id="btnSave" class="gold">Save</button>
+  <button id="btnLoad">Load</button>
+  <input id="fileLoad" type="file" accept=".json,application/json" hidden>
+  <button id="btnReset" class="reset danger">Reset</button>
+</header>
+
+<div class="layout">
+  <main>
+    <div id="dataErr"></div>
+    <div class="row2">
+      <section class="card" id="cardIdentity"></section>
+      <section class="card" id="cardStats"></section>
+    </div>
+    <section class="card" id="cardClasses"></section>
+    <section class="card" id="cardSkills"></section>
+    <section class="card" id="cardProf"></section>
+    <section class="card" id="cardBreak"></section>
+    <section class="card" id="cardItems"></section>
+  </main>
+  <aside class="pane live" id="paneLive"></aside>
+  <aside class="pane abil" id="paneAbil"></aside>
+</div>
+
+<div id="kwPop"></div>
+<div id="detail"><div class="box"><div class="dh" id="dHead"></div><div class="db" id="dBody"></div><div class="df" id="dFoot"></div></div></div>
+<script>
+/* =====================================================================
+   0. SETUP AND SMALL HELPERS
+   ===================================================================== */
+var LC = window.LC || {};
+var CLASSES = LC.classes || {}, RACES = LC.races || {}, BTS = LC.breakthroughs || {},
+    REQS = LC.requirements || {}, ITEMS = LC.items || {}, UNLOCKS = LC.raceClassUnlocks || [],
+    KEYWORDS = LC.keywords || {};
+var SAVE_KEY = "lyrianPlanner.v1";
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function num(v){ var n = parseInt(v, 10); return isNaN(n) ? 0 : n; }
+function sortByName(a, b){ return a.name.localeCompare(b.name); }
+function fmt(n){ return (Math.round(n * 10) / 10).toLocaleString(); }
+function sign(n){ return (n >= 0 ? "+" : "") + n; }
+function listHtml(arr){
+  if (!arr || !arr.length) return "";
+  return "<ul>" + arr.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>";
+}
+
+var MAIN = ["Power", "Focus", "Agility", "Toughness"];
+var SUB  = ["Fitness", "Cunning", "Reason", "Awareness", "Presence"];
+var MAIN_ARRAY = [5, 4, 4, 3];
+var SUB_ARRAY  = [5, 4, 3, 2, 1];
+
+// Skill list. kind: main = the normal skills, craft = crafting, gather = gathering.
+var SKILLS = [
+  ["Athletics","Fitness","main"],["Riding","Fitness","main"],
+  ["Deception","Cunning","main"],["Roguecraft","Cunning","main"],["Stealth","Cunning","main"],
+  ["Appraise","Reason","main"],["Artifice","Reason","main"],["Common Knowledge","Reason","main"],
+  ["Flight","Reason","main"],["History","Reason","main"],["Linguistics","Reason","main"],
+  ["Magic","Reason","main"],["Medicine","Reason","main"],["Religion","Reason","main"],
+  ["Animal Husbandry","Awareness","main"],["Insight","Awareness","main"],
+  ["Perception","Awareness","main"],["Survival","Awareness","main"],
+  ["Art","Presence","main"],["Intimidation","Presence","main"],["Negotiation","Presence","main"],
+  ["Expert Knowledge","","main"],
+  ["Alchemy","","craft"],["Armorsmithing","","craft"],["Artificing","","craft"],
+  ["Blacksmithing","","craft"],["Carpentry","","craft"],["Culinary","","craft"],["Farming","","craft"],
+  ["Foraging","","gather"],["Mining","","gather"]
+].map(function(a){ return {name:a[0], stat:a[1], kind:a[2]}; });
+var SKILL = {}; SKILLS.forEach(function(s){ SKILL[s.name] = s; });
+
+// Turn a data "options" value into a list of skill names.
+function skillOptions(opt){
+  if (Array.isArray(opt)) {
+    return opt.map(function(o){ return /^Expert Knowledge/.test(o) ? "Expert Knowledge" : o; })
+              .filter(function(o){ return SKILL[o]; });
+  }
+  var main = SKILLS.filter(function(s){ return s.kind === "main"; }).map(function(s){ return s.name; });
+  var gather = SKILLS.filter(function(s){ return s.kind === "gather"; }).map(function(s){ return s.name; });
+  if (opt === "ANY_NON_CRAFTING_NON_GATHERING") return main;
+  if (opt === "ANY_NON_CRAFTING") return main.concat(gather);
+  if (opt === "ANY_REASON_AWARENESS_OR_PRESENCE_SKILL")
+    return SKILLS.filter(function(s){ return ["Reason","Awareness","Presence"].indexOf(s.stat) >= 0; }).map(function(s){ return s.name; });
+  return main;
+}
+
+/* =====================================================================
+   1. THE BUILD (everything that gets saved)
+   ===================================================================== */
+function newBuild(){
+  return {
+    v: 1,
+    name: "", gender: "", race: "", subrace: "", canon: false,
+    raceChoice: { clan: "", element: "", main: "", sub: "" },
+    mainArr: { Power: 5, Focus: 4, Agility: 4, Toughness: 3 },
+    subArr:  { Fitness: 5, Cunning: 4, Reason: 3, Awareness: 2, Presence: 1 },
+    expEarned: 0, ipEarned: 0, startClim: 3000, climAdded: 0,
+    classes: [],        // [{id, owned:[true x8], picks:{5:"Reason", 7:"Focus"}}] in purchase order
+    bts: [],            // [{id, pick:{}}] in purchase order
+    items: [],          // [{id, qty, equipped}]
+    alloc: {},          // skill spending per source: {sourceId: {sk:{Skill:n}, ex:[{skill,name,pts}]}}
+    activeSource: "start",
+    profPicks: {},      // proficiency choices: {"class:fighter#0": ["Axes", ...]}
+    notes: ""
+  };
+}
+var B = loadLocal() || newBuild();
+var ui = { classSearch: "", classTier: "", showLocked: false, btSearch: "", btOnlyOk: false,
+           itemSearch: "", itemCat: "", exSkill: "", exName: "" };
+
+function loadLocal(){
+  try { var s = localStorage.getItem(SAVE_KEY); if (s) return fixBuild(JSON.parse(s)); } catch (e) {}
+  return null;
+}
+function saveLocal(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(B)); } catch (e) {} }
+function fixBuild(b){ // fill in anything missing from older saves
+  var d = newBuild();
+  for (var k in d) if (b[k] === undefined) b[k] = d[k];
+  b.raceChoice = Object.assign(d.raceChoice, b.raceChoice || {});
+  return b;
+}
+
+/* =====================================================================
+   2. CALCULATIONS (everything the page shows is worked out here)
+   ===================================================================== */
+function raceRec(){ return RACES[B.race] || null; }
+function subRec(){ return RACES[B.subrace] || null; }
+// Race records that give stats/skills. Sub-races that "use parent creation" use the main race's.
+function creationRace(){
+  var s = subRec(), r = raceRec();
+  if (s && !s.usesParentCreation && (s.stats || s.skills)) return s;
+  return r;
+}
+function raceIds(){ // every race id this character counts as
+  var a = []; if (B.race) a.push(B.race); if (B.subrace) a.push(B.subrace); return a;
+}
+function hasBt(id){ return B.bts.some(function(b){ return b.id === id; }); }
+function btGrants(key){ return B.bts.map(function(b){ var r = BTS[b.id]; return r && r.grants ? {g:r.grants, b:b} : null; })
+  .filter(function(x){ return x && x.g[key] !== undefined; }); }
+
+function isMastered(c){ return c.owned.every(Boolean); }
+
+// Free class levels given by race / clan (e.g. Demon clan Wi = Saboteur at level 1).
+function raceUnlock(classId){
+  var srcs = raceIds().map(function(r){ return "race:" + r; });
+  if (B.race === "demon" && B.raceChoice.clan) srcs.push("clan:" + B.raceChoice.clan);
+  var best = null;
+  UNLOCKS.forEach(function(u){ if (u.classId === classId && srcs.indexOf(u.source) >= 0) best = u; });
+  return best;
+}
+
+// EXP cost of one step of a class (step index 0..7)
+function stepCost(classId, i){
+  var c = CLASSES[classId]; if (!c) return 0;
+  var u = raceUnlock(classId);
+  if (u && u.level >= i + 1) return 0;
+  if (i === 0) return c.tier * 100 - (u && u.level === 0 ? 100 : 0);
+  return 100;
+}
+function classIpCost(classId){ var u = raceUnlock(classId); return (u && u.level >= 1) ? 0 : 1; }
+
+function btCostAt(id, nth){ // nth = 0 for the first time you take it
+  var r = BTS[id]; if (!r) return 0;
+  if (r.costScale) return r.costScale[Math.min(nth, r.costScale.length - 1)];
+  return num(r.cost);
+}
+
+function itemCost(it){ return typeof it.cost === "number" ? it.cost : null; }
+function itemBurden(it){ return typeof it.burden === "number" ? it.burden : 0; }
+
+function calc(){
+  var C = { warn: [] };
+  var cr = creationRace();
+
+  // ---- stats ----
+  var st = {};
+  MAIN.forEach(function(s){ st[s] = num(B.mainArr[s]); });
+  SUB.forEach(function(s){ st[s] = num(B.subArr[s]); });
+  var bonus = {}; MAIN.concat(SUB).forEach(function(s){ bonus[s] = []; });
+  function add(stat, n, why){ if (bonus[stat]) bonus[stat].push({n:n, why:why}); }
+  if (cr && cr.stats) {
+    for (var k in cr.stats) if (k !== "choice") add(k, cr.stats[k], cr.name);
+    if (cr.stats.choice) {
+      if (B.raceChoice.main) add(B.raceChoice.main, 1, cr.name); else C.warn.push(cr.name + ": pick your +1 main stat (Identity).");
+      if (B.raceChoice.sub) add(B.raceChoice.sub, 1, cr.name); else C.warn.push(cr.name + ": pick your +1 sub stat (Identity).");
+    }
+  }
+  B.classes.forEach(function(c){
+    var rec = CLASSES[c.id]; if (!rec) return;
+    rec.steps.forEach(function(s, i){
+      if ((s.type === "heart" || s.type === "soul") && c.owned[i]) {
+        var p = c.picks && c.picks[s.level];
+        if (p) add(p, s.amount || 1, rec.name + " " + s.label);
+        else C.warn.push(rec.name + ": pick a stat for the " + s.label + " step.");
+      }
+    });
+  });
+  B.bts.forEach(function(b){
+    var r = BTS[b.id]; if (!r || !r.grants) return; var g = r.grants, p = b.pick || {};
+    if (g.statChoice) { if (p.stat) add(p.stat, g.amount || 1, r.name); else C.warn.push(r.name + ": pick a stat."); }
+    if (g.mainStatChoice) { if (p.main) add(p.main, g.mainStatChoice, r.name); else C.warn.push(r.name + ": pick a main stat."); }
+    if (g.subStatChoice) { if (p.sub) add(p.sub, g.subStatChoice, r.name); else C.warn.push(r.name + ": pick a sub stat."); }
+  });
+  C.base = st; C.bonus = bonus; C.stat = {};
+  MAIN.concat(SUB).forEach(function(s){
+    C.stat[s] = st[s] + bonus[s].reduce(function(t, x){ return t + x.n; }, 0);
+  });
+
+  // ---- spirit core / EXP ----
+  var classExp = 0, classCount = 0, ipSpent = 0;
+  B.classes.forEach(function(c){
+    if (!CLASSES[c.id]) return; classCount++; ipSpent += classIpCost(c.id);
+    c.owned.forEach(function(o, i){ if (o) classExp += stepCost(c.id, i); });
+  });
+  var btExp = 0, seen = {};
+  B.bts.forEach(function(b){ var n = seen[b.id] || 0; btExp += btCostAt(b.id, n); seen[b.id] = n + 1; });
+  var human = raceIds().indexOf("human") >= 0 ? 100 : 0;
+  var startClassExp = 1000 + btGrants("startingClassExp").reduce(function(t, x){ return t + x.g.startingClassExp; }, 0);
+  C.exp = {
+    startClass: startClassExp,
+    startBt: 300,
+    human: human,
+    earned: num(B.expEarned),
+    classSpent: classExp,
+    btSpent: btExp,
+    classOver: Math.max(0, classExp - startClassExp),
+    btOver: Math.max(0, btExp - 300),
+    classLeft: Math.max(0, startClassExp - classExp),
+    btLeft: Math.max(0, 300 - btExp)
+  };
+  C.exp.general = C.exp.earned + human;
+  C.exp.generalSpent = C.exp.classOver + C.exp.btOver;
+  C.exp.unspent = C.exp.general - C.exp.generalSpent;
+  C.exp.spiritCore = classExp + C.exp.btOver + human;  // the 300 breakthrough EXP is not added (rulebook)
+  if (C.exp.unspent < 0) C.warn.push("You've spent " + (-C.exp.unspent) + " more EXP than you have. Add EXP earned or remove something.");
+
+  // ---- IP ----
+  C.ip = { total: 3 + num(B.ipEarned), spent: ipSpent };
+  C.ip.left = C.ip.total - C.ip.spent;
+  if (C.ip.left < 0) C.warn.push("Not enough IP for all your classes.");
+
+  // ---- Clim and burden ----
+  var climSpent = 0, burden = 0, unknownCost = [];
+  B.items.forEach(function(e){
+    var it = ITEMS[e.id]; if (!it) return;
+    var c = itemCost(it); if (c === null) unknownCost.push(it.name); else climSpent += c * e.qty;
+    burden += itemBurden(it) * e.qty;
+  });
+  var richClim = btGrants("clim").reduce(function(t, x){ return t + x.g.clim; }, 0);
+  var canonClim = B.canon ? 1000 : 0;  // canon campaign: +1000 starting Clim
+  C.clim = { start: num(B.startClim), added: num(B.climAdded), bonus: richClim, canon: canonClim, spent: climSpent, unknown: unknownCost };
+  C.clim.left = C.clim.start + C.clim.added + C.clim.bonus + C.clim.canon - climSpent;
+  C.burden = burden;
+  if (unknownCost.length) C.warn.push("Price not a plain number, not counted: " + unknownCost.join(", "));
+  if (C.clim.left < 0) C.warn.push("You're " + (-C.clim.left).toLocaleString() + " Clim over budget.");
+
+  // ---- owned abilities (for requirements and the abilities pane) ----
+  C.owned = {}; C.ownedNames = {};
+  B.classes.forEach(function(c){
+    var rec = CLASSES[c.id]; if (!rec) return;
+    rec.steps.forEach(function(s, i){
+      if (s.ability && c.owned[i]) {
+        C.owned[c.id + "/" + s.ability] = true;
+        var a = rec.abilities[s.ability]; if (a) C.ownedNames[a.name.toLowerCase()] = a;
+      }
+    });
+  });
+  C.mastered = B.classes.filter(function(c){ return CLASSES[c.id] && isMastered(c); }).map(function(c){ return c.id; });
+
+  // ---- proficiencies ----
+  calcProfs(C);
+
+  // ---- skills ----
+  calcSkills(C);
+
+  // ---- derived combat values ----
+  var arm = { guard: 0, block: 0, evasion: 0, dodge: 0, initiative: 0 }, shield = 0;
+  B.items.forEach(function(e){
+    var it = ITEMS[e.id]; if (!it || !it.armor || !e.equipped) return;
+    if (it.tag === "Shield" || /shield/i.test(it.armor.type || "")) { shield += num(String(it.armor.block).replace("+", "")); return; }
+    ["guard","block","evasion","dodge","initiative"].forEach(function(k){ arm[k] += num(it.armor[k]); });
+  });
+  var T = C.stat.Toughness, A = C.stat.Agility, P = C.stat.Power, F = C.stat.Focus;
+  var mana = btGrants("maxMana").reduce(function(t, x){ return t + x.g.maxMana; }, 0);
+  var spd = btGrants("speedBonus").reduce(function(t, x){ return t + x.g.speedBonus; }, 0);
+  var ini = btGrants("initiative").reduce(function(t, x){ return t + x.g.initiative; }, 0);
+  C.d = {
+    hp: 20 + T * 10, mana: 6 + P + mana, ap: 4, rp: 2 + A,
+    guard: arm.guard + T, blockGuard: 2 * T + arm.block + shield + arm.guard + 0,
+    evasion: 7 + A + arm.evasion, dodge: 20 + A + (arm.dodge || arm.evasion),
+    init: A + arm.initiative + ini, speed: 20 + spd, potency: 11 + F,
+    save: "2d10 + " + T, acc: "1d20 + " + F, accP: "1d20 + " + (2 * F),
+    light: "2d4 + " + P, heavy: "4d6 + " + (2 * P), heavy2: "5d6 + " + (2 * P)
+  };
+  // Block guard per rulebook: 2 x Toughness + armor Block value (shield +4). Armor Guard already counts in Guard.
+  C.d.blockGuard = 2 * T + arm.block + shield;
+  if (C.burden > 10) C.warn.push("Burden " + C.burden + " is over 10: you'd be Rooted.");
+  return C;
+}
+
+/* ---------- Skill sources: every place that gives skill points ---------- */
+function skillSources(){
+  var out = [];
+  out.push({ id: "start", label: "Starting points", points: 10, options: skillOptions("ANY_NON_CRAFTING_NON_GATHERING"),
+             note: "10 points at character creation (normal skills only)." });
+  var cr = creationRace();
+  if (cr && cr.skills && cr.skills.points) {
+    out.push({ id: "race", label: cr.name + " (race)", points: cr.skills.points, options: skillOptions(cr.skills.options),
+               note: "Race skill points" + (cr.skills.pick === "UNCLEAR" ? " (the page doesn't say how they split - see ISSUES.md)." : ".") });
+  }
+  B.classes.forEach(function(c){
+    var rec = CLASSES[c.id]; if (!rec) return;
+    rec.steps.forEach(function(s, i){
+      if (s.type === "skills" && c.owned[i])
+        out.push({ id: "cls:" + c.id, label: rec.name, points: s.points, options: skillOptions(s.options), note: s.summary || "" });
+    });
+  });
+  var n = {};
+  B.bts.forEach(function(b, idx){
+    var r = BTS[b.id]; if (!r || !r.grants || !r.grants.skillPoints) return;
+    var excl = r.grants.excludes || "";
+    var opts = /gathering/.test(excl) ? skillOptions("ANY_NON_CRAFTING_NON_GATHERING") : skillOptions("ANY_NON_CRAFTING");
+    n[b.id] = (n[b.id] || 0) + 1;
+    out.push({ id: "bt:" + idx, label: r.name + (n[b.id] > 1 ? " #" + n[b.id] : ""), points: r.grants.skillPoints, options: opts, note: (r.summary || []).join(" ") });
+  });
+  return out;
+}
+function allocOf(id){ if (!B.alloc[id]) B.alloc[id] = { sk: {}, ex: [] }; return B.alloc[id]; }
+function srcUsed(a){
+  var s = 0; for (var k in a.sk) s += a.sk[k];
+  a.ex.forEach(function(e){ s += e.pts / 2; });
+  return s;
+}
+function skillCap(sk, sc){
+  var kind = SKILL[sk] ? SKILL[sk].kind : "main";
+  if (kind === "craft") return 10;
+  if (sc >= 10000) return 999;
+  return sc >= 5000 ? 20 : 15;
+}
+function calcSkills(C){
+  var srcs = skillSources(); C.sources = srcs;
+  var ids = {}; srcs.forEach(function(s){ ids[s.id] = s; });
+  // forget spending from sources that no longer exist (e.g. class removed)
+  for (var k in B.alloc) if (!ids[k]) delete B.alloc[k];
+  if (!ids[B.activeSource]) B.activeSource = srcs.length ? srcs[0].id : "start";
+  C.pts = {}; C.ex = {}; C.srcLeft = {}; var leftTotal = 0;
+  srcs.forEach(function(s){
+    var a = allocOf(s.id);
+    for (var sk in a.sk) C.pts[sk] = (C.pts[sk] || 0) + a.sk[sk];
+    a.ex.forEach(function(e){
+      var key = e.skill + "|" + e.name.trim().toLowerCase();
+      if (!C.ex[key]) C.ex[key] = { skill: e.skill, name: e.name.trim(), pts: 0 };
+      C.ex[key].pts += e.pts;
+    });
+    C.srcLeft[s.id] = s.points - srcUsed(a); leftTotal += C.srcLeft[s.id];
+  });
+  C.skillLeft = leftTotal;
+  C.bestEx = {};
+  for (var key in C.ex) { var e = C.ex[key]; if (!C.bestEx[e.skill] || C.bestEx[e.skill].pts < e.pts) C.bestEx[e.skill] = e; }
+}
+
+/* ---------- Requirement checking ----------
+   Each class has routes (any one route works). Each route is a list of conditions (all needed).
+   A condition is true (met), false (not met) or null (the planner can't check it - check yourself). */
+function condCheck(c, C){
+  if (c.ability) {
+    if (C.owned[c.ability]) return true;
+    var nm = c.ability.split("/")[1] || "";
+    for (var r in RACES) { var rr = RACES[r]; if (rr.abilities && rr.abilities[nm] && raceIds().indexOf(r) >= 0) return true; }
+    return false;
+  }
+  if (c.classLearned) return B.classes.some(function(x){ return x.id === c.classLearned; });
+  if (c.mastered) return C.mastered.indexOf(c.mastered) >= 0;
+  if (c.masteredAny) return C.mastered.length + earlyAscension() >= c.masteredAny;
+  if (c.masteredTier) {
+    // "any tier 2 class mastered" - counts tier 2 or higher. Early Ascension counts as one.
+    var n = C.mastered.filter(function(id){ return CLASSES[id].tier >= c.masteredTier; }).length + earlyAscension();
+    return n >= (c.count || 1);
+  }
+  if (c.race) {
+    if (raceIds().indexOf(c.race) >= 0) return true;
+    if (c.race === "human" && hasBt("the-unknown-paladin")) return true;
+    return false;
+  }
+  if (c.breakthrough) return hasBt(c.breakthrough);
+  if (c.skill) return (C.pts[c.skill] || 0) >= (c.points || 1);
+  if (c.expertise) {
+    var any = false;
+    for (var k in C.ex) {
+      var e = C.ex[k], label = (e.skill + " (" + e.name + ")").toLowerCase();
+      var hit = c.expertise.some(function(x){
+        x = x.toLowerCase(); return x === label || (x.indexOf("(any") >= 0 && x.split(" (")[0] === e.skill.toLowerCase());
+      });
+      if (hit && e.pts >= (c.points || 1)) return true;
+      if (c.expertise.some(function(x){ return x.split(" (")[0].toLowerCase() === e.skill.toLowerCase(); })) any = true;
+    }
+    return any ? null : false;
+  }
+  if (c.mastery) {
+    var els = elementMasteries();
+    return els.indexOf(c.mastery) >= 0 ? true : null;
+  }
+  if (c.hasSpell) {
+    for (var n2 in C.ownedNames) { if ((C.ownedNames[n2].keywords || []).indexOf("Spell") >= 0) return c.damaging ? null : true; }
+    return false;
+  }
+  if (c.proficiency) return profCheck(c.proficiency, C);
+  return null; // mystic eye slots and anything new: check yourself
+}
+function earlyAscension(){ return hasBt("early-ascension") ? 1 : 0; }
+function elementMasteries(){
+  var a = [];
+  B.bts.forEach(function(b){ if (b.id === "elemental-affinity" && b.pick && b.pick.element) a.push(b.pick.element); });
+  if (B.subrace === "ryujin" && B.raceChoice.element) a.push(B.raceChoice.element);
+  return a;
+}
+function classStatus(id, C){
+  var res = { state: "met", text: null, why: "" };
+  var q = REQS[id];
+  if (q) res.text = q.text;
+  var u = raceUnlock(id);
+  if (u) { res.state = "met"; res.why = "Unlocked by " + u.via; return res; }
+  if (btGrants("classUnlocked").some(function(x){ return x.g.classUnlocked === id; })) { res.why = "Unlocked by breakthrough"; return res; }
+  if (!q || !q.routes || !q.routes.length) return res;
+  var best = "no";
+  q.routes.forEach(function(route){
+    var vals = route.map(function(c){ return condCheck(c, C); });
+    var st = vals.indexOf(false) >= 0 ? "no" : (vals.indexOf(null) >= 0 ? "check" : "met");
+    if (st === "met") best = "met"; else if (st === "check" && best !== "met") best = "check";
+  });
+  res.state = best;
+  return res;
+}
+
+/* =====================================================================
+   3. DRAWING THE PAGE
+   ===================================================================== */
+var C = null;
+function render(){
+  C = calc();
+  renderIdentity(); renderStats(); renderClasses(); renderSkills(); renderProf(); renderBreak(); renderItems();
+  renderLive(); renderAbil();
+  $("hdrName").textContent = B.name ? "— " + B.name : "";
+  saveLocal();
+}
+function renderSome(list){ C = calc(); list.forEach(function(f){ f(); }); renderLive(); saveLocal(); }
+
+/* ---------- Identity ---------- */
+function renderIdentity(){
+  var r = raceRec(), h = "<h2>Identity</h2>";
+  h += '<div class="field"><label>Name</label><input type="text" id="inName" value="' + esc(B.name) + '" placeholder="Character name"></div>';
+  h += '<div class="field"><label>Gender</label><select id="inGender">' +
+       ['', 'Male', 'Female'].map(function(g){ return '<option value="' + g + '"' + (B.gender === g ? " selected" : "") + ">" + (g || "—") + "</option>"; }).join("") +
+       "</select></div>";
+  var mains = Object.values(RACES).filter(function(x){ return x.kind === "primary"; }).sort(sortByName);
+  h += '<div class="field"><label>Race</label><select id="inRace"><option value="">— choose —</option>' +
+       mains.map(function(x){ return '<option value="' + x.id + '"' + (B.race === x.id ? " selected" : "") + ">" + esc(x.name) + "</option>"; }).join("") + "</select>" +
+       (B.race ? '<button class="ibtn" data-info="race:' + B.race + '" title="Race details">ⓘ</button>' : "") +
+       '<button class="ibtn" data-info="races:" title="Browse all races">Browse</button></div>';
+  if (r && r.subraces && r.subraces.length) {
+    h += '<div class="field"><label>Sub-race</label><select id="inSub"><option value="">— choose —</option>' +
+      r.subraces.map(function(id){ return RACES[id]; }).filter(Boolean).sort(sortByName).map(function(x){
+        var lock = genderLock(x);
+        return '<option value="' + x.id + '"' + (B.subrace === x.id ? " selected" : "") + (lock ? " disabled" : "") + ">" + esc(x.name) + (lock ? " (" + lock + ")" : "") + "</option>";
+      }).join("") + "</select>" + (B.subrace ? '<button class="ibtn" data-info="race:' + B.subrace + '" title="Sub-race details">ⓘ</button>' : "") +
+      '<button class="ibtn" data-info="races:' + r.id + '" title="Browse sub-races">Browse</button></div>';
+  }
+  var cr = creationRace();
+  if (cr && cr.stats && cr.stats.choice) {
+    h += '<div class="field"><label>+1 main stat</label>' + pickSel("rcMain", MAIN, B.raceChoice.main) + "</div>";
+    h += '<div class="field"><label>+1 sub stat</label>' + pickSel("rcSub", SUB, B.raceChoice.sub) + "</div>";
+  }
+  if (r && r.options) {
+    h += '<div class="field"><label>Clan</label><select id="rcClan"><option value="">— choose —</option>' +
+      r.options.choices.map(function(c){ return '<option value="' + esc(c.code) + '"' + (B.raceChoice.clan === c.code ? " selected" : "") + ">" + esc(c.code + " - " + c.name) + "</option>"; }).join("") + "</select></div>";
+  }
+  var s = subRec();
+  if (s && s.options) {
+    h += '<div class="field"><label>' + esc(s.options.label.replace(/\(.*\)/, "")) + '</label>' + pickSel("rcElem", s.options.choices, B.raceChoice.element) + "</div>";
+  }
+  var gl = s && genderLock(s);
+  if (gl) h += '<div class="errbox">' + esc(s.name) + " is " + esc(gl) + "</div>";
+  if (r && r.subraces && r.subraces.length && !B.subrace) h += '<div class="warnbox">' + esc(r.name) + " needs a sub-race.</div>";
+  if (cr) {
+    var bits = [];
+    if (cr.stats) for (var k in cr.stats) if (k !== "choice") bits.push(sign(cr.stats[k]) + " " + k);
+    if (cr.languages) bits.push("Languages: " + cr.languages.join(", "));
+    if (cr.proficiencies && cr.proficiencies.length) bits.push("Proficiencies: " + cr.proficiencies.join(", "));
+    [r, s].forEach(function(x){ if (x && x.extras) bits = bits.concat(x.extras); });
+    if (s && s.size) bits.push("Size: " + s.size);
+    h += '<div class="note">' + bits.map(esc).join("<br>") + "</div>";
+  }
+  h += '<div class="field" style="margin-top:10px"><label>Canon campaign</label><input type="checkbox" id="inCanon"' + (B.canon ? " checked" : "") + '><span class="note">+1,000 starting Clim, and allows restricted options like Angelblooded.</span></div>';
+  $("cardIdentity").innerHTML = h;
+
+  $("inName").oninput = function(){ B.name = this.value; $("hdrName").textContent = B.name ? "— " + B.name : ""; saveLocal(); };
+  $("inGender").onchange = function(){ B.gender = this.value; render(); };
+  $("inRace").onchange = function(){ B.race = this.value; B.subrace = ""; B.raceChoice = { clan: "", element: "", main: "", sub: "" }; render(); };
+  if ($("inSub")) $("inSub").onchange = function(){ B.subrace = this.value; B.raceChoice.element = ""; render(); };
+  if ($("rcMain")) $("rcMain").onchange = function(){ B.raceChoice.main = this.value; render(); };
+  if ($("rcSub")) $("rcSub").onchange = function(){ B.raceChoice.sub = this.value; render(); };
+  if ($("rcClan")) $("rcClan").onchange = function(){ B.raceChoice.clan = this.value; render(); };
+  if ($("rcElem")) $("rcElem").onchange = function(){ B.raceChoice.element = this.value; render(); };
+  $("inCanon").onchange = function(){ B.canon = this.checked; render(); };
+}
+function genderLock(x){
+  if (!x.restriction) return "";
+  var m = /^(Male|Female) only/i.exec(x.restriction);
+  if (m && B.gender && B.gender.toLowerCase() !== m[1].toLowerCase()) return m[1] + " only";
+  return "";
+}
+function pickSel(id, opts, val){
+  return '<select id="' + id + '"><option value="">— pick —</option>' +
+    opts.map(function(o){ return '<option' + (o === val ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>";
+}
+
+/* ---------- Stats ---------- */
+function renderStats(){
+  var h = "<h2>Stats</h2>";
+  h += statTable("Main stats (combat)", MAIN, MAIN_ARRAY, "mainArr");
+  h += statTable("Sub stats (out of combat)", SUB, SUB_ARRAY, "subArr");
+  h += '<div class="note">Pick the base values; choosing a number another stat has swaps them, so each value is used once.</div>';
+  $("cardStats").innerHTML = h;
+  document.querySelectorAll("[data-stat]").forEach(function(sel){
+    sel.onchange = function(){
+      var grp = B[this.dataset.grp], stat = this.dataset.stat, v = num(this.value), old = grp[stat];
+      for (var k in grp) if (k !== stat && grp[k] === v) { grp[k] = old; break; }
+      grp[stat] = v; render();
+    };
+  });
+}
+function statTable(title, names, arr, grp){
+  var vals = arr.filter(function(v, i, a){ return a.indexOf(v) === i; });
+  var h = "<h3>" + title + '</h3><table class="statgrid"><tr><th></th><th>Base</th><th>Bonus</th><th class="num">Total</th></tr>';
+  names.forEach(function(s){
+    var b = C.bonus[s], bt = b.reduce(function(t, x){ return t + x.n; }, 0);
+    h += "<tr><td>" + s + "</td><td><select data-grp=\"" + grp + "\" data-stat=\"" + s + "\">" +
+      vals.map(function(v){ return "<option" + (B[grp][s] === v ? " selected" : "") + ">" + v + "</option>"; }).join("") + "</select></td>" +
+      '<td title="' + esc(b.map(function(x){ return sign(x.n) + " " + x.why; }).join("\n")) + '">' + (bt ? '<span class="good">' + sign(bt) + "</span>" : '<span class="dim">—</span>') + "</td>" +
+      '<td class="num final">' + C.stat[s] + "</td></tr>";
+  });
+  return h + "</table>";
+}
+
+/* ---------- Classes ---------- */
+function renderClasses(){
+  var h = "<h2>Classes</h2>";
+  h += '<div class="note">Abilities are bought in order. Learning a class costs 1 IP + tier x 100 EXP and gives its key ability; each later step costs 100 EXP.</div>';
+  if (!B.classes.length) h += '<p class="dim">No classes yet. Add one below.</p>';
+  B.classes.forEach(function(c, idx){ h += classBlock(c, idx); });
+
+  // Picker
+  h += "<h3>Add a class</h3>";
+  h += '<div class="toolbar"><input type="search" id="clsSearch" placeholder="Search classes, roles, requirements..." value="' + esc(ui.classSearch) + '">' +
+       '<select id="clsTier"><option value="">All tiers</option><option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option></select>' +
+       '<label class="small"><input type="checkbox" id="clsLocked"' + (ui.showLocked ? " checked" : "") + "> show locked</label></div>";
+  h += '<div class="list" id="clsList"></div>';
+  $("cardClasses").innerHTML = h;
+  $("clsTier").value = ui.classTier;
+  $("clsSearch").oninput = function(){ ui.classSearch = this.value; drawClassList(); };
+  $("clsTier").onchange = function(){ ui.classTier = this.value; drawClassList(); };
+  $("clsLocked").onchange = function(){ ui.showLocked = this.checked; drawClassList(); };
+  drawClassList();
+
+  document.querySelectorAll("[data-step]").forEach(function(cb){
+    cb.onchange = function(){
+      var c = B.classes[num(this.dataset.cls)], i = num(this.dataset.step);
+      if (this.checked) { for (var j = 1; j <= i; j++) c.owned[j] = true; }
+      else { for (var k = i; k < 8; k++) c.owned[k] = false; }
+      render();
+    };
+  });
+  document.querySelectorAll("[data-pick]").forEach(function(sel){
+    sel.onchange = function(){ var c = B.classes[num(this.dataset.cls)]; c.picks = c.picks || {}; c.picks[this.dataset.pick] = this.value; render(); };
+  });
+  document.querySelectorAll("[data-rmcls]").forEach(function(b){
+    b.onclick = function(){
+      var c = B.classes[num(this.dataset.rmcls)];
+      if (confirm("Remove " + (CLASSES[c.id] ? CLASSES[c.id].name : c.id) + " and refund its EXP and IP?")) { B.classes.splice(num(this.dataset.rmcls), 1); render(); }
+    };
+  });
+  document.querySelectorAll("[data-mv]").forEach(function(b){
+    b.onclick = function(){
+      var i = num(this.dataset.mv), d = num(this.dataset.dir), j = i + d;
+      if (j < 0 || j >= B.classes.length) return;
+      var t = B.classes[i]; B.classes[i] = B.classes[j]; B.classes[j] = t; render();
+    };
+  });
+  document.querySelectorAll("[data-goskills]").forEach(function(b){
+    b.onclick = function(){ B.activeSource = this.dataset.goskills; render(); $("cardSkills").scrollIntoView({behavior:"smooth"}); };
+  });
+}
+function classBlock(c, idx){
+  var rec = CLASSES[c.id];
+  if (!rec) return '<div class="errbox">Unknown class "' + esc(c.id) + '" (not in classes.js). <button class="small" data-rmcls="' + idx + '">Remove</button></div>';
+  var spent = 0; c.owned.forEach(function(o, i){ if (o) spent += stepCost(c.id, i); });
+  var u = raceUnlock(c.id);
+  var h = '<div class="cls"><div class="head"><span class="name" data-info="class:' + c.id + '">' + esc(rec.name) + "</span>" +
+    '<span class="tag gold">Tier ' + rec.tier + "</span>" + (rec.role ? '<span class="tag">' + esc(rec.role) + (rec.secondary ? " / " + esc(rec.secondary) : "") + "</span>" : "") +
+    (isMastered(c) ? '<span class="tag good">Mastered</span>' : "") + (u ? '<span class="tag good">' + esc(u.via) + "</span>" : "") +
+    '<span class="grow" style="flex:1"></span><span class="dim small">' + spent + " EXP" + (classIpCost(c.id) ? " + 1 IP" : "") + "</span>" +
+    '<button class="small" data-mv="' + idx + '" data-dir="-1" title="Move up">▲</button><button class="small" data-mv="' + idx + '" data-dir="1" title="Move down">▼</button>' +
+    '<button class="small danger" data-rmcls="' + idx + '">Remove</button></div>';
+  rec.steps.forEach(function(s, i){
+    var owned = !!c.owned[i], cost = stepCost(c.id, i);
+    var canBuy = i === 0 || owned || (c.owned[i - 1] && cost <= expAvailFor("class"));
+    var body = '<span class="nm">' + esc(s.label) + "</span>";
+    if (s.ability && rec.abilities[s.ability]) {
+      var a = rec.abilities[s.ability];
+      body += ": <b>" + esc(a.name) + "</b> " + abilityMeta(a);
+    } else if (s.type === "skills" || s.type === "special") {
+      body += ": +" + s.points + " points" + (Array.isArray(s.options) ? " (" + esc(s.options.join(", ")) + ")" : "");
+      if (owned && s.type === "skills") {
+        var left = C.srcLeft["cls:" + c.id];
+        body += ' <button class="small" data-goskills="cls:' + c.id + '">' + (left > 0 ? "Spend " + fmt(left) + " left" : "Edit") + "</button>";
+      }
+      if (s.type === "special") body += '<div class="note">' + esc(s.summary || "") + "</div>";
+    } else if (s.type === "heart" || s.type === "soul") {
+      var p = (c.picks || {})[s.level] || "";
+      body += ": +" + (s.amount || 1) + " " + '<select data-cls="' + idx + '" data-pick="' + s.level + '"' + (owned ? "" : " disabled") + '><option value="">— pick —</option>' +
+        s.options.map(function(o){ return "<option" + (o === p ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>" +
+        (owned && !p ? ' <span class="warn small">pick one</span>' : "");
+    }
+    h += '<div class="step' + (owned ? " owned" : "") + '"><span class="lv">' + s.level + "</span>" +
+      '<input type="checkbox" data-cls="' + idx + '" data-step="' + i + '"' + (owned ? " checked" : "") + (i === 0 || (!owned && !canBuy) ? " disabled" : "") + ">" +
+      '<div class="body">' + body + "</div><span class=\"cost\">" + (cost ? cost + " EXP" : "free") + "</span></div>";
+  });
+  return h + "</div>";
+}
+function abilityMeta(a){
+  var bits = [];
+  if (a.cost) bits.push(a.cost); if (a.range) bits.push(a.range);
+  var h = bits.length ? '<span class="dim small">(' + esc(bits.join(" · ")) + ")</span>" : "";
+  (a.keywords || []).forEach(function(k){ h += kwTag(k); });
+  return h;
+}
+// EXP you can still spend on classes / breakthroughs right now
+function expAvailFor(kind){
+  var gen = C.exp.unspent;
+  return kind === "class" ? C.exp.classLeft + gen : C.exp.btLeft + gen;
+}
+function drawClassList(){
+  var q = ui.classSearch.trim().toLowerCase(), have = {};
+  B.classes.forEach(function(c){ have[c.id] = true; });
+  var rows = Object.values(CLASSES).sort(sortByName).filter(function(c){
+    if (ui.classTier && String(c.tier) !== ui.classTier) return false;
+    if (q && (c.name + " " + (c.role || "") + " " + (c.secondary || "") + " " + (c.requires || "")).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+  var h = "", shown = 0, hidden = 0;
+  rows.forEach(function(c){
+    var st = classStatus(c.id, C), cost = stepCost(c.id, 0), ip = classIpCost(c.id);
+    var why = [];
+    if (have[c.id]) why.push("already taken");
+    if (st.state === "no") why.push("requirements not met");
+    if (ip > C.ip.left) why.push("not enough IP");
+    if (cost > expAvailFor("class")) why.push("not enough EXP");
+    if (st.state === "no" && !ui.showLocked && !have[c.id]) { hidden++; return; }
+    shown++;
+    var badge = st.state === "met" ? '<span class="tag good">' + (st.why ? esc(st.why) : (st.text ? "requirements met" : "no requirements")) + "</span>"
+              : st.state === "check" ? '<span class="tag warn">check requirements yourself</span>' : '<span class="tag bad">locked</span>';
+    h += '<div class="li' + (why.length ? " locked" : "") + '"><div class="top"><span class="name" data-info="class:' + c.id + '">' + esc(c.name) + "</span>" +
+      '<span class="tag gold">T' + c.tier + "</span>" + (c.role ? '<span class="tag">' + esc(c.role) + (c.secondary ? " / " + esc(c.secondary) : "") + "</span>" : "") +
+      (c.difficulty ? '<span class="tag">Difficulty ' + c.difficulty + "</span>" : "") + badge +
+      '<span class="grow"></span><span class="dim small">' + (ip ? "1 IP + " : "") + cost + ' EXP</span> <button class="small" data-addcls="' + c.id + '"' + (why.length ? " disabled title=\"" + esc(why.join(", ")) + "\"" : "") + ">Add</button></div>";
+    if (st.text) h += '<div class="small dim">Requires: ' + esc(st.text) + "</div>";
+    var k = c.steps[0] && c.abilities[c.steps[0].ability];
+    if (k) h += '<details><summary>Key ability: ' + esc(k.name) + "</summary>" + listHtml(k.summary) + "</details>";
+    h += "</div>";
+  });
+  if (hidden) h += '<div class="li dim small">' + hidden + ' locked classes hidden. Tick "show locked" to see them.</div>';
+  if (!shown && !hidden) h = '<div class="li dim">No matches.</div>';
+  $("clsList").innerHTML = h;
+  document.querySelectorAll("[data-addcls]").forEach(function(b){
+    b.onclick = function(){
+      B.classes.push({ id: this.dataset.addcls, owned: [true, false, false, false, false, false, false, false], picks: {} });
+      render();
+    };
+  });
+}
+
+/* ---------- Skills ---------- */
+function renderSkills(){
+  var srcs = C.sources, act = B.activeSource, src = srcs.filter(function(s){ return s.id === act; })[0];
+  var h = "<h2>Skills</h2>";
+  h += '<div class="note">Pick where the points come from, then use + / −. Each skill point can instead become 2 expertise points. Only your best single expertise counts on a roll.</div>';
+  h += '<div class="chips">' + srcs.map(function(s){
+    var left = C.srcLeft[s.id];
+    return '<span class="chip' + (s.id === act ? " on" : "") + (left > 0 ? " alert" : "") + '" data-src="' + esc(s.id) + '">' + esc(s.label) +
+      '<span class="left ' + (left < 0 ? "bad" : left > 0 ? "warn" : "good") + '">' + fmt(left) + " left</span></span>";
+  }).join("") + "</div>";
+  if (src) h += '<div class="note">' + esc(src.note) + "</div>";
+  var sc = C.exp.spiritCore, a = src ? allocOf(src.id) : { sk: {}, ex: [] }, left = src ? C.srcLeft[src.id] : 0;
+  h += '<div class="scrollx"><table><tr><th>Skill</th><th>Stat</th><th class="num">Points</th><th>Best expertise</th><th class="num">Roll bonus</th><th class="num">From this source</th></tr>';
+  SKILLS.forEach(function(s){
+    var pts = C.pts[s.name] || 0, ok = src && src.options.indexOf(s.name) >= 0, mine = a.sk[s.name] || 0;
+    if (!pts && !ok && !C.bestEx[s.name]) return;
+    var be = C.bestEx[s.name], stat = s.stat ? C.stat[s.stat] : 0;
+    var cap = skillCap(s.name, sc);
+    var total = stat + pts + (be ? be.pts : 0);
+    h += '<tr class="' + (ok ? "can" : "off") + '"><td>' + esc(s.name) + (s.kind !== "main" ? ' <span class="tag">' + s.kind + "</span>" : "") + "</td>" +
+      "<td>" + (s.stat ? esc(s.stat) + " " + stat : '<span class="dim">—</span>') + "</td>" +
+      '<td class="num">' + pts + (pts > cap ? ' <span class="bad">(cap ' + cap + ")</span>" : "") + "</td>" +
+      "<td>" + (be ? esc(be.name) + " +" + be.pts : '<span class="dim">—</span>') + "</td>" +
+      '<td class="num"><b>' + sign(total) + "</b></td>" +
+      '<td class="num">' + (ok ? '<span class="pm"><button class="small" data-sk="' + esc(s.name) + '" data-d="-1"' + (mine > 0 ? "" : " disabled") + '>−</button>' +
+        "<b style=\"min-width:18px;display:inline-block;text-align:center\">" + mine + "</b>" +
+        '<button class="small" data-sk="' + esc(s.name) + '" data-d="1"' + (left >= 1 && pts < cap ? "" : " disabled") + ">+</button></span>" : "") + "</td></tr>";
+  });
+  h += "</table></div>";
+  if (src) {
+    h += "<h3>Expertise from " + esc(src.label) + "</h3>";
+    var exOpts = src.options.filter(function(n){ return SKILL[n].kind !== "gather"; });
+    if (a.ex.length) {
+      h += "<table><tr><th>Skill</th><th>Expertise</th><th class=\"num\">Points</th><th></th></tr>";
+      a.ex.forEach(function(e, i){
+        h += "<tr><td>" + esc(e.skill) + "</td><td>" + esc(e.name) + '</td><td class="num">' + e.pts + "</td>" +
+          '<td class="num"><button class="small" data-ex="' + i + '" data-d="-1">−</button> <button class="small" data-ex="' + i + '" data-d="1"' + (left >= 0.5 ? "" : " disabled") + ">+</button></td></tr>";
+      });
+      h += "</table>";
+    }
+    h += '<div class="toolbar" style="margin-top:6px">' + '<select id="exSkill"><option value="">— skill —</option>' +
+      exOpts.map(function(n){ return "<option" + (ui.exSkill === n ? " selected" : "") + ">" + esc(n) + "</option>"; }).join("") + "</select>" +
+      '<input type="text" id="exName" placeholder="Expertise name (e.g. Singing)" value="' + esc(ui.exName) + '">' +
+      '<button id="exAdd" class="small"' + (left >= 0.5 ? "" : " disabled") + ">Add expertise (+2)</button></div>";
+  }
+  var allEx = Object.values(C.ex);
+  if (allEx.length) h += '<div class="note">All expertise: ' + allEx.map(function(e){ return esc(e.skill + " (" + e.name + ") +" + e.pts); }).join(" · ") + "</div>";
+  h += '<div class="note">Caps: ' + (sc >= 10000 ? "none (10k+ Spirit Core)" : (sc >= 5000 ? "20" : "15")) + " per skill and expertise; crafting skills 10. Gathering skills have no expertise.</div>";
+  $("cardSkills").innerHTML = h;
+
+  document.querySelectorAll("[data-src]").forEach(function(el){ el.onclick = function(){ B.activeSource = this.dataset.src; renderSome([renderSkills]); }; });
+  document.querySelectorAll("[data-sk]").forEach(function(b){
+    b.onclick = function(){
+      var al = allocOf(B.activeSource), k = this.dataset.sk;
+      al.sk[k] = Math.max(0, (al.sk[k] || 0) + num(this.dataset.d)); if (!al.sk[k]) delete al.sk[k];
+      render();
+    };
+  });
+  document.querySelectorAll("[data-ex]").forEach(function(b){
+    b.onclick = function(){
+      var al = allocOf(B.activeSource), e = al.ex[num(this.dataset.ex)];
+      e.pts += num(this.dataset.d); if (e.pts <= 0) al.ex.splice(num(this.dataset.ex), 1);
+      render();
+    };
+  });
+  if ($("exSkill")) {
+    $("exSkill").onchange = function(){ ui.exSkill = this.value; };
+    $("exName").oninput = function(){ ui.exName = this.value; };
+    $("exAdd").onclick = function(){
+      if (!ui.exSkill || !ui.exName.trim()) { alertNote("Pick a skill and type an expertise name first."); return; }
+      allocOf(B.activeSource).ex.push({ skill: ui.exSkill, name: ui.exName.trim(), pts: 2 });
+      ui.exName = ""; render();
+    };
+  }
+}
+function alertNote(msg){ var d = document.createElement("div"); d.className = "warnbox"; d.textContent = msg; $("cardSkills").appendChild(d); setTimeout(function(){ d.remove(); }, 3000); }
+
+/* ---------- Breakthroughs ---------- */
+function btBlockers(r){
+  var why = [];
+  if (r.race && r.race.length && !r.race.some(function(x){ return raceIds().indexOf(x) >= 0; })) why.push("race");
+  if (r.restricted && !B.canon) why.push("restricted (tick Canon campaign)");
+  if (!r.repeatable && !r.costScale && !r.costNote && hasBt(r.id)) why.push("already taken");
+  if (r.requiresBreakthrough && !hasBt(r.requiresBreakthrough)) why.push("needs " + (BTS[r.requiresBreakthrough] ? BTS[r.requiresBreakthrough].name : r.requiresBreakthrough));
+  var nth = B.bts.filter(function(b){ return b.id === r.id; }).length;
+  if (btCostAt(r.id, nth) > expAvailFor("bt")) why.push("not enough EXP");
+  return why;
+}
+function renderBreak(){
+  var h = "<h2>Breakthroughs</h2>";
+  h += '<div class="note">You start with 300 EXP that can only be spent here (it does not count toward Spirit Core; unspent is lost). After that, breakthroughs cost normal EXP.</div>';
+  if (B.bts.length) {
+    h += "<h3>Taken</h3>";
+    var seen = {};
+    B.bts.forEach(function(b, i){
+      var r = BTS[b.id]; if (!r) { h += '<div class="errbox">Unknown breakthrough ' + esc(b.id) + ' <button class="small" data-rmbt="' + i + '">Remove</button></div>'; return; }
+      var n = seen[b.id] || 0; seen[b.id] = n + 1;
+      h += '<div class="li"><div class="top"><span class="name" data-info="bt:' + r.id + '">' + esc(r.name) + "</span>" + (n ? '<span class="tag">#' + (n + 1) + "</span>" : "") +
+        '<span class="grow"></span><span class="dim small">' + btCostAt(b.id, n) + ' EXP</span> <button class="small danger" data-rmbt="' + i + '">Remove</button></div>' + btPickHtml(r, b, i) + "</div>";
+    });
+  }
+  h += "<h3>Add a breakthrough</h3>";
+  h += '<div class="toolbar"><input type="search" id="btSearch" placeholder="Search breakthroughs..." value="' + esc(ui.btSearch) + '">' +
+       '<label class="small"><input type="checkbox" id="btOk"' + (ui.btOnlyOk ? " checked" : "") + "> only ones I can take</label></div>";
+  h += '<div class="list" id="btList"></div>';
+  $("cardBreak").innerHTML = h;
+  $("btSearch").oninput = function(){ ui.btSearch = this.value; drawBtList(); };
+  $("btOk").onchange = function(){ ui.btOnlyOk = this.checked; drawBtList(); };
+  drawBtList();
+  document.querySelectorAll("[data-rmbt]").forEach(function(b){ b.onclick = function(){ B.bts.splice(num(this.dataset.rmbt), 1); render(); }; });
+  document.querySelectorAll("[data-btpick]").forEach(function(sel){
+    sel.onchange = function(){ var b = B.bts[num(this.dataset.bt)]; b.pick = b.pick || {}; b.pick[this.dataset.btpick] = this.value; render(); };
+  });
+}
+function btPickHtml(r, b, i){
+  var g = r.grants || {}, p = b.pick || {}, h = "";
+  function sel(key, opts, label){
+    return '<div class="field"><label>' + label + '</label><select data-bt="' + i + '" data-btpick="' + key + '"><option value="">— pick —</option>' +
+      opts.map(function(o){ return "<option" + (p[key] === o ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select></div>";
+  }
+  if (g.statChoice) h += sel("stat", g.statChoice, "+" + (g.amount || 1) + " stat");
+  if (g.mainStatChoice) h += sel("main", MAIN, "+1 main stat");
+  if (g.subStatChoice) h += sel("sub", SUB, "+1 sub stat");
+  if (g.mastery === "CHOICE") h += sel("element", ["Fire","Water","Earth","Wind","Lightning","Frost","Arcane","Holy","Dark"], "Element");
+  if (g.proficiency) h += '<div class="note">Pick the proficiency in the Proficiencies section.</div>';
+  if (g.language === "CHOICE") {
+    h += '<div class="field"><label>Choice</label><input type="text" data-bt="' + i + '" data-bttext="text" value="' + esc(p.text || "") + '" placeholder="' + esc(g.proficiency || "Language") + '"></div>';
+  }
+  if (g.skillPoints) h += '<div class="note">Skill points from this show up as their own source in Skills.</div>';
+  setTimeout(function(){
+    document.querySelectorAll("[data-bttext]").forEach(function(inp){
+      inp.onchange = function(){ var bb = B.bts[num(this.dataset.bt)]; bb.pick = bb.pick || {}; bb.pick.text = this.value; saveLocal(); };
+    });
+  }, 0);
+  return h;
+}
+function drawBtList(){
+  var q = ui.btSearch.trim().toLowerCase(), h = "";
+  Object.values(BTS).sort(sortByName).forEach(function(r){
+    if (q && (r.name + " " + (r.summary || []).join(" ") + " " + (r.requires || "")).toLowerCase().indexOf(q) < 0) return;
+    var why = btBlockers(r);
+    if (ui.btOnlyOk && why.length) return;
+    if (r.restricted && !B.canon && !q) return;
+    var nth = B.bts.filter(function(b){ return b.id === r.id; }).length;
+    var tags = "";
+    if (r.creationOnly) tags += '<span class="tag warn">creation only</span>';
+    if (r.repeatable || r.costScale || r.costNote) tags += '<span class="tag">repeatable</span>';
+    if (r.restricted) tags += '<span class="tag bad">restricted</span>';
+    if (r.drawback) tags += '<span class="tag bad">drawback</span>';
+    h += '<div class="li' + (why.length ? " locked" : "") + '"><div class="top"><span class="name" data-info="bt:' + r.id + '">' + esc(r.name) + "</span>" + tags +
+      '<span class="grow"></span><span class="dim small">' + btCostAt(r.id, nth) + ' EXP</span> <button class="small" data-addbt="' + r.id + '"' +
+      (why.length ? ' disabled title="' + esc(why.join(", ")) + '"' : "") + ">Add</button></div>" +
+      (r.requires ? '<div class="small dim">Requires: ' + esc(r.requires) + "</div>" : "") +
+      listHtml(r.summary) + (r.drawback ? '<div class="small bad">Drawback: ' + esc(r.drawback) + "</div>" : "") +
+      (r.costNote ? '<div class="small dim">' + esc(r.costNote) + "</div>" : "") +
+      (why.length ? '<div class="small bad">Can\'t add: ' + esc(why.join(", ")) + "</div>" : "") + "</div>";
+  });
+  $("btList").innerHTML = h || '<div class="li dim">No matches.</div>';
+  document.querySelectorAll("[data-addbt]").forEach(function(b){ b.onclick = function(){ B.bts.push({ id: this.dataset.addbt, pick: {} }); render(); }; });
+}
+
+/* ---------- Items ---------- */
+function renderItems(){
+  var cats = {}; Object.values(ITEMS).forEach(function(it){ cats[it.category] = (cats[it.category] || 0) + 1; });
+  var h = "<h2>Items</h2>";
+  h += '<div class="note">Buy items to track Clim and burden. Tick "equip" on armor and shields in the side panel to apply their stats.</div>';
+  h += '<div class="toolbar"><input type="search" id="itSearch" placeholder="Search items..." value="' + esc(ui.itemSearch) + '">' +
+    '<select id="itCat"><option value="">All types</option>' + Object.keys(cats).sort().map(function(c){ return "<option>" + esc(c) + "</option>"; }).join("") + "</select></div>";
+  h += '<div class="list" id="itList"></div>';
+  $("cardItems").innerHTML = h;
+  $("itCat").value = ui.itemCat;
+  $("itSearch").oninput = function(){ ui.itemSearch = this.value; drawItemList(); };
+  $("itCat").onchange = function(){ ui.itemCat = this.value; drawItemList(); };
+  drawItemList();
+}
+function itemDetail(it){
+  var bits = [];
+  if (it.activation) bits.push("Use: " + it.activation);
+  if (it.range) bits.push("Range: " + it.range);
+  var w = it.weapon;
+  if (w) bits.push("Weapon: " + [w.group, w.hands ? w.hands + "H" : "", w.range, w.property].filter(Boolean).join(" · "));
+  var a = it.armor;
+  if (a) bits.push("Armor: " + Object.keys(a).filter(function(k){ return k !== "type"; }).map(function(k){ return k + " " + a[k]; }).join(", "));
+  var m = it.mount;
+  if (m) bits.push("Mount: " + Object.keys(m).map(function(k){ return k + " " + m[k]; }).join(", "));
+  if (it.fuel) bits.push("Fuel: shell " + it.fuel.shell + ", " + it.fuel.usage);
+  if (it.crafting) bits.push("Crafting: " + [it.crafting.points, it.crafting.discipline, it.crafting.materials].filter(function(x){ return x !== undefined && x !== null; }).join(" · "));
+  var h = '<div class="small dim">' + bits.map(esc).join("<br>") + "</div>" + listHtml(it.summary);
+  if (it.mods) {
+    ["A", "B", "Frame"].forEach(function(t){
+      if (it.mods[t] && it.mods[t].length) h += '<div class="small"><b>' + t + " mods:</b> " +
+        it.mods[t].map(function(x){ return esc(x.name) + " (" + x.points + ") — " + esc(x.summary); }).join("<br>") + "</div>";
+    });
+  }
+  return h + '<div class="small"><a href="' + esc(it.url) + '" target="_blank" rel="noopener">View on static copy (unofficial)</a></div>';
+}
+function drawItemList(){
+  var q = ui.itemSearch.trim().toLowerCase(), h = "";
+  Object.values(ITEMS).sort(sortByName).forEach(function(it){
+    if (ui.itemCat && it.category !== ui.itemCat) return;
+    if (q && (it.name + " " + it.tag + " " + (it.summary || []).join(" ")).toLowerCase().indexOf(q) < 0) return;
+    var c = itemCost(it);
+    h += '<div class="li"><div class="top"><span class="name" data-info="item:' + it.id + '">' + esc(it.name) + '</span><span class="tag">' + esc(it.category) + (it.tag && it.tag !== it.category ? " · " + esc(it.tag) : "") + "</span>" +
+      '<span class="grow"></span><span class="dim small">' + (c !== null ? c.toLocaleString() + " Clim" : esc(it.cost)) + " · burden " + esc(it.burden == null ? "?" : it.burden) + "</span>" +
+      ' <button class="small" data-buy="' + it.id + '">Buy</button></div><details><summary>Details</summary>' + itemDetail(it) + "</details></div>";
+  });
+  $("itList").innerHTML = h || '<div class="li dim">No matches.</div>';
+  document.querySelectorAll("[data-buy]").forEach(function(b){
+    b.onclick = function(){
+      var id = this.dataset.buy, e = B.items.filter(function(x){ return x.id === id; })[0];
+      if (e) e.qty++; else B.items.push({ id: id, qty: 1, equipped: false });
+      renderSome([]);
+    };
+  });
+}
+
+/* ---------- Live pane (pools + combat values + inventory) ---------- */
+function renderLive(){
+  var e = C.exp, d = C.d, h = "";
+  if (C.warn.length) h += '<div class="warnbox">' + C.warn.map(esc).join("<br>") + "</div>";
+
+  h += '<div class="card"><h2>Pools</h2>';
+  h += '<div class="kv"><span>Class EXP left (creation)</span><b class="' + (e.classLeft ? "warn" : "") + '">' + e.classLeft + " / " + e.startClass + "</b></div>";
+  h += '<div class="kv"><span>Breakthrough EXP left</span><b class="' + (e.btLeft ? "warn" : "") + '">' + e.btLeft + " / 300</b></div>";
+  h += '<div class="kv"><span>Unspent EXP</span><b class="' + (e.unspent < 0 ? "bad" : "") + '">' + e.unspent.toLocaleString() + "</b></div>";
+  h += '<div class="kv"><span>Spirit Core</span><b>' + e.spiritCore.toLocaleString() + "</b></div>";
+  h += '<div class="kv"><span>EXP earned since creation</span><input type="number" id="inExp" min="0" step="25" value="' + num(B.expEarned) + '"></div>';
+  if (e.human) h += '<div class="note">Includes Human Ambition +100 EXP.</div>';
+  h += '<div class="kv"><span>IP left</span><b class="' + (C.ip.left < 0 ? "bad" : "") + '">' + C.ip.left + " / " + C.ip.total + "</b></div>";
+  h += '<div class="kv"><span>IP earned since creation</span><input type="number" id="inIp" min="0" value="' + num(B.ipEarned) + '"></div>';
+  h += '<div class="kv"><span>Clim left</span><b class="' + (C.clim.left < 0 ? "bad" : "") + '">' + C.clim.left.toLocaleString() + "</b></div>";
+  h += '<div class="kv"><span>Clim spent</span><b>' + C.clim.spent.toLocaleString() + "</b></div>";
+  h += '<div class="kv"><span>Starting Clim</span><input type="number" id="inClimStart" min="0" step="100" value="' + num(B.startClim) + '"></div>';
+  h += '<div class="kv"><span>Clim gained since</span><input type="number" id="inClimAdd" step="100" value="' + num(B.climAdded) + '"></div>';
+  if (C.clim.canon) h += '<div class="note">Includes +1,000 Clim for a canon campaign.</div>';
+  if (C.clim.bonus) h += '<div class="note">Includes ' + C.clim.bonus.toLocaleString() + " Clim from breakthroughs.</div>";
+  h += '<div class="kv"><span>Skill points left</span><b class="' + (C.skillLeft > 0 ? "warn" : C.skillLeft < 0 ? "bad" : "") + '">' + fmt(C.skillLeft) + "</b></div>";
+  h += "</div>";
+
+  h += '<div class="card"><h2>Combat</h2><div class="big">' +
+    "<div><b>" + d.hp + "</b><span>HP</span></div><div><b>" + d.mana + "</b><span>Mana</span></div><div><b>" + d.guard + "</b><span>Guard</span></div>" +
+    "<div><b>" + d.ap + "</b><span>AP</span></div><div><b>" + d.rp + "</b><span>RP</span></div><div><b>" + d.evasion + "</b><span>Evasion</span></div></div>";
+  [["Dodge evasion", d.dodge], ["Block guard", d.blockGuard], ["Initiative", "1d4 " + sign(d.init)], ["Speed", d.speed + "ft"],
+   ["Potency (save DC)", d.potency], ["Save", d.save], ["Accuracy", d.acc], ["Accuracy (Precise)", d.accP],
+   ["Light attack", d.light], ["Heavy attack", d.heavy], ["Heavy (2H melee)", d.heavy2]].forEach(function(x){
+    h += '<div class="kv"><span>' + x[0] + "</span><b>" + esc(x[1]) + "</b></div>";
+  });
+  h += '<div class="note">Formulas from the rulebook (section 3 of RULES_REFERENCE.md). Class/race ability bonuses aren\'t added automatically yet.</div></div>';
+
+  h += '<div class="card inv"><h2>Inventory</h2>';
+  if (!B.items.length) h += '<div class="dim small">Nothing bought yet.</div>';
+  B.items.forEach(function(e, i){
+    var it = ITEMS[e.id]; if (!it) return;
+    var eq = it.armor ? '<label class="small"><input type="checkbox" data-eq="' + i + '"' + (e.equipped ? " checked" : "") + "> equip</label>" : "";
+    var need = itemProf(it);
+    if (need && !C.profs[need]) eq += ' <span class="tag bad" title="You are not proficient with ' + esc(need) + '">not proficient</span>';
+    h += '<div class="kv"><span>' + esc(it.name) + " " + eq + '</span><span class="pm"><button class="small" data-q="' + i + '" data-d="-1">−</button><b>' + e.qty + '</b><button class="small" data-q="' + i + '" data-d="1">+</button></span></div>';
+  });
+  h += '<div class="kv"><span>Burden</span><b class="' + (C.burden > 10 ? "bad" : "") + '">' + C.burden + " / 10</b></div></div>";
+  $("paneLive").innerHTML = h;
+
+  function bindNum(id, key){ $(id).onchange = function(){ B[key] = num(this.value); render(); }; }
+  bindNum("inExp", "expEarned"); bindNum("inIp", "ipEarned"); bindNum("inClimStart", "startClim"); bindNum("inClimAdd", "climAdded");
+  document.querySelectorAll("[data-q]").forEach(function(b){
+    b.onclick = function(){ var i = num(this.dataset.q), e = B.items[i]; e.qty += num(this.dataset.d); if (e.qty <= 0) B.items.splice(i, 1); renderSome([]); };
+  });
+  document.querySelectorAll("[data-eq]").forEach(function(cb){
+    cb.onchange = function(){
+      var e = B.items[num(this.dataset.eq)], it = ITEMS[e.id];
+      // only one body armor at a time (plates and shields are separate)
+      if (this.checked && /^(Light|Medium|Heavy|Clothing)$/.test(it.armor.type || "")) {
+        B.items.forEach(function(o){ var oi = ITEMS[o.id]; if (oi && oi.armor && /^(Light|Medium|Heavy|Clothing)$/.test(oi.armor.type || "")) o.equipped = false; });
+      }
+      e.equipped = this.checked; renderSome([renderStats]);
+    };
+  });
+}
+
+/* ---------- Abilities pane ---------- */
+function renderAbil(){
+  var h = '<div class="card"><h2>Abilities</h2>';
+  var groups = [];
+  var r = raceRec(), s = subRec();
+  [r, s].forEach(function(x){
+    if (!x || !x.abilities) return;
+    var list = Object.keys(x.abilities);
+    if (x.id === "demon" && x.options) { // show base demon abilities + the chosen clan's only
+      var clanAbs = x.options.choices.map(function(c){ return c.ability; });
+      var mine = (x.options.choices.filter(function(c){ return c.code === B.raceChoice.clan; })[0] || {}).ability;
+      list = list.filter(function(id){ return clanAbs.indexOf(id) < 0 || id === mine; });
+    }
+    groups.push({ title: x.name + (x.kind === "subrace" ? " (sub-race)" : " (race)"), abs: list.map(function(id){ return x.abilities[id]; }) });
+  });
+  B.classes.forEach(function(c){
+    var rec = CLASSES[c.id]; if (!rec) return;
+    var abs = [];
+    rec.steps.forEach(function(st, i){ if (st.ability && c.owned[i] && rec.abilities[st.ability]) abs.push(rec.abilities[st.ability]); });
+    if (abs.length) groups.push({ title: rec.name + " (T" + rec.tier + ")", abs: abs });
+  });
+  if (!groups.length) h += '<div class="dim small">Pick a race and classes to see abilities here.</div>';
+  groups.forEach(function(g){
+    h += "<h3>" + esc(g.title) + "</h3>";
+    g.abs.forEach(function(a){
+      h += '<div class="ab"><div class="t">' + esc(a.name) + "</div>" +
+        '<div class="meta">' + esc([a.cost, a.range].filter(Boolean).join(" · ")) +
+        (a.keywords || []).map(kwTag).join("") + "</div>" +
+        (a.requires ? '<div class="meta">Requires: ' + esc(a.requires) + "</div>" : "") +
+        (a.usage ? '<div class="meta">' + esc(a.usage) + "</div>" : "") + listHtml(a.summary) + "</div>";
+    });
+  });
+  h += '<div class="note">Ability text is a plain-English summary. For exact wording, check the official site.</div></div>';
+  $("paneAbil").innerHTML = h;
+}
+
+/* ---------- Proficiencies ---------- */
+var PROF = { groups: LC.weaponGroups || [], armor: LC.armorGroups || [], sets: LC.profSets || {}, grants: LC.profGrants || [] };
+function profList(from){ return Array.isArray(from) ? from : (PROF.sets[from] || []); }
+// Every grant that applies to this build right now, with a key for saving its picks.
+function activeProfGrants(){
+  var out = [], ids = raceIds();
+  PROF.grants.forEach(function(g){
+    var p = g.source.split(":"), t = p[0], id = p[1];
+    if (t === "race" && ids.indexOf(id) >= 0) out.push({ g: g, key: g.source, label: (RACES[id] || {}).name + " (race)" });
+    if (t === "clan" && B.race === "demon" && B.raceChoice.clan === id) out.push({ g: g, key: g.source, label: "Demon clan " + id });
+    if (t === "class") {
+      B.classes.forEach(function(c){
+        var rec = CLASSES[c.id]; if (c.id !== id || !rec) return;
+        var i = rec.steps.map(function(s){ return s.ability; }).indexOf(g.ability);
+        if (i >= 0 && c.owned[i]) out.push({ g: g, key: g.source, label: rec.name + " — " + (rec.abilities[g.ability] || {}).name });
+      });
+    }
+    if (t === "bt") {
+      var n = 0;
+      B.bts.forEach(function(b, idx){
+        if (b.id !== id) return; n++;
+        out.push({ g: g, key: "bt:" + idx, label: (BTS[id] || {}).name + (n > 1 ? " #" + n : "") });
+      });
+    }
+  });
+  return out;
+}
+function calcProfs(C){
+  C.profs = {}; C.profSlots = []; C.profNotes = []; C.profOpenSlots = 0;
+  var keep = {};
+  activeProfGrants().forEach(function(a){
+    (a.g.fixed || []).forEach(function(n){ (C.profs[n] = C.profs[n] || []).push(a.label); });
+    (a.g.choose || []).forEach(function(ch, j){
+      var k = a.key + "#" + j, picks = (B.profPicks[k] || []).slice(0, ch.n); keep[k] = 1;
+      picks.forEach(function(n){ if (n) (C.profs[n] = C.profs[n] || []).push(a.label); });
+      var open = ch.n - picks.filter(Boolean).length; C.profOpenSlots += open;
+      C.profSlots.push({ key: k, label: a.label, text: ch.label, n: ch.n, options: profList(ch.from), picks: picks });
+    });
+    if (a.g.note) C.profNotes.push(a.label + ": " + a.g.note);
+  });
+  for (var k in B.profPicks) if (!keep[k]) delete B.profPicks[k];  // forget picks from removed classes/breakthroughs
+  if (C.profOpenSlots) C.warn.push(C.profOpenSlots + " proficienc" + (C.profOpenSlots > 1 ? "ies" : "y") + " still to pick (Proficiencies section).");
+  B.items.forEach(function(e){
+    var it = ITEMS[e.id]; if (!it || !e.equipped || !it.armor) return;
+    var need = itemProf(it);
+    if (need && !C.profs[need]) C.warn.push("Not proficient with " + need + " (" + it.name + "): the rulebook gives non-proficient armor and shields a Guard and Evasion penalty.");
+  });
+}
+// Which proficiency an item needs (or null).
+function itemProf(it){
+  if (LC.itemProfById && LC.itemProfById[it.id]) return LC.itemProfById[it.id];
+  if (it.weapon && it.weapon.group) {
+    var g = String(it.weapon.group).replace(/\s*\(.*\)$/, "");
+    return (LC.itemGroupMap || {})[it.weapon.group] || (LC.itemGroupMap || {})[g] || null;
+  }
+  return null;
+}
+// Requirement names -> our names ("Longsword" -> "Longswords", "Thrown" -> "Thrown Weapons", ...)
+function profName(x){
+  var all = PROF.groups.map(function(g){ return g.name; }).concat(PROF.armor), l = x.toLowerCase();
+  for (var i = 0; i < all.length; i++) {
+    var a = all[i].toLowerCase();
+    if (a === l || a === l + "s" || a === l + "es" || a.replace(/ weapons?$/, "") === l || a.split(" ")[0] === l) return all[i];
+  }
+  return x;
+}
+function profCheck(list, C){
+  var want = [];
+  list.forEach(function(x){
+    if (x === "ANY_WEAPON") want = want.concat(PROF.groups.map(function(g){ return g.name; }));
+    else if (x === "ANY_MELEE") want = want.concat(PROF.groups.filter(function(g){
+      return ["common-melee", "artisan"].indexOf(g.kind) >= 0 || ["Lances", "Whips", "Gauntlets", "Saboteur Thread Daggers", "Staves"].indexOf(g.name) >= 0; }).map(function(g){ return g.name; }));
+    else if (x === "ANY_TWO_HANDED_MELEE") want = want.concat(PROF.groups.filter(function(g){ return g.twoHanded && g.kind !== "other"; }).map(function(g){ return g.name; }));
+    else want.push(profName(x));
+  });
+  if (want.some(function(n){ return C.profs[n]; })) return true;
+  // an unfilled pick that could be one of these -> can't say yet
+  var could = C.profSlots.some(function(s){ return s.picks.filter(Boolean).length < s.n && s.options.some(function(o){ return want.indexOf(o) >= 0; }); });
+  return could ? null : false;
+}
+function renderProf(){
+  var h = "<h2>Proficiencies</h2>";
+  var have = Object.keys(C.profs).sort();
+  h += '<div class="note">Weapon and armor proficiencies from your race, classes and breakthroughs. Class requirements and equipped gear are checked against these.</div>';
+  h += have.length ? '<div class="chips">' + have.map(function(n){ return '<span class="tag gold" title="' + esc(C.profs[n].join("\n")) + '">' + esc(n) + "</span>"; }).join(" ") + "</div>"
+                   : '<p class="dim">None yet.</p>';
+  if (C.profSlots.length) {
+    h += "<h3>Choices</h3>";
+    C.profSlots.forEach(function(sl){
+      h += '<div class="li"><div class="small"><b>' + esc(sl.label) + "</b> — " + esc(sl.text) + "</div><div class=\"toolbar\" style=\"margin:4px 0 0\">";
+      for (var k = 0; k < sl.n; k++) {
+        var cur = sl.picks[k] || "";
+        h += '<select data-profkey="' + esc(sl.key) + '" data-slot="' + k + '"><option value="">— pick —</option>' +
+          sl.options.map(function(o){
+            var dup = o !== cur && sl.picks.indexOf(o) >= 0;
+            return '<option' + (o === cur ? " selected" : "") + (dup ? " disabled" : "") + ">" + esc(o) + "</option>";
+          }).join("") + "</select>";
+      }
+      h += "</div></div>";
+    });
+  }
+  if (C.profNotes.length) h += '<div class="note">' + C.profNotes.map(esc).join("<br>") + "</div>";
+  $("cardProf").innerHTML = h;
+  document.querySelectorAll("[data-profkey]").forEach(function(sel){
+    sel.onchange = function(){
+      var k = this.dataset.profkey, arr = B.profPicks[k] = B.profPicks[k] || [];
+      arr[num(this.dataset.slot)] = this.value; render();
+    };
+  });
+}
+
+/* ---------- Details window (tap a name or ⓘ) ---------- */
+function abilityFull(a, extra){
+  return '<div class="ab"><div class="t">' + esc(a.name) + (extra || "") + "</div>" +
+    '<div class="meta">' + esc([a.cost, a.range].filter(Boolean).join(" · ")) + (a.keywords || []).map(kwTag).join("") + "</div>" +
+    (a.requires ? '<div class="meta">Requires: ' + esc(a.requires) + "</div>" : "") +
+    (a.usage ? '<div class="meta">' + esc(a.usage) + "</div>" : "") + listHtml(a.summary) + "</div>";
+}
+function pageLink(url, text){ return url ? '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(text || "View on static copy (unofficial)") + "</a>" : ""; }
+var detailNow = null;
+function openDetail(spec){
+  detailNow = spec;
+  var p = spec.split(":"), kind = p[0], id = p.slice(1).join(":");
+  var head = "", body = "", foot = "";
+  if (kind === "class" && CLASSES[id]) {
+    var c = CLASSES[id], st = classStatus(id, C), have = B.classes.some(function(x){ return x.id === id; });
+    var cost = stepCost(id, 0), ip = classIpCost(id);
+    head = '<span class="t">' + esc(c.name) + '</span><span class="tag gold">Tier ' + c.tier + "</span>" +
+      (c.role ? '<span class="tag">' + esc(c.role) + (c.secondary ? " / " + esc(c.secondary) : "") + "</span>" : "") +
+      (c.difficulty ? '<span class="tag">Difficulty ' + c.difficulty + "</span>" : "");
+    var badge = st.state === "met" ? '<span class="tag good">' + esc(st.why || (st.text ? "requirements met" : "no requirements")) + "</span>"
+      : st.state === "check" ? '<span class="tag warn">check requirements yourself</span>' : '<span class="tag bad">requirements not met</span>';
+    body += '<div class="small">Requires: ' + esc(st.text || "nothing") + " " + badge + "</div>";
+    body += '<div class="small dim">Learn: ' + (ip ? "1 IP + " : "") + cost + " EXP · each later step 100 EXP · master it all for " +
+      (ip ? "1 IP + " : "") + c.steps.reduce(function(t, s, i){ return t + stepCost(id, i); }, 0) + " EXP</div>";
+    var unlocks = (LC.leadsTo || {})[id];
+    if (unlocks && unlocks.length) body += '<div class="small dim">Mastering this helps unlock: ' +
+      unlocks.map(function(u){ return '<span class="name" data-info="class:' + u.classId + '">' + esc((CLASSES[u.classId] || {}).name || u.classId) + "</span>"; }).join(", ") + "</div>";
+    c.steps.forEach(function(s){
+      body += '<div class="stp"><div class="lbl">Step ' + s.level + " · " + esc(s.label) + "</div>";
+      if (s.ability && c.abilities[s.ability]) body += abilityFull(c.abilities[s.ability]);
+      else if (s.type === "skills" || s.type === "special") body += '<div class="small">+' + s.points + " points" + (Array.isArray(s.options) ? ": " + esc(s.options.join(", ")) : "") + "</div>" + (s.summary ? '<div class="small dim">' + esc(s.summary) + "</div>" : "");
+      else if (s.type === "heart" || s.type === "soul") body += '<div class="small">+' + (s.amount || 1) + " to one of: " + esc((s.options || []).join(", ")) + "</div>";
+      body += "</div>";
+    });
+    var why = [];
+    if (have) why.push("already taken"); if (st.state === "no") why.push("requirements not met");
+    if (ip > C.ip.left) why.push("not enough IP"); if (cost > expAvailFor("class")) why.push("not enough EXP");
+    foot = '<button class="gold" data-dadd="class:' + id + '"' + (why.length ? " disabled" : "") + ">Add class</button>" +
+      (why.length ? '<span class="small bad">' + esc(why.join(", ")) + "</span>" : "") + '<span style="flex:1"></span>' + pageLink(c.url);
+  }
+  else if (kind === "race" && RACES[id]) {
+    var r = RACES[id], par = r.parent ? RACES[r.parent] : null, src = (r.usesParentCreation && par) ? par : r;
+    head = '<span class="t">' + esc(r.name) + '</span><span class="tag gold">' + (r.kind === "subrace" ? "Sub-race of " + esc(par ? par.name : r.parent) : "Race") + "</span>" +
+      (r.size ? '<span class="tag">' + esc(r.size) + "</span>" : "") + (r.restriction ? '<span class="tag bad">' + esc(r.restriction) + "</span>" : "");
+    var bits = [];
+    if (src.stats) bits.push("Stats: " + Object.keys(src.stats).map(function(k){ return k === "choice" ? src.stats[k] : sign(src.stats[k]) + " " + k; }).join(", ") + (src !== r ? " (from " + src.name + ")" : ""));
+    if (src.skills) bits.push("Skills: +" + src.skills.points + " points in " + (Array.isArray(src.skills.options) ? src.skills.options.join(", ") : "any normal skill"));
+    if (src.languages) bits.push("Languages: " + src.languages.join(", "));
+    if (src.proficiencies && src.proficiencies.length) bits.push("Proficiencies: " + src.proficiencies.join(", "));
+    [par, r].forEach(function(x){ if (x && x.extras && (x === r || r.usesParentCreation)) bits = bits.concat(x.extras); });
+    if (r.note) bits.push(r.note);
+    body += '<div class="small">' + bits.map(esc).join("<br>") + "</div>";
+    if (r.options) body += "<h3>" + esc(r.options.label) + "</h3>" + '<div class="small">' + r.options.choices.map(function(ch){
+      return typeof ch === "string" ? esc(ch) : "<b>" + esc(ch.code + " - " + ch.name) + "</b>" + (ch.extras ? ": " + esc(ch.extras.join("; ")) : "");
+    }).join("<br>") + "</div>";
+    if (r.subraces && r.subraces.length) body += "<h3>Sub-races</h3>" + r.subraces.map(function(sid){
+      return RACES[sid] ? '<span class="tag" data-info="race:' + sid + '">' + esc(RACES[sid].name) + "</span>" : ""; }).join(" ");
+    var unl = UNLOCKS.filter(function(u){ return u.source === "race:" + id; });
+    if (unl.length) body += '<div class="small good">Unlocks: ' + unl.map(function(u){ return esc((CLASSES[u.classId] || {}).name + " (" + u.via + ")"); }).join(", ") + "</div>";
+    var rbts = Object.values(BTS).filter(function(b){ return (b.race || []).indexOf(id) >= 0; });
+    if (rbts.length) body += '<div class="small">Race breakthroughs: ' + rbts.map(function(b){ return '<span class="name" data-info="bt:' + b.id + '">' + esc(b.name) + "</span>"; }).join(", ") + "</div>";
+    if (par && r.usesParentCreation && par.abilities) {
+      body += "<h3>" + esc(par.name) + " abilities</h3>";
+      Object.values(par.abilities).forEach(function(a){ body += abilityFull(a); });
+    }
+    body += "<h3>" + esc(r.name) + " abilities</h3>";
+    Object.values(r.abilities || {}).forEach(function(a){ body += abilityFull(a); });
+    var gl = genderLock(r), isSub = r.kind === "subrace";
+    var chosen = isSub ? B.subrace === id : B.race === id;
+    foot = (chosen ? '<span class="tag good">Your ' + (isSub ? "sub-race" : "race") + "</span>"
+      : '<button class="gold" data-dadd="race:' + id + '"' + (gl ? " disabled" : "") + ">Choose this " + (isSub ? "sub-race" : "race") + "</button>" + (gl ? '<span class="small bad">' + esc(gl) + "</span>" : "")) +
+      '<span style="flex:1"></span>' + pageLink(r.url);
+  }
+  else if (kind === "races") {
+    var list = id ? (RACES[id].subraces || []).map(function(x){ return RACES[x]; }).filter(Boolean)
+                  : Object.values(RACES).filter(function(x){ return x.kind === "primary"; });
+    head = '<span class="t">' + (id ? esc(RACES[id].name) + " sub-races" : "Races") + "</span>";
+    list.sort(sortByName).forEach(function(x){
+      var src = (x.usesParentCreation && RACES[x.parent]) ? RACES[x.parent] : x;
+      var stats = src.stats ? Object.keys(src.stats).map(function(k){ return k === "choice" ? "+1 main, +1 sub (choice)" : sign(src.stats[k]) + " " + k; }).join(", ") : "";
+      body += '<div class="li"><div class="top"><span class="name" data-info="race:' + x.id + '">' + esc(x.name) + "</span>" +
+        (x.size ? '<span class="tag">' + esc(x.size) + "</span>" : "") + (x.restriction ? '<span class="tag bad">' + esc(x.restriction) + "</span>" : "") +
+        (x.subraces && x.subraces.length ? '<span class="tag">' + x.subraces.length + " sub-races</span>" : "") +
+        '<span class="grow"></span><button class="small" data-info="race:' + x.id + '">Details</button></div>' +
+        '<div class="small dim">' + esc(stats) + (stats ? " · " : "") + esc(Object.values(x.abilities || {}).map(function(a){ return a.name; }).join(", ")) + "</div></div>";
+    });
+    foot = '<span class="small dim">Tap a name for full details.</span>';
+  }
+  else if (kind === "bt" && BTS[id]) {
+    var b = BTS[id], why2 = btBlockers(b), nth = B.bts.filter(function(x){ return x.id === id; }).length;
+    head = '<span class="t">' + esc(b.name) + "</span>" + '<span class="tag gold">' + btCostAt(id, nth) + " EXP</span>" +
+      (b.creationOnly ? '<span class="tag warn">creation only</span>' : "") + (b.restricted ? '<span class="tag bad">restricted</span>' : "");
+    body += (b.requires ? '<div class="small">Requires: ' + esc(b.requires) + "</div>" : "") + listHtml(b.summary) +
+      (b.drawback ? '<div class="small bad">Drawback: ' + esc(b.drawback) + "</div>" : "") +
+      (b.costNote ? '<div class="small dim">' + esc(b.costNote) + "</div>" : "") +
+      (b.removal ? '<div class="small dim">Removal: ' + esc(b.removal) + "</div>" : "") +
+      (b.options ? '<div class="small">Options:<br>' + b.options.map(function(o){ return esc(typeof o === "string" ? o : (o.name || "") + (o.summary ? ": " + o.summary : "")); }).join("<br>") + "</div>" : "");
+    foot = '<button class="gold" data-dadd="bt:' + id + '"' + (why2.length ? " disabled" : "") + ">Add breakthrough</button>" +
+      (why2.length ? '<span class="small bad">' + esc(why2.join(", ")) + "</span>" : "") + '<span style="flex:1"></span>' + pageLink(b.url);
+  }
+  else if (kind === "item" && ITEMS[id]) {
+    var it = ITEMS[id], ic = itemCost(it), need = itemProf(it);
+    head = '<span class="t">' + esc(it.name) + '</span><span class="tag">' + esc(it.category) + (it.tag && it.tag !== it.category ? " · " + esc(it.tag) : "") + "</span>" +
+      '<span class="tag gold">' + (ic !== null ? ic.toLocaleString() + " Clim" : esc(it.cost)) + "</span>" + '<span class="tag">burden ' + esc(it.burden == null ? "?" : it.burden) + "</span>" +
+      (need ? '<span class="tag ' + (C.profs[need] ? "good" : "bad") + '">' + esc(need) + (C.profs[need] ? " ✓" : " — not proficient") + "</span>" : "");
+    body = itemDetail(it);
+    foot = '<button class="gold" data-dadd="item:' + id + '">Buy</button><span class="small dim">Clim left: ' + C.clim.left.toLocaleString() + "</span>";
+  }
+  else return;
+  $("dHead").innerHTML = head + '<span style="flex:1"></span><button id="dClose">Close ✕</button>';
+  $("dBody").innerHTML = body; $("dFoot").innerHTML = foot;
+  $("dBody").scrollTop = 0;
+  $("detail").classList.add("open");
+  $("dClose").onclick = closeDetail;
+  document.querySelectorAll("[data-dadd]").forEach(function(btn){
+    btn.onclick = function(){
+      var q = this.dataset.dadd.split(":"), k = q[0], v = q[1];
+      if (k === "class") B.classes.push({ id: v, owned: [true, false, false, false, false, false, false, false], picks: {} });
+      if (k === "bt") B.bts.push({ id: v, pick: {} });
+      if (k === "item") { var e = B.items.filter(function(x){ return x.id === v; })[0]; if (e) e.qty++; else B.items.push({ id: v, qty: 1, equipped: false }); }
+      if (k === "race") {
+        var rr = RACES[v];
+        if (rr.kind === "subrace") { B.race = rr.parent; B.subrace = v; B.raceChoice.element = ""; }
+        else { B.race = v; B.subrace = ""; B.raceChoice = { clan: "", element: "", main: "", sub: "" }; }
+      }
+      render(); openDetail(detailNow);  // refresh the window so it shows the new state
+    };
+  });
+}
+function closeDetail(){ $("detail").classList.remove("open"); detailNow = null; }
+$("detail").addEventListener("click", function(e){ if (e.target === this) closeDetail(); });
+document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeDetail(); });
+document.addEventListener("click", function(e){
+  var el = e.target.closest ? e.target.closest("[data-info]") : null;
+  if (el) { e.preventDefault(); openDetail(el.dataset.info); }
+});
+
+/* ---------- Keyword pop-ups (tap or hover a keyword tag) ---------- */
+// Finds the keyword for a tag like "Burning 5", "Persist 2" or "Stagger X".
+function findKeyword(tag){
+  var base = String(tag).toLowerCase().replace(/\s+(\d+|x)$/, "").trim();
+  for (var id in KEYWORDS) if (KEYWORDS[id].name.toLowerCase() === base) return KEYWORDS[id];
+  return null;
+}
+function kwTag(k){
+  var kw = findKeyword(k);
+  if (!kw) return '<span class="tag" title="Descriptor tag (no keyword page on the site)">' + esc(k) + "</span>";
+  return '<span class="tag kw" data-kw="' + esc(kw.id) + '" data-kwlabel="' + esc(k) + '">' + esc(k) + "</span>";
+}
+var kwPinned = null;
+function showKw(el){
+  var kw = KEYWORDS[el.dataset.kw]; if (!kw) return;
+  var pop = $("kwPop");
+  pop.innerHTML = "<b>" + esc(el.dataset.kwlabel) + "</b>" + listHtml(kw.rules);
+  pop.style.display = "block";
+  var r = el.getBoundingClientRect(), w = pop.offsetWidth, hgt = pop.offsetHeight;
+  var x = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+  var y = r.bottom + 6; if (y + hgt > window.innerHeight - 8) y = Math.max(8, r.top - hgt - 6);
+  pop.style.left = x + "px"; pop.style.top = y + "px";
+}
+function hideKw(){ $("kwPop").style.display = "none"; kwPinned = null; }
+document.addEventListener("click", function(e){
+  var el = e.target.closest ? e.target.closest("[data-kw]") : null;
+  if (el) { if (kwPinned === el) { hideKw(); return; } showKw(el); kwPinned = el; e.stopPropagation(); return; }
+  if (!e.target.closest || !e.target.closest("#kwPop")) hideKw();
+});
+document.addEventListener("mouseover", function(e){
+  var el = e.target.closest ? e.target.closest("[data-kw]") : null;
+  if (el && !kwPinned) showKw(el);
+});
+document.addEventListener("mouseout", function(e){
+  var el = e.target.closest ? e.target.closest("[data-kw]") : null;
+  if (el && !kwPinned) $("kwPop").style.display = "none";
+});
+window.addEventListener("scroll", hideKw, true);
+
+/* =====================================================================
+   4. SAVE / LOAD / RESET
+   ===================================================================== */
+$("btnSave").onclick = function(){
+  var blob = new Blob([JSON.stringify(B, null, 2)], { type: "application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "lyrian-build-" + ((B.name || "unnamed").replace(/[^a-z0-9]+/gi, "-").toLowerCase()) + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+};
+$("btnLoad").onclick = function(){ $("fileLoad").click(); };
+$("fileLoad").onchange = function(){
+  var f = this.files[0]; if (!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    try { B = fixBuild(JSON.parse(rd.result)); render(); }
+    catch (e) { alert("That file couldn't be read as a planner save."); }
+  };
+  rd.readAsText(f); this.value = "";
+};
+$("btnReset").onclick = function(){
+  if (confirm("Start a new empty build? (Save first if you want to keep this one.)")) { B = newBuild(); render(); }
+};
+
+/* =====================================================================
+   5. START
+   ===================================================================== */
+(function start(){
+  var missing = [];
+  if (!Object.keys(CLASSES).length) missing.push("data/classes.js");
+  if (!Object.keys(RACES).length) missing.push("data/races.js");
+  if (!Object.keys(BTS).length) missing.push("data/breakthroughs.js");
+  if (!Object.keys(REQS).length) missing.push("data/requirements.js");
+  if (!Object.keys(ITEMS).length) missing.push("data/items.js");
+  if (!Object.keys(KEYWORDS).length) missing.push("data/keywords.js");
+  if (!(LC.profGrants || []).length) missing.push("data/proficiencies.js");
+  if (missing.length) $("dataErr").innerHTML = '<div class="errbox">Couldn\'t load: ' + missing.join(", ") + '. Keep planner.html next to the "data" folder.</div>';
+  var any = Object.values(CLASSES)[0];
+  $("dataVer").textContent = "Data v" + (any ? any.version : "?") + " · " + Object.keys(CLASSES).length + " classes · " +
+    Object.keys(ITEMS).length + " items";
+  render();
+})();
+</script>
+</body>
+</html>
