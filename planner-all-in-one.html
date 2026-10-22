@@ -19377,6 +19377,9 @@ function renderLive(){
     '<div data-bd="evasion" data-bdlabel="Evasion"><b>' + d.evasion + "</b><span>Evasion</span></div></div>";
   h += '<div class="kv"><span>Dodge evasion</span>' + bd("dodge", d.dodge, "Dodge evasion") + "</div>";
   h += '<div class="kv"><span>Block guard</span>' + bd("blockGuard", d.blockGuard, "Block guard") + "</div>";
+  var Tn = C.stat.Toughness || 0;
+  h += '<div class="kv" title="HP regained per rest (rulebook): floor 1x Toughness, camp/basic lodging 2x, luxury 3x"><span>Rest heals (floor / camp / luxury)</span><b>' +
+       Tn + " / " + (2 * Tn) + " / " + (3 * Tn) + " HP</b></div>";
   h += '<div class="kv"><span>Initiative</span>' + bd("init", "1d4 " + sign(d.init), "Initiative bonus") + "</div>";
   h += '<div class="kv"><span>Speed</span>' + bd("speed", d.speed + "ft" + (d.walk ? " (walk " + d.walk + "ft)" : ""), "Speed") + "</div>";
   h += '<div class="kv"><span>Potency (save DC)</span>' + bd("potency", d.potency, "Potency") + "</div>";

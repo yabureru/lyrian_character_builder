@@ -1508,7 +1508,7 @@ When the site version changes, recheck classes already entered.
 - [ ] Giant Dragonfly: no line-movement note (it flies; other fliers have straight-line flight).
 - [ ] Greater Speed Potion and Speed Potion: page metadata says "Materials: 1"/"Materials: 2", which disagrees with the body text. Body text used.
 - [x] Facilities: effects added from the rulebook (workshops +2/+4/+6, uses per level, etc.). Greenhouse effect still MISSING.
-- [ ] Rest and food rules: the static rulebook copy really does stop mid-sentence at "To regain HP a character needs to rest." (the later Housing/Facilities sections mention Rest-action doubling but not the base rules). Needs the user's rulebook file.
+- [x] Rest and food rules: read in full from the official rulebook (2026-10-22) and added to RULES_REFERENCE.md section 8b. The Combat panel now shows HP regained per rest (1x/2x/3x Toughness).
 
 ---
 

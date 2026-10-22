@@ -2,8 +2,8 @@
 
 Source: https://lyrian.splatpass.net/rulebook/ plus /keywords/ and /basic-actions/ (static edition, v0.13.2), read 2026-10-21.
 Written in my own words as a working reference. Numbers are exact; wording is not official.
-**Gap:** the site copy of the rulebook stops mid-sentence at "To regain HP a character needs to rest." The rest of
-the Food & Rest section (and anything after it) could not be read. Basic Actions has no rest rules either.
+**Rest & food:** the static copy stopped mid-sentence at "To regain HP a character needs to rest."; the full text was read from the
+official rulebook (rpg.angelssword.com, v0.13.2) on 2026-10-22 - see section 8b.
 
 ---
 
@@ -104,6 +104,19 @@ Downed: Crawl, Grit 2 AP (heal 4), Play Dead 4 AP, Throw Rock 2 AP (2 dmg, 40ft)
 - GM gives IP: 0 none, 1 days, 2 weeks, 3 months. **IP doesn't carry over.** Each IP gained also gives **1 Errand Point (EP)**. First errand per interlude free, more cost 1 IP each.
 - Actions: Appraise Item (1 IP) · Class Action · Crafting (1 IP) · Gather (600 units; x2 with mastered T1 gathering class) · Heal Injury (1 IP) · Investigate · Job (1 IP = 300 Clim, +300 with a mastered crafting class) · **Learn Class (1 IP + tier x 100 EXP)** · Mentor Class (1 IP; student skips IP) · Open Shop (1 IP) · Recover (1 IP, remove one injury) · Research (auto 20) · Rest (+20% HP and mana as temp pools next adventure) · **Train (+25 EXP)**.
 - Raising animals needs a Stable; hatch/grow/train cost IP.
+
+## 8b. Rest, food and starvation (official rulebook, v0.13.2)
+- **Rest:** usually 8 hours overnight with no strenuous activity; an interruption of up to 1 hour can be resumed.
+- **HP regained per rest:** 1x Toughness (sleeping on the floor) · 2x Toughness (camp or basic lodging) · 3x Toughness (luxury lodging).
+- **Mana comes from food:** eat one food item at any time to regain mana; after that you can't eat for mana again until you've rested.
+  1 Mana: small snack / meager meal · 2 Mana: basic meal or rations · 3 Mana: well-cooked gourmet meal · 4 Mana: legendary food by a master.
+- **Rest actions:** one per adventurer per rest. Most need a kit (e.g. Medical Kit, a set-up Camping Kit); some class abilities are rest actions.
+- **Starvation:** you need at least 40 food units (or one ration) a day. Each day without enough food gives a level of starvation the next day:
+  per level, Burden Limit -5 and travel speed -25%, and all main and sub stats -1. If that takes Toughness to 0, starvation becomes lethal
+  the next day; one more day without food gives a mortal wound.
+- **Gameplay flow:** campaign -> arcs; phases Prologue -> Travel/Mystery -> Conflict (ends in a conflict resolution phase with EXP) -> Rest
+  (regain HP and the ability to eat for mana; one rest action; may spend EXP on skills/abilities but NOT new classes) -> Climax -> Interlude
+  (new classes, skills and languages can be bought here).
 
 ## 9. Crafting & gathering
 - **Crafting:** pay materials; 5 Crafting Dice (d10). Check = d10 + crafting skill (+ expertise) + modifiers; points must reach the item's Crafting HP or the craft fails and materials are lost. Actions: Basic Craft (1 die, Rapid), Beginner's Luck (1 die, 2d10 keep high, no skill), Standard Finish (2 dice, double points and end; not on modified items), Steady Craft (1 die counts as 5). Generic rerolls (e.g. Human racial) don't work; crafting-class abilities (e.g. Transmuter) do. Alchemy makes at least 3.
