@@ -32,6 +32,7 @@ h1{font-size:18px;margin:0;color:var(--gold2);letter-spacing:.5px}
 h2{font-size:15px;margin:0 0 10px;color:var(--gold2);text-transform:uppercase;letter-spacing:1px}
 h3{font-size:14px;margin:12px 0 6px;color:var(--gold)}
 a{color:var(--blue)}
+table.cmp td{padding:3px 6px;border-top:1px solid var(--line)} table.cmp tr.cmpDiff td{background:rgba(201,162,74,.07)}
 .dim{color:var(--dim)} .good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
 .small{font-size:12px}
 
@@ -166,9 +167,14 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
   <a class="hlink" href="https://lyrian.splatpass.net/" target="_blank" rel="noopener" title="Unofficial static copy of the rules. The planner's data was checked against it (v0.13.2).">Static copy (unofficial)</a>
   <span class="spacer"></span>
   <span id="dataVer" class="dim small"></span>
+  <span style="display:inline-flex;gap:6px;white-space:nowrap">
+    <button id="btnUndo" disabled title="Undo (Ctrl+Z)">↶ Undo</button>
+    <button id="btnRedo" disabled title="Redo (Ctrl+Y)">↷ Redo</button>
+  </span>
   <button id="btnSave" class="gold">Save</button>
   <button id="btnLoad">Load</button>
   <button id="btnShare">Share</button>
+  <button id="btnCompare">Compare</button>
   <button id="btnSheet">Print sheet</button>
   <input id="fileLoad" type="file" accept=".json,application/json" hidden>
   <button id="btnReset" class="reset danger">Reset</button>
@@ -286,7 +292,40 @@ function loadLocal(){
   try { var s = localStorage.getItem(SAVE_KEY); if (s) return fixBuild(JSON.parse(s)); } catch (e) {}
   return null;
 }
-function saveLocal(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(B)); } catch (e) {} }
+function saveLocal(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(B)); } catch (e) {} histTrack(); }
+
+/* ---------- Undo / Redo ----------
+   Every change to the build is remembered (up to 100 steps). Typing in one box counts as one step.
+   Reset and Load can be undone too. History is for this visit only (not saved). */
+var HIST = { past: [], future: [], cur: null, t: 0, busy: false, el: null };
+function histTrack(){
+  if (HIST.busy) return;
+  var s = JSON.stringify(B);
+  if (HIST.cur === null) { HIST.cur = s; histButtons(); return; }
+  if (s === HIST.cur) return;
+  var a = document.activeElement, typing = a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && /^(text|number|search)$/.test(a.type)));
+  var now = Date.now();
+  // keep typing in the same box as one step
+  if (!(typing && a === HIST.el && now - HIST.t < 1500 && HIST.past.length)) {
+    HIST.past.push(HIST.cur); if (HIST.past.length > 100) HIST.past.shift();
+  }
+  HIST.el = typing ? a : null; HIST.t = now;
+  HIST.cur = s; HIST.future = []; histButtons();
+}
+function histGo(from, to){
+  if (!from.length) return;
+  to.push(HIST.cur); HIST.cur = from.pop(); HIST.el = null;
+  HIST.busy = true;
+  try { B = fixBuild(JSON.parse(HIST.cur)); render(); } finally { HIST.busy = false; }
+  histButtons();
+}
+function undo(){ histGo(HIST.past, HIST.future); }
+function redo(){ histGo(HIST.future, HIST.past); }
+function histButtons(){
+  var u = document.getElementById("btnUndo"), r = document.getElementById("btnRedo");
+  if (u) { u.disabled = !HIST.past.length; u.title = "Undo (Ctrl+Z) - " + HIST.past.length + " step(s)"; }
+  if (r) { r.disabled = !HIST.future.length; r.title = "Redo (Ctrl+Y) - " + HIST.future.length + " step(s)"; }
+}
 function fixBuild(b){ // fill in anything missing from older saves
   var d = newBuild();
   for (var k in d) if (b[k] === undefined) b[k] = d[k];
@@ -2016,6 +2055,110 @@ function openShare(){
   };
 }
 $("btnShare").onclick = openShare;
+
+/* ---------- Compare two builds ----------
+   "Pin" the current build, change things, then open Compare to see before vs now.
+   You can also compare against a saved .json file or a build code. The pinned build is kept in this browser. */
+var CMP_KEY = "lyrianPlanner.compare";
+function cmpLoad(){ try { var s = localStorage.getItem(CMP_KEY); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+function cmpSave(o){ try { if (o) localStorage.setItem(CMP_KEY, JSON.stringify(o)); else localStorage.removeItem(CMP_KEY); } catch (e) {} }
+var cmpOther = null; // { label, build }
+// Work out the numbers for any build without touching the one you're editing.
+function calcFor(build){
+  var keepB = B, keepC = C;
+  try { B = fixBuild(JSON.parse(JSON.stringify(build))); return { b: B, c: calc() }; }
+  finally { B = keepB; C = keepC; }
+}
+function openCompare(){
+  detailNow = null;
+  if (!cmpOther) cmpOther = cmpLoad();
+  $("dHead").innerHTML = '<span class="t">Compare builds</span><span style="flex:1"></span><button id="dClose">Close ✕</button>';
+  var h = '<div class="note">Pin your build, make changes, then come back here to see what changed. Or compare with a saved file or a build code.</div>' +
+    '<div class="toolbar"><button id="cmpPin" class="gold">Pin current build</button><button id="cmpFile">Compare with a file…</button>' +
+    '<button id="cmpSwap"' + (cmpOther ? "" : " disabled") + '>Load the other build</button>' +
+    '<button id="cmpClear"' + (cmpOther ? "" : " disabled") + ">Clear</button>" +
+    '<input id="cmpFileIn" type="file" accept=".json,application/json" hidden></div>' +
+    '<details><summary class="small">Compare with a build code</summary><textarea id="cmpCode" rows="2" style="width:100%" placeholder="Paste a code starting with LCP1:"></textarea>' +
+    '<div class="toolbar"><button id="cmpCodeGo">Use this code</button><span id="cmpMsg" class="small"></span></div></details>';
+  h += cmpOther ? cmpTable(cmpOther) : '<p class="dim">Nothing to compare yet. Press <b>Pin current build</b> first.</p>';
+  $("dBody").innerHTML = h;
+  $("dFoot").innerHTML = '<span class="small dim">▲/▼ show how your current build differs from the other one.</span>';
+  $("detail").classList.add("open");
+  $("dClose").onclick = closeDetail;
+  $("cmpPin").onclick = function(){
+    cmpOther = { label: (B.name || "Unnamed") + " (pinned " + new Date().toLocaleString() + ")", build: JSON.parse(JSON.stringify(B)) };
+    cmpSave(cmpOther); openCompare();
+  };
+  $("cmpClear").onclick = function(){ cmpOther = null; cmpSave(null); openCompare(); };
+  $("cmpSwap").onclick = function(){
+    if (!cmpOther || !confirm("Load the other build into the planner? (Undo can bring yours back.)")) return;
+    var mine = { label: (B.name || "Unnamed") + " (before swap)", build: JSON.parse(JSON.stringify(B)) };
+    B = fixBuild(JSON.parse(JSON.stringify(cmpOther.build))); cmpOther = mine; cmpSave(cmpOther); render(); openCompare();
+  };
+  $("cmpFile").onclick = function(){ $("cmpFileIn").click(); };
+  $("cmpFileIn").onchange = function(){
+    var f = this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      try { var o = JSON.parse(rd.result); cmpOther = { label: f.name, build: o.build || o }; cmpSave(cmpOther); openCompare(); }
+      catch (e) { alert("That file isn't a planner save."); }
+    };
+    rd.readAsText(f);
+  };
+  $("cmpCodeGo").onclick = function(){
+    try { var nb = readCode($("cmpCode").value); cmpOther = { label: (nb.name || "Build code"), build: nb }; cmpSave(cmpOther); openCompare(); }
+    catch (e) { $("cmpMsg").textContent = "That doesn't look like a planner build code."; $("cmpMsg").className = "small bad"; }
+  };
+}
+function cmpTable(other){
+  var A = calcFor(other.build), N = { b: B, c: C };
+  function row(label, a, n, lowerBetter){
+    var d = (typeof a === "number" && typeof n === "number") ? n - a : null, mark = "";
+    if (d) mark = '<span class="' + ((d > 0) !== !!lowerBetter ? "good" : "bad") + '">' + (d > 0 ? "▲+" : "▼") + d + "</span>";
+    else if (d === null && String(a) !== String(n)) mark = '<span class="dim">changed</span>';
+    return "<tr" + (mark ? ' class="cmpDiff"' : "") + "><td>" + esc(label) + "</td><td>" + esc(String(a)) + "</td><td>" + esc(String(n)) + "</td><td>" + mark + "</td></tr>";
+  }
+  function sec(t){ return '<tr><th colspan="4" style="text-align:left;padding-top:10px">' + t + "</th></tr>"; }
+  var a = A.c, n = N.c, h = '<div class="scrollx"><table class="cmp" style="width:100%;border-collapse:collapse">' +
+    '<tr><th style="text-align:left"></th><th style="text-align:left">Other: ' + esc(other.label) + '</th><th style="text-align:left">Current</th><th></th></tr>';
+  function raceName(x){ var r = RACES[x.b.race], s = RACES[x.b.subrace]; return (r ? r.name : "—") + (s ? " / " + s.name : ""); }
+  h += sec("Character") + row("Race", raceName(A), raceName(N));
+  h += sec("Pools and combat");
+  [["HP","hp"],["Mana","mana"],["AP","ap"],["RP","rp"],["Guard","guard"],["Block guard","blockGuard"],["Evasion","evasion"],["Dodge","dodge"],
+   ["Initiative","init"],["Speed (ft)","speed"],["Potency","potency"],["Burden limit","burdenMax"]].forEach(function(k){ h += row(k[0], a.d[k[1]], n.d[k[1]]); });
+  h += row("Burden carried", a.burden, n.burden, true);
+  h += sec("Stats");
+  MAIN.concat(SUB).forEach(function(k){ h += row(k, a.stat[k], n.stat[k]); });
+  h += sec("Progress");
+  h += row("Spirit Core", a.exp.spiritCore, n.exp.spiritCore) + row("EXP unspent", a.exp.unspent, n.exp.unspent) +
+       row("IP used", a.ip.spent, n.ip.spent, true) + row("Clim left", a.clim.left, n.clim.left) +
+       row("Classes mastered", a.mastered.length, n.mastered.length) + row("Abilities owned", a.ownedAbs.length, n.ownedAbs.length);
+  var skills = SKILLS.map(function(s){ return s.name; }).filter(function(s){ return a.pts[s] || n.pts[s]; });
+  if (skills.length) { h += sec("Skill points"); skills.forEach(function(s){ h += row(s, a.pts[s] || 0, n.pts[s] || 0); }); }
+  h += "</table></div>";
+  // ability / class / breakthrough lists: what's only in one build
+  function names(x){ return x.c.ownedAbs.map(function(o){ return o.rec.name + " — " + o.a.name; }); }
+  function onlyIn(p, q){ return p.filter(function(s){ return q.indexOf(s) < 0; }); }
+  var an = names(A), nn = names(N);
+  var bA = A.b.bts.map(function(x){ return BTS[x.id] ? BTS[x.id].name : x.id; }), bN = B.bts.map(function(x){ return BTS[x.id] ? BTS[x.id].name : x.id; });
+  var pA = Object.keys(a.profs), pN = Object.keys(n.profs);
+  function list(t, arr){ return arr.length ? "<h3>" + t + "</h3><div class=\"small\">" + arr.map(esc).join("<br>") + "</div>" : ""; }
+  var lists = list("Abilities only in the current build", onlyIn(nn, an)) + list("Abilities only in the other build", onlyIn(an, nn)) +
+    list("Breakthroughs only in the current build", onlyIn(bN, bA)) + list("Breakthroughs only in the other build", onlyIn(bA, bN)) +
+    list("Proficiencies only in the current build", onlyIn(pN, pA)) + list("Proficiencies only in the other build", onlyIn(pA, pN));
+  return h + (lists || '<p class="dim small">Same abilities, breakthroughs and proficiencies.</p>');
+}
+$("btnCompare").onclick = openCompare;
+$("btnUndo").onclick = undo;
+$("btnRedo").onclick = redo;
+document.addEventListener("keydown", function(e){
+  if (!(e.ctrlKey || e.metaKey)) return;
+  var a = document.activeElement;
+  if (a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && /^(text|number|search)$/.test(a.type)))) return; // let the box undo its own typing
+  var k = e.key.toLowerCase();
+  if (k === "z" && !e.shiftKey) { e.preventDefault(); undo(); }
+  else if (k === "y" || (k === "z" && e.shiftKey)) { e.preventDefault(); redo(); }
+});
 
 /* ---------- Print sheet: fill the official fillable character sheet PDF ----------
    You load your own copy of the official sheet (Character Sheet 1.2). The planner writes your build into its
