@@ -362,8 +362,8 @@ CL("aeromancer", {
       cost: null, range: null, keywords: [], requires: null,
       grantsAbility: "glide",
       grants: { mastery: "Wind" },
-      refund: { overlapsWith: ["Windbringer", "Zephyr Warder"], amount: "MISSING",
-                note: "Page says a refund is possible and that Windbringer and Zephyr Warder also grant this. Amount not captured." },
+      refund: { overlapsWith: ["Windbringer", "Zephyr Warder"], amount: "full",
+                note: "Page says a refund is possible and that Windbringer and Zephyr Warder also grant this. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [
         "Benefit 1: You gain Wind Mastery.",
         "Benefit 2: You can use Glide."
@@ -1294,8 +1294,8 @@ CL("archer", {
       name: "Status Assessment II (key)", kind: "key",
       cost: null, range: null, keywords: [], requires: null,
       grantsAbility: "status-assessment-ii",
-      refund: { overlapsWith: ["Marksman"], amount: "MISSING",
-                note: "Page says refund possible and Marksman also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Marksman"], amount: "full",
+                note: "Page says refund possible and Marksman also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [ "Benefit 1: You can use Status Assessment II." ]
     },
     "status-assessment-ii": {
@@ -1375,8 +1375,8 @@ CL("archsage", {
     "battle-cast": {
       name: "Battle Cast", kind: "ability",
       cost: "0 AP, 1 MP", range: "Self", keywords: ["Circuit"], requires: null,
-      refund: { overlapsWith: ["Battle Mage"], amount: "MISSING",
-                note: "Page says refund possible; Battle Mage also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Battle Mage"], amount: "full",
+                note: "Page says refund possible; Battle Mage also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [ "The next Spell you cast before your turn ends doesn't provoke an attack of opportunity for casting in an enemy's Melee Range." ]
     },
     "clearcasting": {
@@ -1973,8 +1973,8 @@ CL("battle-mage", {
     "battle-cast": {
       name: "Battle Cast", kind: "ability",
       cost: "0 AP, 1 MP", range: "Self", keywords: ["Circuit"], requires: null,
-      refund: { overlapsWith: ["Archsage"], amount: "MISSING",
-                note: "Page says refund possible; Archsage also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Archsage"], amount: "full",
+                note: "Page says refund possible; Archsage also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [ "The next Spell you cast before your turn ends doesn't provoke an attack of opportunity for casting in an enemy's melee range." ]
     },
     "shooting-form": {
@@ -3596,8 +3596,8 @@ CL("deadeye", {
     "aimed-shot": {
       name: "Aimed Shot", kind: "ability",
       cost: "2 AP, 2 MP", range: "Ranged Weapon Range", keywords: ["Lock On"], requires: null,
-      refund: { overlapsWith: ["Sniper"], amount: "MISSING",
-                note: "Page says refund possible; Sniper also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Sniper"], amount: "full",
+                note: "Page says refund possible; Sniper also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [ "Heavy Attack against the target." ]
     },
     "secret-art-perfect-repetition": {
@@ -4218,8 +4218,8 @@ CL("exalted-blade", {
       name: "Undying Justice", kind: "ability",
       cost: "0 RP, 2 MP", range: "Self", keywords: [],
       requires: "You take damage, and your HP is higher than 1.",
-      refund: { overlapsWith: ["Exalted Shield"], amount: "MISSING",
-                note: "Page says refund possible; Exalted Shield also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Exalted Shield"], amount: "full",
+                note: "Page says refund possible; Exalted Shield also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [ "If the damage would drop you to 0 HP or lower, you drop to 1 HP instead." ]
     },
     "divine-storm": {
@@ -4292,8 +4292,8 @@ CL("exalted-shield", {
       name: "Undying Justice", kind: "ability",
       cost: "0 RP, 2 MP", range: "Self", keywords: [],
       requires: "You take damage, and your HP is higher than 1.",
-      refund: { overlapsWith: ["Exalted Blade"], amount: "MISSING",
-                note: "Page says refund possible; Exalted Blade also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Exalted Blade"], amount: "full",
+                note: "Page says refund possible; Exalted Blade also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [ "If the damage would drop you to 0 HP or lower, you drop to 1 HP instead." ]
     },
     "aura-of-resistance": {
@@ -4777,8 +4777,8 @@ CL("fencer", {
     "lunge": {
       name: "Lunge", kind: "ability",
       cost: "0 AP", range: "Self", keywords: [], requires: null,
-      refund: { overlapsWith: ["Lancer"], amount: "MISSING",
-                note: "Page says refund possible; Lancer also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Lancer"], amount: "full",
+                note: "Page says refund possible; Lancer also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [ "Your next basic Light, Heavy or Precise melee attack has double attack range." ]
     },
     "riposte": {
@@ -4962,8 +4962,8 @@ CL("flame-sentinel", {
       name: "Controlled Blaze", kind: "key",
       cost: null, range: null, keywords: [], requires: null,
       grants: { mastery: "Fire" },
-      refund: { overlapsWith: ["Pyromancer"], amount: "MISSING",
-                note: "Page says refund possible; Pyromancer also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Pyromancer"], amount: "full",
+                note: "Page says refund possible; Pyromancer also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [
         "Benefit 1: Your Fire damage can choose not to ignite flammable objects.",
         "Benefit 2: You gain Fire Mastery."
@@ -5366,8 +5366,8 @@ CL("geomancer", {
       cost: null, range: null, keywords: [], requires: null,
       grantsAbility: "tremorsense",
       grants: { mastery: "Earth" },
-      refund: { overlapsWith: ["Granite Warden"], amount: "MISSING",
-                note: "Page says refund possible; Granite Warden also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Granite Warden"], amount: "full",
+                note: "Page says refund possible; Granite Warden also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [
         "Benefit 1: You gain Earth Mastery.",
         "Benefit 2: You can use Tremorsense."
@@ -5569,8 +5569,8 @@ CL("granite-warden", {
       cost: null, range: null, keywords: [], requires: null,
       grantsAbility: "tremorsense",
       grants: { mastery: "Earth" },
-      refund: { overlapsWith: ["Geomancer"], amount: "MISSING",
-                note: "Page says refund possible; Geomancer also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Geomancer"], amount: "full",
+                note: "Page says refund possible; Geomancer also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [
         "Benefit 1: You gain Earth Mastery.",
         "Benefit 2: You can use Tremorsense."
@@ -5939,8 +5939,8 @@ CL("gun-paladin", {
     "divine-weapon": {
       name: "Divine Weapon", kind: "key",
       cost: null, range: null, keywords: [], requires: null,
-      refund: { overlapsWith: ["Shield Paladin", "Sword Paladin"], amount: "MISSING",
-                note: "Page says refund possible; Shield Paladin and Sword Paladin also grant it. Amount not captured." },
+      refund: { overlapsWith: ["Shield Paladin", "Sword Paladin"], amount: "full",
+                note: "Page says refund possible; Shield Paladin and Sword Paladin also grant it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [
         "Benefit 1: A weapon attack can deal your chosen Divine damage type instead of its normal type. Declare it before the accuracy roll.",
         "Benefit 2: Your weapon can give off light like a lantern; toggle for 1 AP."
@@ -6840,8 +6840,8 @@ CL("lancer", {
     "lunge": {
       name: "Lunge", kind: "ability",
       cost: "0 AP", range: "Self", keywords: [], requires: null,
-      refund: { overlapsWith: ["Fencer"], amount: "MISSING",
-                note: "Page says refund possible; Fencer also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Fencer"], amount: "full",
+                note: "Page says refund possible; Fencer also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [ "Your next basic Light, Heavy or Precise melee attack has double attack range." ]
     },
     "piercing-stab": {
@@ -7249,8 +7249,8 @@ CL("marksman", {
       name: "Status Assessment II (key)", kind: "key",
       cost: null, range: null, keywords: [], requires: null,
       grantsAbility: "status-assessment-ii",
-      refund: { overlapsWith: ["Archer"], amount: "MISSING",
-                note: "Page says refund possible; Archer also grants it. Amount not captured." },
+      refund: { overlapsWith: ["Archer"], amount: "full",
+                note: "Page says refund possible; Archer also grants it. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [ "Benefit 1: You can use Status Assessment II." ]
     },
     "status-assessment-ii": {
@@ -9004,8 +9004,8 @@ CL("pyromancer", {
       name: "Controlled Blaze", kind: "key",
       cost: null, range: null, keywords: [], requires: null,
       grants: { mastery: "Fire" },
-      refund: { overlapsWith: ["Flame Sentinel"], amount: "MISSING",
-                note: "Page says a refund is possible and that Flame Sentinel also grants this. Amount not captured." },
+      refund: { overlapsWith: ["Flame Sentinel"], amount: "full",
+                note: "Page says a refund is possible and that Flame Sentinel also grants this. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [
         "Benefit 1: Your fire can be made not to ignite things (option).",
         "Benefit 2: Gain Elemental Mastery: Fire."
@@ -9833,8 +9833,8 @@ CL("shield-paladin", {
     "divine-weapon": {
       name: "Divine Weapon", kind: "key",
       cost: null, range: null, keywords: [], requires: null,
-      refund: { overlapsWith: ["Gun Paladin", "Sword Paladin"], amount: "MISSING",
-                note: "Page says a refund is possible and that Gun Paladin and Sword Paladin also grant this. Amount not captured." },
+      refund: { overlapsWith: ["Gun Paladin", "Sword Paladin"], amount: "full",
+                note: "Page says a refund is possible and that Gun Paladin and Sword Paladin also grant this. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [
         "Benefit 1: Your weapon attacks may deal your chosen Divine damage type instead (declare before the accuracy roll).",
         "Benefit 2: Your weapon can shed light like a lantern; toggling it costs 1 AP."
@@ -10224,8 +10224,8 @@ CL("sniper", {
     "aimed-shot": {
       name: "Aimed Shot", kind: "ability",
       cost: "2 AP, 2 MP", range: "Ranged Weapon Range", keywords: ["Lock On"], requires: null,
-      refund: { overlapsWith: ["Deadeye"], amount: "MISSING",
-                note: "Page says a refund is possible and that Deadeye also grants this. Amount not captured." },
+      refund: { overlapsWith: ["Deadeye"], amount: "full",
+                note: "Page says a refund is possible and that Deadeye also grants this. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [ "Heavy attack." ]
     },
     "killshot": {
@@ -10896,8 +10896,8 @@ CL("sword-paladin", {
     "divine-weapon": {
       name: "Divine Weapon", kind: "key",
       cost: null, range: null, keywords: [], requires: null,
-      refund: { overlapsWith: ["Gun Paladin", "Shield Paladin"], amount: "MISSING",
-                note: "Page says a refund is possible and that Gun Paladin and Shield Paladin also grant this. Amount not captured." },
+      refund: { overlapsWith: ["Gun Paladin", "Shield Paladin"], amount: "full",
+                note: "Page says a refund is possible and that Gun Paladin and Shield Paladin also grant this. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [
         "Benefit 1: Your weapon attacks may deal your chosen Divine damage type instead (declare before the accuracy roll).",
         "Benefit 2: Your weapon can shed light like a lantern; toggling it costs 1 AP."
@@ -12244,8 +12244,8 @@ CL("windbringer", {
       cost: null, range: null, keywords: [], requires: null,
       grantsAbility: "glide",
       grants: { mastery: "Wind" },
-      refund: { overlapsWith: ["Aeromancer", "Zephyr Warder"], amount: "MISSING",
-                note: "Page says a refund is possible and that Aeromancer and Zephyr Warder also grant this. Amount not captured." },
+      refund: { overlapsWith: ["Aeromancer", "Zephyr Warder"], amount: "full",
+                note: "Page says a refund is possible and that Aeromancer and Zephyr Warder also grant this. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [
         "Benefit 1: Gain Wind Mastery.",
         "Benefit 2: You can use Glide."
@@ -12376,8 +12376,8 @@ CL("zephyr-warder", {
       cost: null, range: null, keywords: [], requires: null,
       grantsAbility: "glide",
       grants: { mastery: "Wind" },
-      refund: { overlapsWith: ["Aeromancer", "Windbringer"], amount: "MISSING",
-                note: "Page says a refund is possible and that Aeromancer and Windbringer also grant this. Amount not captured." },
+      refund: { overlapsWith: ["Aeromancer", "Windbringer"], amount: "full",
+                note: "Page says a refund is possible and that Aeromancer and Windbringer also grant this. Rulebook: a duplicate ability gives a full EXP refund (IP still paid)." },
       summary: [
         "Benefit 1: Gain Wind Mastery.",
         "Benefit 2: You can use Glide."

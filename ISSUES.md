@@ -1548,3 +1548,7 @@ When the site version changes, recheck classes already entered.
 - [ ] Craft expertise grants (Forgemaster, Magitechnician, Master Armorer, Timberwright: "5 points in each of 3 crafts") are shown as text only, not tracked.
 - [ ] Magitechnician and Onmyoji pages wouldn't load on 2026-10-22; their bonuses use the data checked on 2026-10-20.
 - [ ] Unlisted abilities (Botanist Forager's Eye, Jonin En-dama, Ninja Kage Shuriken no Jutsu, Shadowbringer Hide in Shadows, Warding Mage Hidden Wards) aren't tied to a step, so the planner never counts them as owned. They show in the class details window.
+
+## Refunds - updated 2026-10-22
+- [x] Shared abilities (Wind Master, Controlled Blaze, Tremorsense, Divine Weapon, Status Assessment II, Battle Cast, Aimed Shot, Undying Justice, Lunge): the class pages only say "Refund possible". The rulebook says buying an ability you already have refunds the EXP (IP still paid for a new class). classes.js refund amounts now say "full", and the planner makes the later purchase cost 0 EXP.
+- [ ] Half refunds ("not an exact match but you still gain everything") aren't detected automatically; there's no list of which abilities count as near-matches.

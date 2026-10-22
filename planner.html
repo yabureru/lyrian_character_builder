@@ -354,8 +354,31 @@ function stepCost(classId, i){
   var c = CLASSES[classId]; if (!c) return 0;
   var u = raceUnlock(classId);
   if (u && u.level >= i + 1) return 0;
+  if (dupOf(classId, i)) return 0;   // duplicate ability: EXP refunded (IP still paid for a class)
   if (i === 0) return c.tier * 100 - (u && u.level === 0 ? 100 : 0);
   return 100;
+}
+// Rulebook: if spending EXP would give you an ability you already have, that EXP is refunded.
+// Returns the name of the class that already gives this step's ability (bought earlier), or null.
+function dupOf(classId, i){
+  var c = CLASSES[classId], st = c && c.steps[i]; if (!st || !st.ability || !c.abilities[st.ability]) return null;
+  var name = c.abilities[st.ability].name.toLowerCase();
+  var pos = function(cid, si){
+    var k = (B.order || []).indexOf("c|" + cid + "|" + si);
+    if (k >= 0) return k;
+    var ci = B.classes.map(function(x){ return x.id; }).indexOf(cid);
+    return ci < 0 ? 1e9 : 1e6 + ci * 8 + si;   // not in the build yet = would be bought last
+  };
+  var me = pos(classId, i), hit = null;
+  B.classes.forEach(function(o){
+    if (hit || o.id === classId) return;
+    var oc = CLASSES[o.id]; if (!oc) return;
+    oc.steps.forEach(function(os, oi){
+      if (hit || !o.owned[oi] || !os.ability || !oc.abilities[os.ability]) return;
+      if (oc.abilities[os.ability].name.toLowerCase() === name && pos(o.id, oi) < me) hit = oc.name;
+    });
+  });
+  return hit;
 }
 function classIpCost(classId){ var u = raceUnlock(classId); return (u && u.level >= 1) ? 0 : 1; }
 
@@ -984,7 +1007,7 @@ function classBlock(c, idx){
     }
     h += '<div class="step' + (owned ? " owned" : "") + '"><span class="lv">' + s.level + "</span>" +
       '<input type="checkbox" data-cls="' + idx + '" data-step="' + i + '"' + (owned ? " checked" : "") + (i === 0 || (!owned && !canBuy) ? " disabled" : "") + ">" +
-      '<div class="body">' + body + "</div><span class=\"cost\">" + (cost ? cost + " EXP" : "free") + "</span></div>";
+      '<div class="body">' + body + "</div><span class=\"cost\">" + (cost ? cost + " EXP" : (dupOf(c.id, i) ? '<span title="You already have this ability from ' + esc(dupOf(c.id, i)) + ': EXP refunded">refunded</span>' : "free")) + "</span></div>";
   });
   var mom = (LC.masteryOnMastery || {})[c.id];
   if (mom) {
@@ -1080,6 +1103,7 @@ function roadmap(){
       var ab = st.ability && rec.abilities[st.ability];
       label = rec.name + (x.i === 0 ? " — learn class" : " — step " + st.level);
       sub = ab ? ab.name : st.label;
+      var dp = dupOf(x.cls, x.i); if (dp) sub += " (already from " + dp + ": EXP refunded)";
       if (x.i === 7) tag = "Mastered";
     } else {
       var r = BTS[x.bt.id], nth = btSeen[x.bt.id] || 0; btSeen[x.bt.id] = nth + 1;
