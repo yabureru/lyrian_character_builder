@@ -105,6 +105,8 @@ tr.can td:first-child{color:var(--gold2)}
 .kv:last-child{border-bottom:none}
 .kv b{font-variant-numeric:tabular-nums}
 .big{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.bdv{cursor:pointer;border-bottom:1px dotted var(--dim)}
+[data-bd]{cursor:pointer}
 .big div{background:#1f2128;border:1px solid var(--line);border-radius:8px;padding:5px;text-align:center}
 .big b{display:block;font-size:18px;color:var(--gold2)}
 .big span{font-size:11px;color:var(--dim)}
@@ -17170,6 +17172,95 @@ LC.profGrants = [
 ];
 
 </script>
+<script>
+/* ---- data/bonuses.js (built in) ---- */
+// Lyrian Chronicles Character Planner - Bonus Data
+// Things that change the numbers on your sheet. Checked against each race/class/breakthrough page
+// (unofficial static copy, v0.13.2, 2026-10-22).
+//
+// Class key-ability bonuses that are always on (Fighter +5 HP, Arcanist +2 Mana, skill points,
+// element masteries...) are already stored in classes.js as each ability's "grants", so they are
+// NOT repeated here. This file holds:
+//   - race bonuses that are always on
+//   - "toggle" bonuses: only while a stance/aura/transformation/condition is active.
+//     The planner shows these as checkboxes so you can see your numbers with them on or off.
+//   - "note" bonuses: situational (e.g. +2 to saves vs spells). Shown as text, not added to totals.
+//
+// FIELDS
+//   source  - "race:<id>", "class:<id>" or "bt:<id>"
+//   ability - the ability that gives it (classes: counts once that step is bought)
+//   type    - "always", "toggle" or "note"
+//   mods    - numbers to add: hp, mana, ap, rp, guard, block, evasion, dodge, init, speed, burden,
+//             Power, Focus, Agility, Toughness, Fitness, Cunning, Reason, Awareness, Presence
+//   baseSpeed / walkSpeed - replaces the normal 20ft base speed
+//   expertise - flat expertise bonus { skill, name, amount }
+//   text    - what to show (own words)
+
+window.LC = window.LC || {};
+
+LC.bonuses = [
+  // ---------------- Races: always on ----------------
+  { source: "race:nio", ability: "stoneskin", type: "always", mods: { guard: 1, block: 4, evasion: -2, dodge: -2 },
+    text: "Stoneskin: +1 Guard, +4 Block, -2 Evasion and Dodge." },
+  { source: "race:pixie", ability: "tiny-pixie", type: "always", mods: { Toughness: -2, Agility: 2 }, walkSpeed: 5,
+    text: "Tiny Pixie: Toughness -2, Agility +2, Tiny size; walking speed 5ft (flying/hovering uses normal speed)." },
+  { source: "race:catfolk", ability: "fast-runner", type: "always", baseSpeed: 25, text: "Fast Runner: base speed 25ft." },
+  { source: "race:rabbitfolk", ability: "fast-runner", type: "always", baseSpeed: 25, text: "Fast Runner: base speed 25ft." },
+  { source: "race:centaur", ability: "horse-body", type: "always", mods: { burden: 2 }, text: "Horse Body: max Burden +2; Large." },
+  { source: "race:anubis", ability: "weighing-the-heart", type: "always", expertise: { skill: "Insight", name: "Lie detection", amount: 5 },
+    text: "Weighing the Heart: +5 Expertise bonus to Insight to tell if someone is lying." },
+  { source: "race:cu-sith", ability: "scent", type: "always", expertise: { skill: "Perception", name: "Smell", amount: 5 },
+    text: "Scent: +5 Expertise bonus to Perception (Smell)." },
+  { source: "race:mothfolk", ability: "antennae", type: "always", expertise: { skill: "Perception", name: "Vibration Sense", amount: 10 },
+    text: "Antennae: +10 expertise to Perception (Vibration Sense), creatures within 40ft." },
+
+  // ---------------- Races: toggles ----------------
+  { source: "race:dogfolk", ability: "loyalty", type: "toggle", mods: { guard: 1, block: 2 },
+    text: "Loyalty (within 5ft of a heroic ally): +1 Guard, +2 Block." },
+  { source: "race:oni", ability: "spirited-bravado", type: "toggle", mods: { Power: 1 },
+    text: "Spirited Bravado (while Tipsy): +1 Power." },
+  { source: "race:horse-folk", ability: "horse-step-acceleration", type: "toggle", mods: { speed: 30 },
+    text: "Horse Step Acceleration: +30 speed until your next turn; straight-line movement only." },
+  { source: "race:dullahan", ability: "dullahans-mount", type: "toggle", mods: { speed: 30 },
+    text: "Dullahan's Mount (mounted): +30ft speed, Large, straight-line movement only." },
+  { source: "race:demon", ability: "divine-release", type: "toggle", mods: { speed: 5, ap: 1, blockGuard: 5 },
+    text: "Divine Release: +5 speed and flight, +1 AP at the start of your turn, Block gives +5 more Guard. Upkeep 11 HP (16 at or below 0 HP)." },
+  { source: "race:nio", ability: "statue-form", type: "toggle", mods: { guard: 5 },
+    text: "Statue Form: +5 Guard; Block is your only action." },
+  { source: "race:cu-sith", ability: "dog-form", type: "toggle", mods: { guard: -2, block: -4, evasion: 1, dodge: 1 },
+    text: "Dog Form: -2 Guard, -4 Block, +1 Size bonus to Evasion and Dodge; melee unarmed attacks only." },
+
+  // ---------------- Classes: toggles ----------------
+  { source: "class:adventurer", ability: "steel-aura", type: "toggle", mods: { guard: 3 },
+    text: "Steel Aura: +3 Guard until the start of your next turn; only Block or Rage RP actions." },
+  { source: "class:angelblooded", ability: "true-divine-release", type: "toggle", mods: { speed: 5 },
+    text: "True Divine Release: controlled flight and +5 movement speed. Upkeep 2 Mana." },
+  { source: "class:berserker", ability: "rage-stance", type: "toggle", mods: { guard: 1, ap: 2 },
+    text: "Rage Stance: +2 AP each turn (melee attacks only), +1 Guard, +5 to Fitness checks; only Rage RP actions/spells." },
+  { source: "class:death-knight", ability: "bone-armor", type: "toggle", mods: { guard: 2 },
+    text: "Bone Armor: +2 Guard until the encounter ends or you take 2+ damage from one attack." },
+  { source: "class:death-knight", ability: "secret-art-unholy-strength", type: "toggle", mods: { Power: 2, Focus: 2 },
+    text: "Unholy Strength: +2 Power and +2 Focus; melee weapon physical damage becomes Dark. Upkeep 1 Mana." },
+  { source: "class:flowing-wind-style", ability: "plume-treading-art", type: "toggle", mods: { speed: 30 },
+    text: "Plume-Treading Art at 6 Windflow stacks: +30 speed (+5 per stack)." },
+  { source: "class:monk", ability: "serene-water-stance", type: "toggle", mods: { evasion: 3 },
+    text: "Serene Water Stance: +3 Evasion; move 5ft each time an attack misses you." },
+  { source: "class:still-stone-style", ability: "shielding-fist", type: "toggle", mods: { block: 4 },
+    text: "Shielding Fist (1+ hand empty, no shield): +4 Shield bonus to Block." },
+  { source: "class:still-stone-style", ability: "steadfast-earth-stance", type: "toggle", mods: { guard: 2, block: 6 },
+    text: "Steadfast Earth Stance (no armor): +2 Guard, +6 Block." },
+  { source: "class:still-stone-style", ability: "hardening-fist", type: "toggle", mods: { guard: 2, block: 8, evasion: -4, dodge: -4 },
+    text: "Hardening Fist: +2 Guard, +8 Block, -4 Evasion (including Dodge) until your next turn." },
+
+  // ---------------- Notes (situational, not added to totals) ----------------
+  { source: "class:anti-mage", ability: "magic-resistance", type: "note", text: "+2 Anti-Mage bonus to saves against Spells." },
+  { source: "class:scout", ability: "independent-actor", type: "note", text: "+10 Perception, Insight, Survival and Stealth when alone (no known allies within 300ft) for 15+ minutes." },
+  { source: "class:priest", ability: "studied-healer", type: "note", text: "+5 Negotiation bonus with followers of your religion." },
+  { source: "class:great-berserker", ability: "giant-strength", type: "note", text: "In Rage Stance: count as one size larger and +5 to Fitness checks." },
+  { source: "class:magitechnician", ability: "advanced-artificing-key", type: "note", text: "The +1 Burden must be spent on an artifice." }
+];
+
+</script>
 </head>
 <body>
 
@@ -17252,7 +17343,7 @@ var SKILL = {}; SKILLS.forEach(function(s){ SKILL[s.name] = s; });
 // Turn a data "options" value into a list of skill names.
 function skillOptions(opt){
   if (Array.isArray(opt)) {
-    return opt.map(function(o){ return /^Expert Knowledge/.test(o) ? "Expert Knowledge" : o; })
+    return opt.map(function(o){ return /Expert Knowledge/.test(o) ? "Expert Knowledge" : o; })
               .filter(function(o){ return SKILL[o]; });
   }
   var main = SKILLS.filter(function(s){ return s.kind === "main"; }).map(function(s){ return s.name; });
@@ -17280,7 +17371,8 @@ function newBuild(){
     items: [],          // [{id, qty, equipped}]
     alloc: {},          // skill spending per source: {sourceId: {sk:{Skill:n}, ex:[{skill,name,pts}]}}
     activeSource: "start",
-    profPicks: {},      // proficiency choices: {"class:fighter#0": ["Axes", ...]}
+    profPicks: {},
+    toggles: {},        // conditional bonuses switched on: {"class:monk/serene-water-stance": true}      // proficiency choices: {"class:fighter#0": ["Axes", ...]}
     notes: ""
   };
 }
@@ -17348,9 +17440,58 @@ function btCostAt(id, nth){ // nth = 0 for the first time you take it
 function itemCost(it){ return typeof it.cost === "number" ? it.cost : null; }
 function itemBurden(it){ return typeof it.burden === "number" ? it.burden : 0; }
 
+// Every class ability you own: bought steps, plus abilities those grant (e.g. Rogue's Journey -> Feint).
+function ownedAbilities(){
+  var out = [];
+  B.classes.forEach(function(c){
+    var rec = CLASSES[c.id]; if (!rec) return;
+    var have = {};
+    rec.steps.forEach(function(s, i){ if (s.ability && c.owned[i] && rec.abilities[s.ability]) have[s.ability] = { step: s.level, via: null }; });
+    if (c.owned[0]) have[rec.id] = have[rec.id] || null;  // some sub-abilities say "granted by <class>"
+    var grew = true;
+    while (grew) {
+      grew = false;
+      for (var id in rec.abilities) {
+        if (have[id]) continue;
+        var a = rec.abilities[id], by = a.grantedBy;
+        if (by && (have[by] || (by === rec.id && c.owned[0]))) { have[id] = { step: null, via: by }; grew = true; continue; }
+        for (var k in have) {
+          var src = rec.abilities[k];
+          if (src && [].concat(src.grantsAbility || []).indexOf(id) >= 0) { have[id] = { step: null, via: k }; grew = true; break; }
+        }
+      }
+    }
+    for (var id2 in have) if (have[id2] && rec.abilities[id2])
+      out.push({ cls: c.id, rec: rec, id: id2, a: rec.abilities[id2], step: have[id2].step, via: have[id2].via });
+  });
+  return out;
+}
+// Bonuses from data/bonuses.js that apply right now (race always-on, owned class abilities, breakthroughs).
+function activeBonuses(C){
+  var out = [], ids = raceIds();
+  (LC.bonuses || []).forEach(function(b){
+    var p = b.source.split(":"), t = p[0], id = p[1], ok = false;
+    if (t === "race") ok = ids.indexOf(id) >= 0;
+    if (t === "class") ok = !!C.owned[id + "/" + b.ability];
+    if (t === "bt") ok = hasBt(id);
+    if (!ok) return;
+    var key = b.source + "/" + (b.ability || "");
+    out.push({ b: b, key: key, on: b.type === "always" || (b.type === "toggle" && !!(B.toggles || {})[key]) });
+  });
+  return out;
+}
+
 function calc(){
   var C = { warn: [] };
   var cr = creationRace();
+
+  // ---- owned abilities first (bonuses and requirements need them) ----
+  C.ownedAbs = ownedAbilities();
+  C.owned = {}; C.ownedNames = {};
+  C.ownedAbs.forEach(function(o){ C.owned[o.cls + "/" + o.id] = true; C.ownedNames[o.a.name.toLowerCase()] = o.a; });
+  C.mastered = B.classes.filter(function(c){ return CLASSES[c.id] && isMastered(c); }).map(function(c){ return c.id; });
+  C.grants = C.ownedAbs.filter(function(o){ return o.a.grants; }).map(function(o){ return { g: o.a.grants, label: o.rec.name + " — " + o.a.name, o: o }; });
+  C.bon = activeBonuses(C);
 
   // ---- stats ----
   var st = {};
@@ -17375,11 +17516,16 @@ function calc(){
       }
     });
   });
+  C.grants.forEach(function(x){ if (x.g.stat) add(x.g.stat, x.g.amount || 1, x.label); });
   B.bts.forEach(function(b){
     var r = BTS[b.id]; if (!r || !r.grants) return; var g = r.grants, p = b.pick || {};
     if (g.statChoice) { if (p.stat) add(p.stat, g.amount || 1, r.name); else C.warn.push(r.name + ": pick a stat."); }
     if (g.mainStatChoice) { if (p.main) add(p.main, g.mainStatChoice, r.name); else C.warn.push(r.name + ": pick a main stat."); }
     if (g.subStatChoice) { if (p.sub) add(p.sub, g.subStatChoice, r.name); else C.warn.push(r.name + ": pick a sub stat."); }
+  });
+  C.bon.forEach(function(x){
+    if (!x.on || !x.b.mods) return;
+    MAIN.concat(SUB).forEach(function(s){ if (x.b.mods[s]) add(s, x.b.mods[s], bonusLabel(x) + (x.b.type === "toggle" ? " (toggle)" : "")); });
   });
   C.base = st; C.bonus = bonus; C.stat = {};
   MAIN.concat(SUB).forEach(function(s){
@@ -17434,52 +17580,102 @@ function calc(){
   if (unknownCost.length) C.warn.push("Price not a plain number, not counted: " + unknownCost.join(", "));
   if (C.clim.left < 0) C.warn.push("You're " + (-C.clim.left).toLocaleString() + " Clim over budget.");
 
-  // ---- owned abilities (for requirements and the abilities pane) ----
-  C.owned = {}; C.ownedNames = {};
-  B.classes.forEach(function(c){
-    var rec = CLASSES[c.id]; if (!rec) return;
-    rec.steps.forEach(function(s, i){
-      if (s.ability && c.owned[i]) {
-        C.owned[c.id + "/" + s.ability] = true;
-        var a = rec.abilities[s.ability]; if (a) C.ownedNames[a.name.toLowerCase()] = a;
-      }
-    });
-  });
-  C.mastered = B.classes.filter(function(c){ return CLASSES[c.id] && isMastered(c); }).map(function(c){ return c.id; });
-
   // ---- proficiencies ----
   calcProfs(C);
 
   // ---- skills ----
   calcSkills(C);
 
-  // ---- derived combat values ----
-  var arm = { guard: 0, block: 0, evasion: 0, dodge: 0, initiative: 0 }, shield = 0;
+  // ---- derived combat values, with a breakdown of where each number comes from ----
+  calcDerived(C);
+  return C;
+}
+function bonusLabel(x){
+  var p = x.b.source.split(":"), rec = p[0] === "race" ? RACES[p[1]] : p[0] === "class" ? CLASSES[p[1]] : BTS[p[1]];
+  var ab = rec && rec.abilities && rec.abilities[x.b.ability];
+  return (rec ? rec.name : p[1]) + (ab ? " — " + ab.name : "");
+}
+function calcDerived(C){
+  var parts = {};
+  function P(key, label, val){ if (!val && val !== 0) return; (parts[key] = parts[key] || []).push([label, val]); }
+  function sum(key){ return (parts[key] || []).reduce(function(t, x){ return t + x[1]; }, 0); }
+  var T = C.stat.Toughness, A = C.stat.Agility, Pw = C.stat.Power, F = C.stat.Focus;
+
+  // equipment
+  var shield = 0;
   B.items.forEach(function(e){
     var it = ITEMS[e.id]; if (!it || !it.armor || !e.equipped) return;
-    if (it.tag === "Shield" || /shield/i.test(it.armor.type || "")) { shield += num(String(it.armor.block).replace("+", "")); return; }
-    ["guard","block","evasion","dodge","initiative"].forEach(function(k){ arm[k] += num(it.armor[k]); });
+    var need = itemProf(it), noProf = need && !C.profs[need];
+    if (it.tag === "Shield" || /shield/i.test(it.armor.type || "")) {
+      var sv = num(String(it.armor.block).replace("+", ""));
+      P("blockGuard", it.name + " (shield, while Blocking)", sv);
+      if (noProf) P("blockGuard", it.name + " not proficient", -1);
+      return;
+    }
+    if (num(it.armor.guard)) P("guard", it.name, num(it.armor.guard));
+    if (noProf && num(it.armor.guard)) P("guard", it.name + " not proficient", -1);
+    if (num(it.armor.block)) P("blockGuard", it.name + " Block value", num(it.armor.block));
+    if (num(it.armor.evasion)) P("evasion", it.name, num(it.armor.evasion));
+    var dg = it.armor.dodge !== undefined ? num(it.armor.dodge) : num(it.armor.evasion);
+    if (dg) P("dodge", it.name, dg);
+    if (num(it.armor.initiative)) P("init", it.name, num(it.armor.initiative));
   });
-  var T = C.stat.Toughness, A = C.stat.Agility, P = C.stat.Power, F = C.stat.Focus;
-  var mana = btGrants("maxMana").reduce(function(t, x){ return t + x.g.maxMana; }, 0);
-  var spd = btGrants("speedBonus").reduce(function(t, x){ return t + x.g.speedBonus; }, 0);
-  var ini = btGrants("initiative").reduce(function(t, x){ return t + x.g.initiative; }, 0);
+
+  P("hp", "Base", 20); P("hp", "Toughness " + T + " x 10", T * 10);
+  P("mana", "Base", 6); P("mana", "Power", Pw);
+  P("ap", "Base", 4);
+  P("rp", "Base", 2); P("rp", "Agility", A);
+  P("guard", "Toughness", T);
+  P("blockGuard", "2 x Toughness", 2 * T);
+  P("evasion", "Base", 7); P("evasion", "Agility", A);
+  P("dodge", "Base", 20); P("dodge", "Agility", A);
+  P("init", "Agility", A);
+  P("potency", "Base", 11); P("potency", "Focus", F);
+  P("burden", "Base limit", 10);
+
+  // base speed: 20ft unless a race says otherwise
+  var baseSpeed = 20, walk = null;
+  C.bon.forEach(function(x){ if (x.on && x.b.baseSpeed) baseSpeed = x.b.baseSpeed; if (x.on && x.b.walkSpeed) walk = x.b.walkSpeed; });
+  P("speed", "Base", baseSpeed);
+
+  // class grants (always on once owned)
+  C.grants.forEach(function(x){
+    var g = x.g;
+    if (g.hp) P("hp", x.label, g.hp);
+    if (g.maxMana) P("mana", x.label, g.maxMana);
+    if (g.initiative) P("init", x.label, g.initiative);
+    if (g.combatBurden) P("burden", x.label, g.combatBurden);
+    if (g.burden) P("burden", x.label + (g.note ? " (" + g.note + ")" : ""), g.burden);
+  });
+  // breakthrough grants
+  B.bts.forEach(function(b){
+    var r = BTS[b.id]; if (!r || !r.grants) return; var g = r.grants;
+    if (g.maxMana) P("mana", r.name, g.maxMana);
+    if (g.speedBonus) P("speed", r.name, g.speedBonus);
+    if (g.initiative) P("init", r.name, g.initiative);
+    if (g.burden) P("burden", r.name, g.burden);
+  });
+  // data/bonuses.js (always-on + toggles that are switched on)
+  var map = { hp: "hp", mana: "mana", ap: "ap", rp: "rp", guard: "guard", block: "blockGuard", blockGuard: "blockGuard",
+              evasion: "evasion", dodge: "dodge", init: "init", speed: "speed", burden: "burden" };
+  C.bon.forEach(function(x){
+    if (!x.on || !x.b.mods) return;
+    for (var k in x.b.mods) if (map[k]) P(map[k], bonusLabel(x) + (x.b.type === "toggle" ? " (toggle)" : ""), x.b.mods[k]);
+  });
+
+  C.parts = parts;
   C.d = {
-    hp: 20 + T * 10, mana: 6 + P + mana, ap: 4, rp: 2 + A,
-    guard: arm.guard + T, blockGuard: 2 * T + arm.block + shield + arm.guard + 0,
-    evasion: 7 + A + arm.evasion, dodge: 20 + A + (arm.dodge || arm.evasion),
-    init: A + arm.initiative + ini, speed: 20 + spd, potency: 11 + F,
+    hp: sum("hp"), mana: sum("mana"), ap: sum("ap"), rp: sum("rp"), guard: sum("guard"), blockGuard: sum("blockGuard"),
+    evasion: sum("evasion"), dodge: sum("dodge"), init: sum("init"), speed: sum("speed"), walk: walk, potency: sum("potency"),
+    burdenMax: sum("burden"),
     save: "2d10 + " + T, acc: "1d20 + " + F, accP: "1d20 + " + (2 * F),
-    light: "2d4 + " + P, heavy: "4d6 + " + (2 * P), heavy2: "5d6 + " + (2 * P)
+    light: "2d4 + " + Pw, heavy: "4d6 + " + (2 * Pw), heavy2: "5d6 + " + (2 * Pw)
   };
-  // Block guard per rulebook: 2 x Toughness + armor Block value (shield +4). Armor Guard already counts in Guard.
-  C.d.blockGuard = 2 * T + arm.block + shield;
-  if (C.burden > 10) C.warn.push("Burden " + C.burden + " is over 10: you'd be Rooted.");
-  return C;
+  if (C.burden > C.d.burdenMax) C.warn.push("Burden " + C.burden + " is over your limit of " + C.d.burdenMax + ": you'd be Rooted.");
 }
 
 /* ---------- Skill sources: every place that gives skill points ---------- */
-function skillSources(){
+function skillSources(C){
   var out = [];
   out.push({ id: "start", label: "Starting points", points: 10, options: skillOptions("ANY_NON_CRAFTING_NON_GATHERING"),
              note: "10 points at character creation (normal skills only)." });
@@ -17494,6 +17690,16 @@ function skillSources(){
       if (s.type === "skills" && c.owned[i])
         out.push({ id: "cls:" + c.id, label: rec.name, points: s.points, options: skillOptions(s.options), note: s.summary || "" });
     });
+  });
+  // skill points from class abilities (e.g. Mage's Journey: +5 Magic)
+  (C && C.grants || []).forEach(function(x){
+    var g = x.g, base = "grant:" + x.o.cls + "/" + x.o.id;
+    if (g.skill && g.fixed) out.push({ id: base + ":fixed", label: x.label + " (" + g.skill + ")", points: g.fixed, options: [g.skill], note: "Fixed points in " + g.skill + "." });
+    if (g.points && (g.options || g.skill)) {
+      var opts = g.options ? skillOptions(g.options) : [g.skill];
+      out.push({ id: base, label: x.label, points: g.points, options: opts,
+                 note: "+" + g.points + " skill points" + (opts.length > 1 ? " among: " + opts.join(", ") : " in " + opts[0]) + (g.expertiseTrade ? "; any point can be 2 expertise points in these skills." : ".") });
+    }
   });
   var n = {};
   B.bts.forEach(function(b, idx){
@@ -17518,7 +17724,7 @@ function skillCap(sk, sc){
   return sc >= 5000 ? 20 : 15;
 }
 function calcSkills(C){
-  var srcs = skillSources(); C.sources = srcs;
+  var srcs = skillSources(C); C.sources = srcs;
   var ids = {}; srcs.forEach(function(s){ ids[s.id] = s; });
   // forget spending from sources that no longer exist (e.g. class removed)
   for (var k in B.alloc) if (!ids[k]) delete B.alloc[k];
@@ -17535,6 +17741,21 @@ function calcSkills(C){
     C.srcLeft[s.id] = s.points - srcUsed(a); leftTotal += C.srcLeft[s.id];
   });
   C.skillLeft = leftTotal;
+  // flat expertise bonuses from races/classes (not bought with points)
+  C.grantNotes = [];
+  function flatEx(skill, name, amt, from){
+    var key = skill + "|" + name.toLowerCase();
+    if (!C.ex[key]) C.ex[key] = { skill: skill, name: name, pts: 0 };
+    C.ex[key].pts += amt; C.ex[key].from = from;
+  }
+  C.bon.forEach(function(x){ if (x.on && x.b.expertise) flatEx(x.b.expertise.skill, x.b.expertise.name, x.b.expertise.amount, bonusLabel(x)); });
+  C.grants.forEach(function(x){
+    var e = x.g.expertise; if (!e) return;
+    var m = /^([A-Za-z ]+?)\s*[(:]\s*([^)+]+?)\)?\s*(?:\+(\d+))?(?:\s*\(.*\))?$/.exec(e);
+    var amt = x.g.amount || (m && m[3] ? num(m[3]) : 0);
+    if (m && amt && SKILL[m[1].trim()]) flatEx(m[1].trim(), m[2].trim(), amt, x.label);
+    else C.grantNotes.push(x.label + ": " + e + (x.g.proficiency ? "" : ""));
+  });
   C.bestEx = {};
   for (var key in C.ex) { var e = C.ex[key]; if (!C.bestEx[e.skill] || C.bestEx[e.skill].pts < e.pts) C.bestEx[e.skill] = e; }
 }
@@ -17590,6 +17811,7 @@ function condCheck(c, C){
 function earlyAscension(){ return hasBt("early-ascension") ? 1 : 0; }
 function elementMasteries(){
   var a = [];
+  if (C && C.grants) C.grants.forEach(function(x){ if (x.g.mastery && a.indexOf(x.g.mastery) < 0) a.push(x.g.mastery); });
   B.bts.forEach(function(b){ if (b.id === "elemental-affinity" && b.pick && b.pick.element) a.push(b.pick.element); });
   if (B.subrace === "ryujin" && B.raceChoice.element) a.push(B.raceChoice.element);
   return a;
@@ -18098,15 +18320,36 @@ function renderLive(){
   h += '<div class="kv"><span>Skill points left</span><b class="' + (C.skillLeft > 0 ? "warn" : C.skillLeft < 0 ? "bad" : "") + '">' + fmt(C.skillLeft) + "</b></div>";
   h += "</div>";
 
+  function bd(key, val, label){ // a value you can tap to see where it comes from
+    return '<b class="bdv" data-bd="' + key + '" data-bdlabel="' + esc(label) + '" title="Tap to see where this comes from">' + esc(val) + "</b>";
+  }
   h += '<div class="card"><h2>Combat</h2><div class="big">' +
-    "<div><b>" + d.hp + "</b><span>HP</span></div><div><b>" + d.mana + "</b><span>Mana</span></div><div><b>" + d.guard + "</b><span>Guard</span></div>" +
-    "<div><b>" + d.ap + "</b><span>AP</span></div><div><b>" + d.rp + "</b><span>RP</span></div><div><b>" + d.evasion + "</b><span>Evasion</span></div></div>";
-  [["Dodge evasion", d.dodge], ["Block guard", d.blockGuard], ["Initiative", "1d4 " + sign(d.init)], ["Speed", d.speed + "ft"],
-   ["Potency (save DC)", d.potency], ["Save", d.save], ["Accuracy", d.acc], ["Accuracy (Precise)", d.accP],
+    '<div data-bd="hp" data-bdlabel="HP"><b>' + d.hp + "</b><span>HP</span></div>" +
+    '<div data-bd="mana" data-bdlabel="Mana"><b>' + d.mana + "</b><span>Mana</span></div>" +
+    '<div data-bd="guard" data-bdlabel="Guard"><b>' + d.guard + "</b><span>Guard</span></div>" +
+    '<div data-bd="ap" data-bdlabel="AP"><b>' + d.ap + "</b><span>AP</span></div>" +
+    '<div data-bd="rp" data-bdlabel="RP"><b>' + d.rp + "</b><span>RP</span></div>" +
+    '<div data-bd="evasion" data-bdlabel="Evasion"><b>' + d.evasion + "</b><span>Evasion</span></div></div>";
+  h += '<div class="kv"><span>Dodge evasion</span>' + bd("dodge", d.dodge, "Dodge evasion") + "</div>";
+  h += '<div class="kv"><span>Block guard</span>' + bd("blockGuard", d.blockGuard, "Block guard") + "</div>";
+  h += '<div class="kv"><span>Initiative</span>' + bd("init", "1d4 " + sign(d.init), "Initiative bonus") + "</div>";
+  h += '<div class="kv"><span>Speed</span>' + bd("speed", d.speed + "ft" + (d.walk ? " (walk " + d.walk + "ft)" : ""), "Speed") + "</div>";
+  h += '<div class="kv"><span>Potency (save DC)</span>' + bd("potency", d.potency, "Potency") + "</div>";
+  [["Save", d.save], ["Accuracy", d.acc], ["Accuracy (Precise)", d.accP],
    ["Light attack", d.light], ["Heavy attack", d.heavy], ["Heavy (2H melee)", d.heavy2]].forEach(function(x){
     h += '<div class="kv"><span>' + x[0] + "</span><b>" + esc(x[1]) + "</b></div>";
   });
-  h += '<div class="note">Formulas from the rulebook (section 3 of RULES_REFERENCE.md). Class/race ability bonuses aren\'t added automatically yet.</div></div>';
+  h += '<div class="note">Tap a number to see where it comes from. Rulebook formulas plus always-on bonuses; turn on situational ones below.</div>';
+  var tg = C.bon.filter(function(x){ return x.b.type === "toggle"; });
+  if (tg.length) {
+    h += "<h3>Situational bonuses</h3>";
+    tg.forEach(function(x){
+      h += '<label class="kv small" style="justify-content:flex-start;gap:6px"><input type="checkbox" data-tog="' + esc(x.key) + '"' + (x.on ? " checked" : "") + "><span>" + esc(x.b.text) + "</span></label>";
+    });
+  }
+  var notes = C.bon.filter(function(x){ return x.b.type === "note"; }).map(function(x){ return x.b.text; }).concat(C.grantNotes || []);
+  if (notes.length) h += '<div class="note"><b>Other bonuses (not in the numbers):</b><br>' + notes.map(esc).join("<br>") + "</div>";
+  h += "</div>";
 
   h += '<div class="card inv"><h2>Inventory</h2>';
   if (!B.items.length) h += '<div class="dim small">Nothing bought yet.</div>';
@@ -18117,10 +18360,13 @@ function renderLive(){
     if (need && !C.profs[need]) eq += ' <span class="tag bad" title="You are not proficient with ' + esc(need) + '">not proficient</span>';
     h += '<div class="kv"><span>' + esc(it.name) + " " + eq + '</span><span class="pm"><button class="small" data-q="' + i + '" data-d="-1">−</button><b>' + e.qty + '</b><button class="small" data-q="' + i + '" data-d="1">+</button></span></div>';
   });
-  h += '<div class="kv"><span>Burden</span><b class="' + (C.burden > 10 ? "bad" : "") + '">' + C.burden + " / 10</b></div></div>";
+  h += '<div class="kv"><span>Burden</span><b class="bdv ' + (C.burden > C.d.burdenMax ? "bad" : "") + '" data-bd="burden" data-bdlabel="Burden limit">' + C.burden + " / " + C.d.burdenMax + "</b></div></div>";
   $("paneLive").innerHTML = h;
 
   function bindNum(id, key){ $(id).onchange = function(){ B[key] = num(this.value); render(); }; }
+  document.querySelectorAll("[data-tog]").forEach(function(cb){
+    cb.onchange = function(){ B.toggles = B.toggles || {}; if (this.checked) B.toggles[this.dataset.tog] = true; else delete B.toggles[this.dataset.tog]; render(); };
+  });
   bindNum("inExp", "expEarned"); bindNum("inIp", "ipEarned"); bindNum("inClimStart", "startClim"); bindNum("inClimAdd", "climAdded");
   document.querySelectorAll("[data-q]").forEach(function(b){
     b.onclick = function(){ var i = num(this.dataset.q), e = B.items[i]; e.qty += num(this.dataset.d); if (e.qty <= 0) B.items.splice(i, 1); renderSome([]); };
@@ -18154,15 +18400,21 @@ function renderAbil(){
   });
   B.classes.forEach(function(c){
     var rec = CLASSES[c.id]; if (!rec) return;
-    var abs = [];
-    rec.steps.forEach(function(st, i){ if (st.ability && c.owned[i] && rec.abilities[st.ability]) abs.push(rec.abilities[st.ability]); });
+    var mine = C.ownedAbs.filter(function(o){ return o.cls === c.id; });
+    // steps first (in order), then abilities they grant
+    mine.sort(function(x, y){ return (x.step || 99) - (y.step || 99); });
+    var abs = mine.map(function(o){
+      var a = Object.assign({}, o.a);
+      if (o.via) { var src = rec.abilities[o.via]; a._from = "Granted by " + (src ? src.name : rec.name); }
+      return a;
+    });
     if (abs.length) groups.push({ title: rec.name + " (T" + rec.tier + ")", abs: abs });
   });
   if (!groups.length) h += '<div class="dim small">Pick a race and classes to see abilities here.</div>';
   groups.forEach(function(g){
     h += "<h3>" + esc(g.title) + "</h3>";
     g.abs.forEach(function(a){
-      h += '<div class="ab"><div class="t">' + esc(a.name) + "</div>" +
+      h += '<div class="ab"><div class="t">' + esc(a.name) + "</div>" + (a._from ? '<div class="src">' + esc(a._from) + "</div>" : "") +
         '<div class="meta">' + esc([a.cost, a.range].filter(Boolean).join(" · ")) +
         (a.keywords || []).map(kwTag).join("") + "</div>" +
         (a.requires ? '<div class="meta">Requires: ' + esc(a.requires) + "</div>" : "") +
@@ -18218,7 +18470,7 @@ function calcProfs(C){
   B.items.forEach(function(e){
     var it = ITEMS[e.id]; if (!it || !e.equipped || !it.armor) return;
     var need = itemProf(it);
-    if (need && !C.profs[need]) C.warn.push("Not proficient with " + need + " (" + it.name + "): the rulebook gives non-proficient armor and shields a Guard and Evasion penalty.");
+    if (need && !C.profs[need]) C.warn.push("Not proficient with " + need + " (" + it.name + "): it gives 1 less Guard (already applied).");
   });
 }
 // Which proficiency an item needs (or null).
@@ -18318,6 +18570,16 @@ function openDetail(spec){
       else if (s.type === "heart" || s.type === "soul") body += '<div class="small">+' + (s.amount || 1) + " to one of: " + esc((s.options || []).join(", ")) + "</div>";
       body += "</div>";
     });
+    var stepIds = c.steps.map(function(s){ return s.ability; });
+    var extra = Object.keys(c.abilities).filter(function(k){ return stepIds.indexOf(k) < 0; });
+    if (extra.length) {
+      body += "<h3>Other abilities</h3>";
+      extra.forEach(function(k){
+        var a = c.abilities[k], by = a.grantedBy ? (c.abilities[a.grantedBy] || {}).name || c.name : null;
+        var via = by ? "Granted by " + by : (a.note ? a.note : "");
+        body += abilityFull(a, via ? '<div class="src">' + esc(via) + "</div>" : "");
+      });
+    }
     var why = [];
     if (have) why.push("already taken"); if (st.state === "no") why.push("requirements not met");
     if (ip > C.ip.left) why.push("not enough IP"); if (cost > expAvailFor("class")) why.push("not enough EXP");
@@ -18445,7 +18707,20 @@ function showKw(el){
   pop.style.left = x + "px"; pop.style.top = y + "px";
 }
 function hideKw(){ $("kwPop").style.display = "none"; kwPinned = null; }
+function showBreakdown(el){
+  var rows = (C.parts || {})[el.dataset.bd] || [], pop = $("kwPop"), total = 0;
+  var h = "<b>" + esc(el.dataset.bdlabel) + "</b><table>";
+  rows.forEach(function(r){ total += r[1]; h += "<tr><td>" + esc(r[0]) + '</td><td class="num">' + sign(r[1]) + "</td></tr>"; });
+  h += '<tr><td><b>Total</b></td><td class="num"><b>' + total + "</b></td></tr></table>";
+  pop.innerHTML = h; pop.style.display = "block";
+  var r = el.getBoundingClientRect(), w = pop.offsetWidth, hgt = pop.offsetHeight;
+  pop.style.left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8) + "px";
+  var y = r.bottom + 6; if (y + hgt > window.innerHeight - 8) y = Math.max(8, r.top - hgt - 6);
+  pop.style.top = y + "px";
+}
 document.addEventListener("click", function(e){
+  var bdEl = e.target.closest ? e.target.closest("[data-bd]") : null;
+  if (bdEl) { if (kwPinned === bdEl) { hideKw(); return; } showBreakdown(bdEl); kwPinned = bdEl; e.stopPropagation(); return; }
   var el = e.target.closest ? e.target.closest("[data-kw]") : null;
   if (el) { if (kwPinned === el) { hideKw(); return; } showKw(el); kwPinned = el; e.stopPropagation(); return; }
   if (!e.target.closest || !e.target.closest("#kwPop")) hideKw();
@@ -18496,6 +18771,7 @@ $("btnReset").onclick = function(){
   if (!Object.keys(ITEMS).length) missing.push("data/items.js");
   if (!Object.keys(KEYWORDS).length) missing.push("data/keywords.js");
   if (!(LC.profGrants || []).length) missing.push("data/proficiencies.js");
+  if (!(LC.bonuses || []).length) missing.push("data/bonuses.js");
   if (missing.length) $("dataErr").innerHTML = '<div class="errbox">Couldn\'t load: ' + missing.join(", ") + '. Keep planner.html next to the "data" folder.</div>';
   var any = Object.values(CLASSES)[0];
   $("dataVer").textContent = "Data v" + (any ? any.version : "?") + " · " + Object.keys(CLASSES).length + " classes · " +

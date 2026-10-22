@@ -1513,10 +1513,10 @@ When the site version changes, recheck classes already entered.
 # PLANNER (planner.html)
 
 ## Planner - not done yet
-- [ ] Bonuses written in ability text (e.g. Fighter's Journey +5 HP) aren't added to the Combat numbers automatically yet.
+- [x] Ability bonuses are now added to the Combat numbers (classes.js grants + data/bonuses.js), with tap-to-see breakdowns and toggles for situational ones.
 - [ ] Race hybrids (Faerie-Chimera, 200 EXP, creation only) can't be picked yet.
 - [x] Weapon/armor proficiencies are now tracked (data/proficiencies.js) and checked for class requirements and equipped armor.
-- [ ] Mystic Eye slots and element masteries from classes aren't tracked (only Elemental Affinity and Ryujin's element are).
+- [ ] Mystic Eye slots aren't tracked. Element masteries from class key abilities ARE tracked now; "extra element on mastering the class" (Acolyte, Sorcerer) is not.
 - [x] Canon campaign starting Clim: +1,000 on top of the normal 3,000 (confirmed by user 2026-10-21).
 - [ ] "Any tier 2 class mastered" is counted as tier 2 or higher. Confirm whether a tier 3 mastery counts.
 - [ ] Transmuter/Alkahest "Transmuter points" are shown as text only, not tracked as a pool.
@@ -1533,3 +1533,14 @@ When the site version changes, recheck classes already entered.
 ## Keywords (data/keywords.js)
 - [ ] 92 keywords from the site. Ability tags with no keyword page (Healing, Encounter Start, Arcane, Shield, Mind Affecting, Jump, Aura, Illusion, Counter, Gravity, Errand, Interlude, etc.) show as plain tags with no pop-up.
 - [ ] Mandate: the page says ignoring it means you've "defied the mandate" but doesn't say what that does.
+
+## Bonuses (data/bonuses.js) - rechecked 2026-10-22
+- [ ] Fighter's Journey says "+5 HP" (not "max HP"); treated as +5 max HP.
+- [ ] Angelblooded and Vampire Lord show "+1 stat point to Presence" in the header AND +1 Presence in a benefit. Treated as one +1 (the header summarises the benefit).
+- [ ] Ranger key: page says "5 points in one of the following" while the Grants line says "+5 skill points" over the list. Treated as 5 points spread among the list.
+- [ ] Blocking: the rules say Block *replaces* Guard with 2 x Toughness + armor Block. Not stated whether armor Guard, or Guard bonuses from abilities (Stoneskin, stances), also count while Blocking. The planner keeps them separate: "guard" bonuses -> Guard, "block" bonuses -> Block guard.
+- [ ] Evasion vs Dodge: bonuses that only say "evasion" (Serene Water Stance) are added to Evasion only, not to Dodge evasion. Ones that say "evasion and dodge" (Stoneskin, Hardening Fist, Dog Form) change both.
+- [ ] Unholy Strength (+2 Power/Focus) is added to your stats, which also raises Mana and HP-related numbers while on. Check whether it should only affect attacks.
+- [ ] Craft expertise grants (Forgemaster, Magitechnician, Master Armorer, Timberwright: "5 points in each of 3 crafts") are shown as text only, not tracked.
+- [ ] Magitechnician and Onmyoji pages wouldn't load on 2026-10-22; their bonuses use the data checked on 2026-10-20.
+- [ ] Unlisted abilities (Botanist Forager's Eye, Jonin En-dama, Ninja Kage Shuriken no Jutsu, Shadowbringer Hide in Shadows, Warding Mage Hidden Wards) aren't tied to a step, so the planner never counts them as owned. They show in the class details window.

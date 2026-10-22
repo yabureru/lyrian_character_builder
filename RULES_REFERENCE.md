@@ -36,7 +36,7 @@ the Food & Rest section (and anything after it) could not be read. Basic Actions
 | Initiative bonus | Agility (roll 1d4 + Agility + modifiers) |
 | Evasion | 7 + Agility |
 | Dodge evasion | 20 + Agility (i.e. Evasion +13); Rooted: 13 + Agility |
-| Block guard | 2 x Toughness + armor Block value (shield +4) |
+| Block guard | Blocking *replaces* Guard with 2 x Toughness + armor Block value. Normal shields add +4 only while Blocking; "armors and greatshields always give Guard" (page doesn't say if armor Guard also stacks while Blocking) |
 | Potency (save DC of your effects) | 11 + Focus |
 | Save | 2d10 + Toughness |
 | Speed | 20ft base |
@@ -111,7 +111,7 @@ Downed: Crawl, Grit 2 AP (heal 4), Play Dead 4 AP, Throw Rock 2 AP (2 dmg, 40ft)
 - **Gathering:** 5 Strike Dice; check d10 + gathering skill vs node NP (normal) and LP (lucky). Actions: Basic Strike, Lucky Strike, Novice's Perseverance, Back To Basics, Iron Focus. One attempt per outcrop per day. Node variation d20 table (Explosive ... Exposed Rich).
 
 ## 10. Items & equipment
-- Proficiency needed; a weapon group proficiency covers 1H and 2H versions. Non-proficient weapon = improvised; non-proficient armor/shield = -1 Guard and +1 Evasion penalty.
+- Proficiency needed; a weapon group proficiency covers 1H and 2H versions. Non-proficient weapon = improvised; non-proficient armor/shield: "lowers the guard gained from it by 1" (rechecked 2026-10-22).
 - **Dual wield** (two 1H): once per turn after a basic Light attack, a free 0 AP Light attack with the other weapon.
 - 2H melee heavy = 5d6. Ranged ranges: 1H 60ft, 2H 120ft.
 - **Weapon groups:** Small (hidden weapon: draw 0 AP, once/combat Trick Attack) · Polearm (+5ft reach, threatens 5-10ft) · Light Swords (Nimble: 5ft move after Light attack) · Longsword (Versatile: 1H alone +4 Block / 2H +1d4 on crit) · Dueling (3 attacks on one enemy -> next Dodge/Block vs it 0 RP) · Axes (Wild Swing: miss still deals 4/8) · Bludgeoning (Hollow Blow: +2/+4 if target Blocks) · Katana (Keen: crit 19-20) · Heavy Blades 2H (Overpower: +1d4/+1d12 on crit) · Twinblade 2H (dual-wield attacks).
