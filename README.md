@@ -17,6 +17,8 @@ Community tool. No monetization.
 
 Your build saves automatically in the browser. Use **Save** to download a `.json` copy and **Load** to open one.
 **Share** gives you a text summary (for Discord or your GM) and a one-line build code anyone can paste into their planner.
+**Print sheet** fills your build into the **official fillable character sheet** (Character Sheet 1.2) and downloads it, ready to print.
+The official PDF isn't included here: load your own copy once and the planner remembers it in that browser.
 
 ### Features
 - Race, sub-race, stats, classes (all 8 steps), skills and expertise, proficiencies, breakthroughs and items
@@ -39,6 +41,7 @@ Your build saves automatically in the browser. Use **Save** to download a `.json
 | `data/items.js` | Items: weapons, armor, alchemy, artifice, mounts, materials |
 | `data/keywords.js` | Keyword definitions (shown when you tap a keyword tag) |
 | `data/proficiencies.js` | Weapon/armor proficiencies and who grants them |
+| `data/sheet.js` | Field map of the official Character Sheet 1.2 (positions only, no artwork) |
 | `data/bonuses.js` | Race bonuses, situational (stance/aura/transformation) bonuses and notes |
 | `RULES_REFERENCE.md` | Condensed rules used for the planner's formulas |
 | `ISSUES.md` | Known gaps, unclear rules and things to check |
@@ -60,6 +63,13 @@ copy an existing block and change it. After editing data, rebuild the phone vers
 ```
 python tools/build_all_in_one.py
 ```
+
+If Angel's Sword Studios releases a new character sheet, rebuild the field map from it:
+
+```
+python tools/make_sheet_map.py "path/to/Character_Sheet.pdf"
+```
+(The planner field names are mapped in `sheetValues()` in planner.html; check them if the new sheet renames fields.)
 
 ## License
 

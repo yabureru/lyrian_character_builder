@@ -155,6 +155,7 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
 <script src="data/keywords.js"></script>
 <script src="data/proficiencies.js"></script>
 <script src="data/bonuses.js"></script>
+<script src="data/sheet.js"></script>
 </head>
 <body>
 
@@ -168,6 +169,7 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
   <button id="btnSave" class="gold">Save</button>
   <button id="btnLoad">Load</button>
   <button id="btnShare">Share</button>
+  <button id="btnSheet">Print sheet</button>
   <input id="fileLoad" type="file" accept=".json,application/json" hidden>
   <button id="btnReset" class="reset danger">Reset</button>
 </header>
@@ -270,7 +272,8 @@ function newBuild(){
     profPicks: {},
     toggles: {},
     order: [],          // roadmap purchase order: "c|<class>|<step index>" and "b|<breakthrough uid>"
-    planAhead: false,   // true = don't block purchases on EXP/IP (plan a long-term build)        // conditional bonuses switched on: {"class:monk/serene-water-stance": true}      // proficiency choices: {"class:fighter#0": ["Axes", ...]}
+    planAhead: false,
+    sheet: {},          // extra character sheet text: age, height, weight, personality, appearance   // true = don't block purchases on EXP/IP (plan a long-term build)        // conditional bonuses switched on: {"class:monk/serene-water-stance": true}      // proficiency choices: {"class:fighter#0": ["Axes", ...]}
     notes: ""
   };
 }
@@ -868,6 +871,13 @@ function renderIdentity(){
     if (s && s.size) bits.push("Size: " + s.size);
     h += '<div class="note">' + bits.map(esc).join("<br>") + "</div>";
   }
+  var sd = B.sheet || {};
+  h += '<details style="margin-top:8px"><summary class="small dim" style="cursor:pointer">Character sheet details (optional)</summary>' +
+    ['age', 'height', 'weight'].map(function(k){
+      return '<div class="field"><label>' + k.charAt(0).toUpperCase() + k.slice(1) + '</label><input type="text" data-sheet="' + k + '" value="' + esc(sd[k] || "") + '"></div>'; }).join("") +
+    ['personality', 'appearance'].map(function(k){
+      return '<div class="field" style="align-items:flex-start"><label>' + k.charAt(0).toUpperCase() + k.slice(1) + '</label><textarea data-sheet="' + k + '" rows="3" style="flex:1;background:#1f2128;border:1px solid var(--line);border-radius:6px;color:var(--text);padding:4px 7px">' + esc(sd[k] || "") + "</textarea></div>"; }).join("") +
+    "</details>";
   h += '<div class="field" style="margin-top:10px"><label>Canon campaign</label><input type="checkbox" id="inCanon"' + (B.canon ? " checked" : "") + '><span class="note">+1,000 starting Clim, and allows restricted options like Angelblooded.</span></div>';
   $("cardIdentity").innerHTML = h;
 
@@ -881,6 +891,9 @@ function renderIdentity(){
   if ($("rcDemon")) $("rcDemon").onchange = function(){ B.raceChoice.demonPick = this.value; render(); };
   if ($("rcElem")) $("rcElem").onchange = function(){ B.raceChoice.element = this.value; render(); };
   $("inCanon").onchange = function(){ B.canon = this.checked; render(); };
+  document.querySelectorAll("[data-sheet]").forEach(function(el){
+    el.oninput = function(){ B.sheet = B.sheet || {}; B.sheet[this.dataset.sheet] = this.value; saveLocal(); };
+  });
 }
 function genderLock(x){
   if (!x.restriction) return "";
@@ -1470,8 +1483,7 @@ function renderLive(){
 }
 
 /* ---------- Abilities pane ---------- */
-function renderAbil(){
-  var h = '<div class="card"><h2>Abilities</h2>';
+function abilityGroups(){
   var groups = [];
   var r = raceRec(), s = subRec();
   [r, s].forEach(function(x){
@@ -1499,6 +1511,11 @@ function renderAbil(){
     });
     if (abs.length) groups.push({ title: rec.name + " (T" + rec.tier + ")", abs: abs });
   });
+  return groups;
+}
+function renderAbil(){
+  var h = '<div class="card"><h2>Abilities</h2>';
+  var groups = abilityGroups();
   if (!groups.length) h += '<div class="dim small">Pick a race and classes to see abilities here.</div>';
   groups.forEach(function(g){
     h += "<h3>" + esc(g.title) + "</h3>";
@@ -1905,6 +1922,276 @@ function openShare(){
 }
 $("btnShare").onclick = openShare;
 
+/* ---------- Print sheet: fill the official fillable character sheet PDF ----------
+   You load your own copy of the official sheet (Character Sheet 1.2). The planner writes your build into its
+   form fields and downloads the filled copy. It adds an "incremental update" to the end of the PDF: new values
+   and their drawn text, using the sheet's own fonts. Nothing about the original artwork is changed. */
+var SHEET = LC.sheetMap || null;
+
+function sheetText(s){ // keep to characters the sheet's fonts can draw
+  return String(s == null ? "" : s)
+    .replace(/[‘’′]/g, "'").replace(/[“”″]/g, '"')
+    .replace(/[–—−]/g, "-").replace(/…/g, "...").replace(/×/g, "x")
+    .replace(/[≤]/g, "<=").replace(/[≥]/g, ">=").replace(/[•·]/g, "-")
+    .replace(/✓/g, "v").replace(/★/g, "*").replace(/[▲▼]/g, "")
+    .replace(/[^\n\x20-\x7E\xA0-\xFF]/g, "");
+}
+function pdfStr(s){ // a PDF literal string
+  var o = "(";
+  for (var i = 0; i < s.length; i++) {
+    var c = s.charCodeAt(i);
+    if (c === 40 || c === 41 || c === 92) o += "\\" + s[i];
+    else if (c === 10) o += "\\n";
+    else if (c < 32 || c > 126) o += "\\" + ("00" + c.toString(8)).slice(-3);
+    else o += s[i];
+  }
+  return o + ")";
+}
+function textWidth(s, font, size){
+  var f = SHEET.fonts[font] || {}, w = 0;
+  for (var i = 0; i < s.length; i++) {
+    var c = s.charCodeAt(i), k = c - (f.first || 0);
+    w += (f.widths && f.widths[k] !== undefined) ? f.widths[k] : 556;
+  }
+  return w * size / 1000;
+}
+function wrapLines(text, font, size, maxW){
+  var out = [];
+  String(text).split("\n").forEach(function(par){
+    var words = par.split(/ +/), line = "";
+    if (!par.length) { out.push(""); return; }
+    words.forEach(function(wd){
+      var t = line ? line + " " + wd : wd;
+      if (textWidth(t, font, size) <= maxW || !line) {
+        // a single word longer than the line: cut it
+        while (!line && textWidth(t, font, size) > maxW && t.length > 1) {
+          var cut = t.length - 1; while (cut > 1 && textWidth(t.slice(0, cut), font, size) > maxW) cut--;
+          out.push(t.slice(0, cut)); t = t.slice(cut);
+        }
+        line = t;
+      } else { out.push(line); line = wd; }
+    });
+    out.push(line);
+  });
+  return out;
+}
+function fitTrunc(s, font, size, maxW){
+  if (textWidth(s, font, size) <= maxW) return s;
+  while (s.length > 1 && textWidth(s + "...", font, size) > maxW) s = s.slice(0, -1);
+  return s + "...";
+}
+// Draws one field's text. opts.lines = keep one entry per line (no wrapping) so two columns line up.
+function appearance(field, rect, value, opts){
+  var font = SHEET.fonts[field.font] ? field.font : "Helv";
+  var w = rect[2] - rect[0], h = rect[3] - rect[1], pad = 2, maxW = w - 2 * pad;
+  var multi = (field.ff & 4096) || /\n/.test(value) || (opts && opts.lines);
+  var base = field.size || 10, size, lines;
+  if (!multi) {
+    size = Math.min(base, Math.max(4, (h - 2) * 0.82));
+    while (size > 4 && textWidth(value, font, size) > maxW) size -= 0.25;
+    lines = [fitTrunc(value, font, size, maxW)];
+  } else {
+    var max = Math.min(base, (opts && opts.maxSize) || 9);
+    for (size = max; size >= 4.5; size -= 0.25) {
+      lines = (opts && opts.lines) ? value.split("\n") : wrapLines(value, font, size, maxW);
+      if (lines.length * size * 1.15 <= h - 2 * pad) break;
+    }
+    if (opts && opts.lines) lines = lines.map(function(l){ return fitTrunc(l, font, size, maxW); });
+    var room = Math.floor((h - 2 * pad) / (size * 1.15));
+    if (lines.length > room) { lines = lines.slice(0, room); lines[room - 1] = fitTrunc(lines[room - 1] + " ...", font, size, maxW); }
+  }
+  var cs = "/Tx BMC\nq\n1 1 " + (w - 2).toFixed(2) + " " + (h - 2).toFixed(2) + " re W n\nBT\n/" + font + " " + size.toFixed(2) + " Tf\n0 g\n";
+  var lh = size * 1.15, y = multi ? h - pad - size * 0.85 : (h - size * 0.7) / 2;
+  lines.forEach(function(l){
+    cs += "1 0 0 1 " + pad.toFixed(2) + " " + y.toFixed(2) + " Tm\n" + pdfStr(l) + " Tj\n"; y -= lh;
+  });
+  cs += "ET\nQ\nEMC";
+  return { content: cs, w: w, h: h, font: font, size: size };
+}
+function fillPdf(bytes, values, special){
+  var objs = [], next = SHEET.size;
+  function add(num, body){ objs.push({ num: num, body: body }); }
+  Object.keys(values).forEach(function(name){
+    var f = SHEET.fields[name]; if (!f) return;
+    var val = sheetText(values[name]);
+    var v = pdfStr(val);
+    if (f.parent) add(f.parent.obj, f.parent.dict.replace(/>>\s*$/, "/V " + v + "\n>>"));
+    f.widgets.forEach(function(wd){
+      var ap = appearance(f, wd.rect, val, special[name]);
+      var apNum = next++;
+      add(apNum, "<< /Type /XObject /Subtype /Form /BBox [0 0 " + ap.w.toFixed(2) + " " + ap.h.toFixed(2) + "] " +
+        "/Resources << /Font << /" + ap.font + " " + SHEET.fonts[ap.font].ref + " >> >> /Length " + ap.content.length + " >>\nstream\n" + ap.content + "\nendstream");
+      var d = wd.dict.replace(/\/DA \([^)]*\)/, "/DA " + pdfStr("/" + ap.font + " " + ap.size.toFixed(2) + " Tf 0 g"));
+      d = d.replace(/>>\s*$/, (f.parent ? "" : "/V " + v + "\n") + "/AP << /N " + apNum + " 0 R >>\n>>");
+      add(wd.obj, d);
+    });
+  });
+  var head = bytes.length, out = "\n", xref = [];
+  objs.forEach(function(o){ xref.push({ num: o.num, off: head + out.length }); out += o.num + " 0 obj\n" + o.body + "\nendobj\n"; });
+  var xrefOff = head + out.length;
+  out += "xref\n";
+  xref.sort(function(a, b){ return a.num - b.num; }).forEach(function(x){
+    out += x.num + " 1\n" + ("0000000000" + x.off).slice(-10) + " 00000 n \n";
+  });
+  out += "trailer\n<< /Size " + Math.max(next, SHEET.size) + " /Root " + SHEET.root + (SHEET.info ? " /Info " + SHEET.info : "") +
+    (SHEET.id ? " /ID [<" + SHEET.id[0] + "> <" + SHEET.id[1] + ">]" : "") + " /Prev " + SHEET.startxref + " >>\nstartxref\n" + xrefOff + "\n%%EOF\n";
+  var tail = new Uint8Array(out.length);
+  for (var i = 0; i < out.length; i++) tail[i] = out.charCodeAt(i) & 255;
+  var res = new Uint8Array(bytes.length + tail.length);
+  res.set(bytes, 0); res.set(tail, bytes.length);
+  return res;
+}
+function checkSheet(bytes){
+  if (!SHEET) return "The sheet map (data/sheet.js) didn't load.";
+  if (bytes.length !== SHEET.fileSize) return "This isn't the same file as the official Character Sheet 1.2 the planner was set up for (file size differs).";
+  var tail = ""; for (var i = Math.max(0, bytes.length - 64); i < bytes.length; i++) tail += String.fromCharCode(bytes[i]);
+  var m = /startxref\s+(\d+)\s+%%EOF\s*$/.exec(tail);
+  if (!m || +m[1] !== SHEET.startxref) return "This PDF doesn't match Character Sheet 1.2.";
+  return "";
+}
+// Everything that goes on the sheet, by field name.
+function sheetValues(){
+  var V = {}, S = {}, d = C.d, r = raceRec(), sr = subRec(), sd = B.sheet || {};
+  for (var n = 1; n <= 6; n++) V[n === 1 ? "Name" : "Name" + n] = B.name || "";
+  V.HP = d.hp; V.RP = d.rp; V.Mana = d.mana;
+  MAIN.concat(SUB).forEach(function(k){ V[k] = C.stat[k]; });
+  V.Lattack = "2d4+" + C.stat.Power; V.Hattack = "4d6+" + 2 * C.stat.Power; V.Pattack = "2d4+" + C.stat.Power;
+  V.Evasion = d.evasion; V.Dodge = d.dodge; V.Speed = d.speed + "ft"; V.Guard = d.guard; V.Block = d.blockGuard;
+  // skills: the normal skills, then any crafting/gathering/other skill you have points or expertise in
+  var rows = SKILLS.filter(function(s){ return s.kind === "main" && s.name !== "Expert Knowledge"; });
+  SKILLS.forEach(function(s){
+    if (rows.indexOf(s) < 0 && (C.pts[s.name] || C.bestEx[s.name])) rows.push(s);
+  });
+  for (var i = 1; i <= 27; i++) {
+    var s = rows[i - 1];
+    if (!s) { V["Skill" + i] = ""; V["Stat" + i] = ""; V["Bonus" + i] = ""; V["SkillPoint" + i] = ""; V["Expertise" + i] = ""; continue; }
+    var pts = C.pts[s.name] || 0, be = C.bestEx[s.name], st = s.stat ? C.stat[s.stat] : 0;
+    var exs = Object.values(C.ex).filter(function(e){ return e.skill === s.name; }).map(function(e){ return e.name + " +" + e.pts; });
+    V["Skill" + i] = s.name; V["Stat" + i] = s.stat || (s.kind === "craft" ? "Crafting" : s.kind === "gather" ? "Gathering" : "");
+    V["Bonus" + i] = sign(st + pts + (be ? be.pts : 0));
+    V["SkillPoint" + i] = pts || ""; V["Expertise" + i] = exs.join(", ");
+  }
+  V["Spirit Core"] = C.exp.spiritCore; V.Exp = C.exp.unspent;
+  V.Gender = B.gender || ""; V["Primary Race"] = r ? r.name : ""; V["Sub Race"] = sr ? sr.name : "";
+  V.Age = sd.age || ""; V.Height = sd.height || ""; V.Weight = sd.weight || "";
+  var cls = B.classes.filter(function(c){ return CLASSES[c.id]; });
+  for (var k = 1; k <= 13; k++) {
+    var c = cls[k - 1];
+    if (k === 13 && cls.length > 13) { V.Class13 = "+" + (cls.length - 12) + " more (see planner)"; continue; }
+    if (!c) { V["Class" + k] = ""; V["ClassTier" + k] = ""; V["ClassLevel" + k] = ""; V["Cost" + k] = ""; continue; }
+    var rec = CLASSES[c.id], lv = c.owned.filter(Boolean).length, spent = 0;
+    c.owned.forEach(function(o, i){ if (o) spent += stepCost(c.id, i); });
+    V["Class" + k] = rec.name; V["ClassTier" + k] = rec.tier; V["ClassLevel" + k] = lv === 8 ? "8 (Mastered)" : lv;
+    V["Cost" + k] = spent + (classIpCost(c.id) ? " + 1 IP" : "");
+  }
+  // combat inventory (things with burden, weapons, armor); everything else goes in the Items box
+  var invRows = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19,20,21,22,23,24,25];   // the sheet has no row 18
+  var combat = [], other = [];
+  B.items.forEach(function(e){
+    var it = ITEMS[e.id]; if (!it) return;
+    (itemBurden(it) > 0 || it.weapon || it.armor ? combat : other).push({ it: it, e: e });
+  });
+  invRows.forEach(function(n, j){
+    var x = combat[j];
+    if (!x) { V["CombatInventory" + n] = ""; V["Amount" + n] = ""; V["Bulk" + n] = ""; V["Description" + n] = ""; return; }
+    var it = x.it, desc = [];
+
+    if (it.weapon) desc.push([it.weapon.range, it.weapon.property].filter(Boolean).join(", "));
+    if (it.armor) {
+      var ab = { guard: "Guard", block: "Block", evasion: "Eva", dodge: "Dodge", initiative: "Init" };
+      desc.push(Object.keys(ab).filter(function(k){ return it.armor[k] !== undefined && num(String(it.armor[k]).replace("+", "")); })
+        .map(function(k){ var v = num(String(it.armor[k]).replace("+", "")); return ab[k] + " " + sign(v); }).join(", "));
+    }
+    if (!it.weapon && !it.armor && it.summary) desc.push(it.summary[0]);
+    V["CombatInventory" + n] = it.name + (x.e.equipped ? " (worn)" : ""); V["Amount" + n] = x.e.qty; V["Bulk" + n] = itemBurden(it) * x.e.qty; V["Description" + n] = desc.join("; ");
+  });
+  var itemsTxt = other.map(function(x){ return x.it.name + (x.e.qty > 1 ? " x" + x.e.qty : ""); });
+  if (combat.length > invRows.length) itemsTxt = combat.slice(invRows.length).map(function(x){ return x.it.name + " x" + x.e.qty; }).concat(itemsTxt);
+  itemsTxt.push("", "Clim: " + C.clim.left.toLocaleString() + "   Burden: " + C.burden + "/" + d.burdenMax);
+  V.Items = itemsTxt.join("\n");
+  V.Personality = sd.personality || ""; V.Appearance = sd.appearance || "";
+  var cr = creationRace(), langs = (cr && cr.languages) || [];
+  var pr = ["Proficiencies: " + (Object.keys(C.profs).sort().join(", ") || "none")];
+  if (langs.length) pr.push("Languages: " + langs.join(", "));
+  var els = elementMasteries(); if (els.length) pr.push("Elemental mastery: " + els.join(", "));
+  V.Proficiencies = pr.join("\n\n"); S.Proficiencies = { maxSize: 10 };
+  var bn = [], bd = [];
+  B.bts.forEach(function(b){
+    var r2 = BTS[b.id]; if (!r2) return;
+    var p = b.pick || {}, extra = [p.stat, p.main, p.sub, p.element, p.divine, p.clan, p.text].filter(Boolean).join(", ");
+    bn.push(r2.name.replace(/\s*\(.*\)$/, "") + (extra ? " (" + extra + ")" : ""));
+    bd.push((r2.summary || [""])[0]);
+  });
+  V.BName = bn.join("\n"); V.BDescription = bd.join("\n");
+  S.BName = { lines: true, maxSize: 8 }; S.BDescription = { lines: true, maxSize: 8 };
+  // abilities: race first, then classes; 24 boxes on pages 3-6
+  var abs = [];
+  abilityGroups().forEach(function(g){ g.abs.forEach(function(a){ abs.push({ a: a, from: g.title }); }); });
+  for (var q = 1; q <= 24; q++) {
+    var x2 = abs[q - 1], key = "Ability" + q;
+    if (q === 24 && abs.length > 24) { V[key] = "More abilities (see planner):\n" + abs.slice(23).map(function(y){ return y.a.name; }).join(", "); continue; }
+    if (!x2) { V[key] = ""; continue; }
+    var a = x2.a, meta = [a.cost, a.range].filter(Boolean).concat(a.keywords || []).join(" - ");
+    V[key] = a.name + "  (" + x2.from + ")" + (meta ? "\n" + meta : "") + (a.requires ? "\nRequires: " + a.requires : "") +
+             (a.usage ? "\n" + a.usage : "") + "\n" + (a.summary || []).join("\n");
+  }
+  return { values: V, special: S };
+}
+// Remember the loaded sheet in this browser so you only pick it once
+function idb(fn){
+  try {
+    var rq = indexedDB.open("lyrianPlanner", 1);
+    rq.onupgradeneeded = function(){ rq.result.createObjectStore("files"); };
+    rq.onsuccess = function(){ try { fn(rq.result); } catch (e) { fn(null); } };
+    rq.onerror = function(){ fn(null); };
+  } catch (e) { fn(null); }
+}
+function sheetGet(cb){ idb(function(db){ if (!db) return cb(null); try { var g = db.transaction("files").objectStore("files").get("sheet"); g.onsuccess = function(){ cb(g.result || null); }; g.onerror = function(){ cb(null); }; } catch (e) { cb(null); } }); }
+function sheetPut(buf){ idb(function(db){ if (!db) return; try { db.transaction("files", "readwrite").objectStore("files").put(buf, "sheet"); } catch (e) {} }); }
+function sheetDel(){ idb(function(db){ if (!db) return; try { db.transaction("files", "readwrite").objectStore("files").delete("sheet"); } catch (e) {} }); }
+var sheetBytes = null;
+function openSheetDialog(){
+  detailNow = null;
+  $("dHead").innerHTML = '<span class="t">Print on the official sheet</span><span style="flex:1"></span><button id="dClose">Close ✕</button>';
+  $("dBody").innerHTML =
+    '<div class="note">This fills your build into the official fillable character sheet (Character Sheet 1.2) and downloads it, ready to print. ' +
+    "The planner doesn't include the sheet itself, so load your copy of the PDF below. It's remembered in this browser.</div>" +
+    '<div class="field"><label>Official sheet</label><span id="shStatus" class="small">checking…</span></div>' +
+    '<div class="toolbar"><input type="file" id="shFile" accept=".pdf,application/pdf"><button id="shForget" class="small">Forget saved sheet</button></div>' +
+    '<div class="note">What goes where: stats, combat numbers, skills (Bonus = your total roll bonus: stat + skill points + best expertise), classes with EXP spent, ' +
+    "combat inventory, other items and Clim, proficiencies and languages, breakthroughs, and up to 24 abilities on pages 3-6. " +
+    "Age, height, weight, personality and appearance come from Identity → Character sheet details. The filled fields stay editable in any PDF reader.</div>" +
+    '<div id="shErr"></div>';
+  $("dFoot").innerHTML = '<button id="shMake" class="gold" disabled>Fill and download sheet</button><span class="small dim">Open the downloaded PDF and print it.</span>';
+  $("detail").classList.add("open");
+  $("dClose").onclick = closeDetail;
+  function ready(bytes, how){
+    var bad = checkSheet(bytes);
+    if (bad) { $("shStatus").innerHTML = '<span class="bad">' + esc(bad) + "</span>"; $("shMake").disabled = true; sheetBytes = null; return false; }
+    sheetBytes = bytes; $("shStatus").innerHTML = '<span class="good">Character Sheet 1.2 ' + esc(how) + " ✓</span>"; $("shMake").disabled = false; return true;
+  }
+  if (sheetBytes) ready(sheetBytes, "loaded");
+  else sheetGet(function(buf){ if (buf) ready(new Uint8Array(buf), "remembered from last time"); else $("shStatus").textContent = "not loaded yet - choose the PDF"; });
+  $("shFile").onchange = function(){
+    var f = this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){ var b = new Uint8Array(rd.result); if (ready(b, "loaded")) sheetPut(rd.result); };
+    rd.readAsArrayBuffer(f);
+  };
+  $("shForget").onclick = function(){ sheetDel(); sheetBytes = null; $("shStatus").textContent = "forgotten - choose the PDF"; $("shMake").disabled = true; };
+  $("shMake").onclick = function(){
+    try {
+      var sv = sheetValues(), out = fillPdf(sheetBytes, sv.values, sv.special);
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([out], { type: "application/pdf" }));
+      a.download = ((B.name || "character").replace(/[^a-z0-9]+/gi, "-").toLowerCase()) + "-character-sheet.pdf";
+      document.body.appendChild(a); a.click(); a.remove();
+      $("shErr").innerHTML = '<div class="note good">Done - check your downloads.</div>';
+    } catch (e) { $("shErr").innerHTML = '<div class="errbox">Couldn\'t fill the sheet: ' + esc(e.message) + "</div>"; }
+  };
+}
+$("btnSheet").onclick = openSheetDialog;
+
 /* =====================================================================
    4. SAVE / LOAD / RESET
    ===================================================================== */
@@ -1942,6 +2229,7 @@ $("btnReset").onclick = function(){
   if (!Object.keys(KEYWORDS).length) missing.push("data/keywords.js");
   if (!(LC.profGrants || []).length) missing.push("data/proficiencies.js");
   if (!(LC.bonuses || []).length) missing.push("data/bonuses.js");
+  if (!LC.sheetMap) missing.push("data/sheet.js");
   if (missing.length) $("dataErr").innerHTML = '<div class="errbox">Couldn\'t load: ' + missing.join(", ") + '. Keep planner.html next to the "data" folder.</div>';
   var any = Object.values(CLASSES)[0];
   $("dataVer").textContent = "Data v" + (any ? any.version : "?") + " · " + Object.keys(CLASSES).length + " classes · " +

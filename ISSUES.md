@@ -1558,3 +1558,10 @@ When the site version changes, recheck classes already entered.
 - [x] Spot-check of 20 random classes (highlander, zen-warrior, windbringer, anti-mage, amanita, elementalist, trickster, aurora-blade-style, jewel-idol, agrarian, bard, monk, sage, sanctioner, sniper, duelist, mage, marksman, phosphomancer, daionmyoji) re-read against the static copy: tier, difficulty, roles, requirements and all 8 steps (abilities, skill lists, Heart/Soul options) all matched. 0 errors in 160 steps.
 - [ ] Page typos noted during the audit: Phosphomancer lists "Art Magic" and Daionmyoji "Magic Perception" with a missing comma; the data treats them as two skills each.
 - [ ] Item pages tried and not found (they're abilities that make items, not items): sealing-talisman, purify-elixir, detoxify-elixir, volatile-flask, high-power-shell, shadow-cloak.
+
+## Printable sheet (Print sheet button) - 2026-10-22
+- [x] Fills the official fillable Character Sheet 1.2 (6 pages, 351 fields) using its own fonts. Tested in poppler and pdfium (Chrome's PDF engine); qpdf reports no errors.
+- [ ] The sheet lists "Acrobatics" and "Artisan" as skills; the current rules have neither, so the planner writes its own skill list into those rows (crafting/gathering skills you've put points into go in the spare rows).
+- [ ] "Bonus" column = total roll bonus (stat + skill points + best expertise). Say if you'd rather it show just the stat.
+- [ ] "Exp" field = unspent EXP. L/P Attack = 2d4 + Power, H Attack = 4d6 + 2 x Power. Temp HP/RP/Mana and Injuries are left blank for play.
+- [ ] Only works with that exact PDF file (Character Sheet 1.2, 2,316,411 bytes). A new sheet version needs tools/make_sheet_map.py re-run.
