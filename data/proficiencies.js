@@ -8,6 +8,7 @@
 //  - LC.profGrants: who gives what. Each entry:
 //      source  - "class:<id>" / "race:<id>" / "clan:<code>" / "bt:<breakthrough id>"
 //      ability - (classes only) the ability that gives it; it counts once that step is bought
+//      step    - (classes only) or the step number that gives it (when it isn't an ability)
 //      fixed   - proficiencies you just get
 //      choose  - picks: { n: how many, from: a profSets name or a list, label: shown text }
 //      note    - anything the planner can't track
@@ -109,6 +110,7 @@ LC.profGrants = [
   { source: "class:alchemist", ability: "the-alchemist", choose: [{ n: 1, from: "COMMON", label: "1 basic weapon" }] },
   { source: "class:armorsmith", ability: "armorsmith-basics", fixed: ["Light Armor", "Medium Armor", "Shields", "Smith's Hammers"],
     choose: [{ n: 1, from: "COMMON_MELEE", label: "One basic melee weapon" }] },
+  { source: "class:armorsmith", step: 5, choose: [{ n: 1, from: ["Heavy Armor", "Greatshields"], label: "Heavy Armor OR Greatshields (Level 5 Heart step)" }] },
   { source: "class:artificer", ability: "artificer-basics", fixed: ["Muskets"], note: "Also the Artificer's Multitool." },
   { source: "class:battlemaster", ability: "arms-mastery", note: "Counts as proficient with every melee weapon you wield, but NOT for class requirements." },
   { source: "class:blacksmith", ability: "craft-weapons", fixed: ["Smith's Hammers"], choose: [{ n: 1, from: "SMITHING", label: "1 smithing weapon" }] },

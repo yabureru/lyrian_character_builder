@@ -17030,6 +17030,7 @@ KW("weakened", "Weakened", ["Your max AP becomes 2 and max RP becomes 1.", "When
 //  - LC.profGrants: who gives what. Each entry:
 //      source  - "class:<id>" / "race:<id>" / "clan:<code>" / "bt:<breakthrough id>"
 //      ability - (classes only) the ability that gives it; it counts once that step is bought
+//      step    - (classes only) or the step number that gives it (when it isn't an ability)
 //      fixed   - proficiencies you just get
 //      choose  - picks: { n: how many, from: a profSets name or a list, label: shown text }
 //      note    - anything the planner can't track
@@ -17131,6 +17132,7 @@ LC.profGrants = [
   { source: "class:alchemist", ability: "the-alchemist", choose: [{ n: 1, from: "COMMON", label: "1 basic weapon" }] },
   { source: "class:armorsmith", ability: "armorsmith-basics", fixed: ["Light Armor", "Medium Armor", "Shields", "Smith's Hammers"],
     choose: [{ n: 1, from: "COMMON_MELEE", label: "One basic melee weapon" }] },
+  { source: "class:armorsmith", step: 5, choose: [{ n: 1, from: ["Heavy Armor", "Greatshields"], label: "Heavy Armor OR Greatshields (Level 5 Heart step)" }] },
   { source: "class:artificer", ability: "artificer-basics", fixed: ["Muskets"], note: "Also the Artificer's Multitool." },
   { source: "class:battlemaster", ability: "arms-mastery", note: "Counts as proficient with every melee weapon you wield, but NOT for class requirements." },
   { source: "class:blacksmith", ability: "craft-weapons", fixed: ["Smith's Hammers"], choose: [{ n: 1, from: "SMITHING", label: "1 smithing weapon" }] },
@@ -17796,8 +17798,11 @@ function skillSources(C){
   B.classes.forEach(function(c){
     var rec = CLASSES[c.id]; if (!rec) return;
     rec.steps.forEach(function(s, i){
-      if (s.type === "skills" && c.owned[i])
+      if (s.type === "skills" && c.owned[i]) {
         out.push({ id: "cls:" + c.id, label: rec.name, points: s.points, options: skillOptions(s.options), note: s.summary || "" });
+        // some steps also give fixed points in one skill (e.g. Alchemist: +5 Alchemy)
+        for (var fk in (s.fixed || {})) out.push({ id: "cls:" + c.id + ":" + fk, label: rec.name + " (" + fk + ")", points: s.fixed[fk], options: [fk], note: "+" + s.fixed[fk] + " fixed points in " + fk + "." });
+      }
     });
   });
   // skill points from class abilities (e.g. Mage's Journey: +5 Magic)
@@ -18152,7 +18157,8 @@ function classBlock(c, idx){
       var a = rec.abilities[s.ability];
       body += ": <b>" + esc(a.name) + "</b> " + abilityMeta(a);
     } else if (s.type === "skills" || s.type === "special") {
-      body += ": +" + s.points + " points" + (Array.isArray(s.options) ? " (" + esc(s.options.join(", ")) + ")" : "");
+      body += ": " + Object.keys(s.fixed || {}).map(function(k){ return "+" + s.fixed[k] + " " + esc(k) + ", plus "; }).join("") +
+        "+" + s.points + " points" + (Array.isArray(s.options) ? " (" + esc(s.options.join(", ")) + ")" : "");
       if (owned && s.type === "skills") {
         var left = C.srcLeft["cls:" + c.id];
         body += ' <button class="small" data-goskills="cls:' + c.id + '">' + (left > 0 ? "Spend " + fmt(left) + " left" : "Edit") + "</button>";
@@ -18168,6 +18174,11 @@ function classBlock(c, idx){
       body += ": +" + (s.amount || 1) + " " + '<select data-cls="' + idx + '" data-pick="' + s.level + '"' + (owned ? "" : " disabled") + '><option value="">— pick —</option>' +
         s.options.map(function(o){ return "<option" + (o === p ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>" +
         (owned && !p ? ' <span class="warn small">pick one</span>' : "");
+    }
+    if (s.alsoGrants) {
+      var ag = s.alsoGrants;
+      body += '<div class="note">Also: ' + esc(ag.proficiencyChoice ? "proficiency in " + ag.proficiencyChoice.join(" or ") + " (pick it in Proficiencies)" :
+        ag.weaponProperty || (ag.errand ? "errand action " + ag.errand : "") || ag.note || "") + "</div>";
     }
     h += '<div class="step' + (owned ? " owned" : "") + '"><span class="lv">' + s.level + "</span>" +
       '<input type="checkbox" data-cls="' + idx + '" data-step="' + i + '"' + (owned ? " checked" : "") + (i === 0 || (!owned && !canBuy) ? " disabled" : "") + ">" +
@@ -18766,8 +18777,8 @@ function activeProfGrants(){
     if (t === "class") {
       B.classes.forEach(function(c){
         var rec = CLASSES[c.id]; if (c.id !== id || !rec) return;
-        var i = rec.steps.map(function(s){ return s.ability; }).indexOf(g.ability);
-        if (i >= 0 && c.owned[i]) out.push({ g: g, key: g.source, label: rec.name + " — " + (rec.abilities[g.ability] || {}).name });
+        var i = g.step ? g.step - 1 : rec.steps.map(function(s){ return s.ability; }).indexOf(g.ability);
+        if (i >= 0 && c.owned[i]) out.push({ g: g, key: g.source + (g.step ? "@" + g.step : ""), label: rec.name + " — " + (g.step ? rec.steps[i].label : (rec.abilities[g.ability] || {}).name) });
       });
     }
     if (t === "bt") {
