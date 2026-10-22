@@ -26,6 +26,7 @@ The official PDF isn't included here: load your own copy once and the planner re
 - Combat numbers with always-on bonuses; tap any number to see where it comes from
 - Toggles for situational bonuses (stances, auras, transformations)
 - **Build roadmap**: every purchase in order with the EXP/IP needed to reach it; turn on *Plan ahead* to plan past your current EXP
+- **What can I unlock next?**: classes available now, one step away (grouped by what you need, with the EXP cost) and two steps away
 - Details window for any class, race, breakthrough or item, and keyword pop-ups
 
 ## What's in here

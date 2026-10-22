@@ -183,6 +183,7 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
     </div>
     <section class="card" id="cardClasses"></section>
     <section class="card" id="cardRoad"></section>
+    <section class="card" id="cardUnlock"></section>
     <section class="card" id="cardSkills"></section>
     <section class="card" id="cardProf"></section>
     <section class="card" id="cardBreak"></section>
@@ -810,7 +811,7 @@ function classStatus(id, C){
 var C = null;
 function render(){
   C = calc();
-  renderIdentity(); renderStats(); renderClasses(); renderRoad(); renderSkills(); renderProf(); renderBreak(); renderItems();
+  renderIdentity(); renderStats(); renderClasses(); renderRoad(); renderUnlock(); renderSkills(); renderProf(); renderBreak(); renderItems();
   renderLive(); renderAbil();
   $("hdrName").textContent = B.name ? "— " + B.name : "";
   saveLocal();
@@ -1172,6 +1173,76 @@ function bindRoad(){
       render();
     };
   });
+}
+
+/* ---------- What can I unlock next? ---------- */
+// Plain-English text for one requirement condition, plus how far off it is.
+function condText(c, C){
+  var nm = function(id){ return (CLASSES[id] || {}).name || id; };
+  if (c.ability) {
+    var p = c.ability.split("/"), rec = CLASSES[p[0]], ab = rec && rec.abilities[p[1]];
+    return "Learn " + (ab ? ab.name : p[1]) + (rec ? " (" + rec.name + ")" : "");
+  }
+  if (c.classLearned) return "Learn the " + nm(c.classLearned) + " class";
+  if (c.mastered) {
+    var own = B.classes.filter(function(x){ return x.id === c.mastered; })[0], left = 0, steps = 0;
+    (CLASSES[c.mastered] || { steps: [] }).steps.forEach(function(s, i){ if (!own || !own.owned[i]) { left += stepCost(c.mastered, i); steps++; } });
+    var locked = !own && classStatus(c.mastered, C).state === "no";
+    return "Master " + nm(c.mastered) + " (" + (own ? steps + " steps, " : "") + left + " EXP" + (own ? "" : " + 1 IP") + ")" + (locked ? " - not open to you yet" : "");
+  }
+  if (c.masteredAny) return c.masteredAny > 1 ? "Master " + c.masteredAny + " classes" : "Master any class";
+  if (c.masteredTier) return "Master " + ((c.count || 1) > 1 ? c.count + " tier " + c.masteredTier + "+ classes" : "a tier " + c.masteredTier + "+ class");
+  if (c.race) return "Be " + ((RACES[c.race] || {}).name || c.race);
+  if (c.breakthrough) { var bn = (BTS[c.breakthrough] || {}).name || c.breakthrough; return "Take " + (/^the /i.test(bn) ? "" : "the ") + bn + " breakthrough"; }
+  if (c.skill) return (c.points || 1) + " points in " + c.skill;
+  if (c.expertise) return (c.points || 1) + " expertise points in " + c.expertise.join(" or ");
+  if (c.mastery) return c.mastery + " element mastery";
+  if (c.hasSpell) return "Learn a spell" + (c.damaging ? " that deals damage" : "");
+  if (c.proficiency) return "Proficiency: " + c.proficiency.map(function(x){
+    return { ANY_WEAPON: "any weapon", ANY_MELEE: "any melee weapon", ANY_TWO_HANDED_MELEE: "any two-handed melee weapon" }[x] || x; }).join(" or ");
+  if (c.mysticEyeSlot) return "A free Mystic Eye slot";
+  return "See requirement text";
+}
+function unlockPaths(C){
+  var have = {}, out = { now: [], one: {}, two: [] };
+  B.classes.forEach(function(c){ have[c.id] = true; });
+  Object.values(CLASSES).sort(sortByName).forEach(function(cl){
+    if (have[cl.id]) return;
+    var st = classStatus(cl.id, C);
+    if (st.state !== "no") { out.now.push({ id: cl.id, state: st.state }); return; }
+    var q = REQS[cl.id]; if (!q || !q.routes) return;
+    var best = null;
+    q.routes.forEach(function(route){
+      var miss = route.filter(function(c){ return condCheck(c, C) !== true; });
+      if (miss.some(function(c){ return c.race; })) return;          // can't change your race
+      if (!best || miss.length < best.length) best = miss;
+    });
+    if (!best || !best.length) return;
+    var texts = best.map(function(c){ return condText(c, C); });
+    if (best.length === 1) (out.one[texts[0]] = out.one[texts[0]] || []).push(cl.id);
+    else if (best.length === 2) out.two.push({ id: cl.id, needs: texts });
+  });
+  return out;
+}
+function renderUnlock(){
+  var u = unlockPaths(C), h = "<h2>What can I unlock next?</h2>";
+  h += '<div class="note">Based on your current build. Classes only open to other races are left out. Tap a class name for its details.</div>';
+  var chip = function(id){ var c = CLASSES[id]; return '<span class="tag" data-info="class:' + id + '">' + esc(c.name) + " T" + c.tier + "</span>"; };
+  h += '<details><summary class="small" style="cursor:pointer"><b>Available now: ' + u.now.length + " classes</b> (requirements met or worth checking)</summary>" +
+    '<div style="margin-top:6px">' + u.now.map(function(x){ return chip(x.id).replace('class="tag"', 'class="tag ' + (x.state === "met" ? "good" : "warn") + '"'); }).join(" ") + "</div></details>";
+  var keys = Object.keys(u.one).sort(function(a, b){ return u.one[b].length - u.one[a].length || a.localeCompare(b); });
+  h += "<h3>One step away</h3>";
+  if (!keys.length) h += '<p class="dim small">Nothing is one step away right now.</p>';
+  keys.forEach(function(k){
+    h += '<div class="li"><div class="small"><b>' + esc(k) + "</b> → " + u.one[k].length + " class" + (u.one[k].length > 1 ? "es" : "") + "</div>" +
+      '<div style="margin-top:4px">' + u.one[k].map(chip).join(" ") + "</div></div>";
+  });
+  if (u.two.length) {
+    h += '<details style="margin-top:8px"><summary class="small" style="cursor:pointer"><b>Two steps away: ' + u.two.length + " classes</b></summary>";
+    u.two.forEach(function(x){ h += '<div class="li small">' + chip(x.id) + " needs " + x.needs.map(esc).join(" <b>and</b> ") + "</div>"; });
+    h += "</details>";
+  }
+  $("cardUnlock").innerHTML = h;
 }
 
 /* ---------- Skills ---------- */
