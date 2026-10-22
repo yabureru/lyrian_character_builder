@@ -156,6 +156,7 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
 <script src="data/keywords.js"></script>
 <script src="data/proficiencies.js"></script>
 <script src="data/bonuses.js"></script>
+<script src="data/mods.js"></script>
 <script src="data/sheet.js"></script>
 </head>
 <body>
@@ -434,6 +435,58 @@ function btCostAt(id, nth){ // nth = 0 for the first time you take it
 function itemCost(it){ return typeof it.cost === "number" ? it.cost : (it.cost === null || it.cost === undefined) ? 0 : null; } // no price (relics etc.) = 0
 function itemBurden(it){ return typeof it.burden === "number" ? it.burden : 0; }
 
+/* ---------- Item mods ----------
+   Each inventory entry can have mods ticked (e.mods = list of keys). An item can take its own mods plus
+   the Universal mod lists that fit it (see data/mods.js). data/mods.js says which mods change numbers. */
+var MODFX = LC.modEffects || {};
+var MOD_GROUPS = ["A", "B", "C", "Frame", "Alloy", "Flamellon"];
+function modKey(src, g, name){ return src + "|" + g + "|" + name; }
+function modSources(it){
+  var out = [];
+  if (!it || it.reference) return out;
+  if (it.mods) out.push({ src: "item", label: it.name + " mods", mods: it.mods });
+  (LC.universalMods || []).forEach(function(u){ var r = ITEMS[u.id]; if (r && r.mods && u.fits(it)) out.push({ src: u.id, label: u.label, mods: r.mods }); });
+  return out;
+}
+function chosenMods(e){
+  var it = ITEMS[e.id], out = [];
+  if (!it || !e.mods || !e.mods.length) return out;
+  modSources(it).forEach(function(s){
+    MOD_GROUPS.forEach(function(g){
+      (Array.isArray(s.mods[g]) ? s.mods[g] : []).forEach(function(m){
+        var k = modKey(s.src, g, m.name);
+        if (e.mods.indexOf(k) >= 0) out.push({ key: k, src: s.src, g: g, m: m, fx: MODFX[m.name] || {} });
+      });
+    });
+  });
+  return out;
+}
+function modSum(list, field){ return list.reduce(function(t, x){ return t + (num(x.fx[field]) || 0); }, 0); }
+function modPoints(list){ return list.reduce(function(t, x){ return t + (num(x.m.points) || 0); }, 0); }
+// Burden of one of this entry, with mods (Melding needs another artifice with the same mod in your Burden)
+function itemBurdenFor(e, meld){
+  var it = ITEMS[e.id]; if (!it) return 0;
+  var ms = chosenMods(e), b = itemBurden(it) + modSum(ms, "burden");
+  ms.forEach(function(x){ if (x.fx.meld && (meld || {})[x.fx.meld] >= 2) b -= 1; });
+  return Math.max(0, b);
+}
+function meldCounts(){
+  var m = {};
+  B.items.forEach(function(e){ chosenMods(e).forEach(function(x){ if (x.fx.meld) m[x.fx.meld] = (m[x.fx.meld] || 0) + e.qty; }); });
+  return m;
+}
+function fxText(fx){
+  var t = [], names = { burden: "Burden", guard: "Guard", block: "Block", evasion: "Evasion", dodge: "Dodge", init: "Initiative", speed: "Speed", mana: "Max Mana", rp: "RP" };
+  for (var k in names) if (fx[k]) t.push(names[k] + " " + (fx[k] > 0 ? "+" : "") + fx[k]);
+  if (fx.cut) t.push("armor penalties smaller (Init " + (fx.cut.init || 0) + ", Evasion/Dodge " + (fx.cut.evade || 0) + ")");
+  if (fx.noPenalties) t.push("no armor penalties");
+  if (fx.noEvadePenalty) t.push("no Evasion/Dodge penalty");
+  if (fx.noGuard) t.push("no passive Guard");
+  if (fx.noBlock) t.push("no Block bonus");
+  if (fx.meld) t.push("Burden -1 with another " + fx.meld + " artifice");
+  return t.join(", ");
+}
+
 // Every class ability you own: bought steps, plus abilities those grant (e.g. Rogue's Journey -> Feint).
 function ownedAbilities(){
   var out = [];
@@ -562,11 +615,20 @@ function calc(){
   if (C.ip.left < 0 && !B.planAhead) C.warn.push("Not enough IP for all your classes.");
 
   // ---- Clim and burden ----
-  var climSpent = 0, burden = 0, unknownCost = [];
+  var climSpent = 0, burden = 0, unknownCost = [], meld = meldCounts();
+  C.meld = meld;
+  // mod notes and missing prerequisites
+  C.modNotes = {};
+  B.items.forEach(function(e, i){
+    var ms = chosenMods(e), it = ITEMS[e.id]; if (!ms.length) return;
+    var names = ms.map(function(x){ return x.m.name; });
+    C.modNotes[i] = ms.filter(function(x){ return x.fx.note; }).map(function(x){ return x.m.name + ": " + x.fx.note; });
+    ms.forEach(function(x){ if (x.fx.needs && names.indexOf(x.fx.needs) < 0) C.warn.push(it.name + ": the " + x.m.name + " mod needs " + x.fx.needs + " on the same item."); });
+  });
   B.items.forEach(function(e){
     var it = ITEMS[e.id]; if (!it) return;
     var c = itemCost(it); if (c === null) unknownCost.push(it.name); else climSpent += c * e.qty;
-    burden += itemBurden(it) * e.qty;
+    burden += itemBurdenFor(e, meld) * e.qty;
   });
   var richClim = btGrants("clim").reduce(function(t, x){ return t + x.g.clim; }, 0);
   var canonClim = B.canon ? 1000 : 0;  // canon campaign: +1000 starting Clim
@@ -576,8 +638,9 @@ function calc(){
   C.kitExpert = null;
   if (hasBt("kit-expert")) {
     var bestKit = null;
-    B.items.forEach(function(e){ var it = ITEMS[e.id]; if (it && it.tag === "Kit" && (!bestKit || itemBurden(it) > itemBurden(bestKit))) bestKit = it; });
-    if (bestKit) { var cut = Math.min(2, itemBurden(bestKit)); burden -= cut; C.kitExpert = { name: bestKit.name, cut: cut }; }
+    var bestE = null;
+    B.items.forEach(function(e){ var it = ITEMS[e.id]; if (it && it.tag === "Kit" && (!bestE || itemBurdenFor(e, meld) > itemBurdenFor(bestE, meld))) bestE = e; });
+    if (bestE) { var cut = Math.min(2, itemBurdenFor(bestE, meld)); burden -= cut; C.kitExpert = { name: ITEMS[bestE.id].name, cut: cut }; }
   }
   C.burden = burden;
   if (unknownCost.length) C.warn.push("Price not a plain number, not counted: " + unknownCost.join(", "));
@@ -604,29 +667,48 @@ function calcDerived(C){
   function sum(key){ return (parts[key] || []).reduce(function(t, x){ return t + x[1]; }, 0); }
   var T = C.stat.Toughness, A = C.stat.Agility, Pw = C.stat.Power, F = C.stat.Focus;
 
-  // equipment
-  var shield = 0;
+  // equipment (armor, shields, wielded weapons) and their mods
   B.items.forEach(function(e){
-    var it = ITEMS[e.id]; if (!it || !it.armor || !e.equipped) return;
-    var need = itemProf(it), noProf = need && !C.profs[need];
-    if (it.tag === "Shield" || /shield/i.test(it.armor.type || "")) {
-      var sv = num(String(it.armor.block).replace("+", ""));
-      P("blockGuard", it.name + " (shield, while Blocking)", sv);
-      if (noProf) P("blockGuard", it.name + " not proficient", -1);
-      // Greatshields also give Guard all the time, and lower Initiative/Evasion/Dodge
-      if (num(it.armor.guard)) { P("guard", it.name, num(it.armor.guard)); if (noProf) P("guard", it.name + " not proficient", -1); }
-      if (num(it.armor.evasion)) P("evasion", it.name, num(it.armor.evasion));
-      if (num(it.armor.dodge)) P("dodge", it.name, num(it.armor.dodge));
-      if (num(it.armor.initiative)) P("init", it.name, num(it.armor.initiative));
-      return;
+    var it = ITEMS[e.id]; if (!it || !e.equipped) return;
+    var ms = chosenMods(e);
+    if (it.armor) {
+      var a = {}; for (var ak in it.armor) a[ak] = it.armor[ak];
+      if (a.dodge === undefined && !(it.tag === "Shield" || /shield/i.test(a.type || ""))) a.dodge = a.evasion;
+      ms.forEach(function(x){
+        var f = x.fx;
+        if (f.noPenalties) { a.evasion = 0; a.dodge = 0; a.initiative = 0; }
+        if (f.noEvadePenalty) { a.evasion = 0; a.dodge = 0; }
+        if (f.noGuard) a.guard = 0;
+        if (f.noBlock) a.block = 0;
+        if (f.cut) {
+          a.initiative = Math.min(0, num(a.initiative) + (f.cut.init || 0));
+          a.evasion = Math.min(0, num(a.evasion) + (f.cut.evade || 0));
+          a.dodge = Math.min(0, num(a.dodge) + (f.cut.evade || 0));
+        }
+      });
+      var need = itemProf(it), noProf = need && !C.profs[need];
+      if (it.tag === "Shield" || /shield/i.test(a.type || "")) {
+        var sv = num(String(a.block).replace("+", ""));
+        P("blockGuard", it.name + " (shield, while Blocking)", sv);
+        if (noProf) P("blockGuard", it.name + " not proficient", -1);
+        // Greatshields also give Guard all the time, and lower Initiative/Evasion/Dodge
+        if (num(a.guard)) { P("guard", it.name, num(a.guard)); if (noProf) P("guard", it.name + " not proficient", -1); }
+      } else {
+        if (num(a.guard)) P("guard", it.name, num(a.guard));
+        if (noProf && num(a.guard)) P("guard", it.name + " not proficient", -1);
+        if (num(a.block)) P("blockGuard", it.name + " Block value", num(a.block));
+      }
+      if (num(a.evasion)) P("evasion", it.name, num(a.evasion));
+      if (num(a.dodge)) P("dodge", it.name, num(a.dodge));
+      if (num(a.initiative)) P("init", it.name, num(a.initiative));
     }
-    if (num(it.armor.guard)) P("guard", it.name, num(it.armor.guard));
-    if (noProf && num(it.armor.guard)) P("guard", it.name + " not proficient", -1);
-    if (num(it.armor.block)) P("blockGuard", it.name + " Block value", num(it.armor.block));
-    if (num(it.armor.evasion)) P("evasion", it.name, num(it.armor.evasion));
-    var dg = it.armor.dodge !== undefined ? num(it.armor.dodge) : num(it.armor.evasion);
-    if (dg) P("dodge", it.name, dg);
-    if (num(it.armor.initiative)) P("init", it.name, num(it.armor.initiative));
+    // flat numbers from mods (while equipped / wielded)
+    ms.forEach(function(x){
+      [["guard", "guard"], ["block", "blockGuard"], ["evasion", "evasion"], ["dodge", "dodge"], ["init", "init"],
+       ["speed", "speed"], ["mana", "mana"], ["rp", "rp"]].forEach(function(pr){
+        if (num(x.fx[pr[0]])) P(pr[1], it.name + " — " + x.m.name + " mod", num(x.fx[pr[0]]));
+      });
+    });
   });
 
   P("hp", "Base", 20); P("hp", "Toughness " + T + " x 10", T * 10);
@@ -1600,10 +1682,15 @@ function renderLive(){
   if (!B.items.length) h += '<div class="dim small">Nothing bought yet.</div>';
   B.items.forEach(function(e, i){
     var it = ITEMS[e.id]; if (!it) return;
-    var eq = it.armor ? '<label class="small"><input type="checkbox" data-eq="' + i + '"' + (e.equipped ? " checked" : "") + "> equip</label>" : "";
+    var eq = it.armor ? '<label class="small"><input type="checkbox" data-eq="' + i + '"' + (e.equipped ? " checked" : "") + "> equip</label>" :
+             it.weapon ? '<label class="small" title="Wielded: its mods count in your numbers"><input type="checkbox" data-eq="' + i + '"' + (e.equipped ? " checked" : "") + "> wield</label>" : "";
+    var ms = chosenMods(e), canMod = modSources(it).length > 0;
+    if (canMod) eq += ' <button class="small" data-mods="' + i + '" title="Pick this item\'s mods">Mods' + (ms.length ? " (" + ms.length + ")" : "") + "</button>";
     var need = itemProf(it);
     if (need && !C.profs[need]) eq += ' <span class="tag bad" title="You are not proficient with ' + esc(need) + '">not proficient</span>';
     h += '<div class="kv"><span>' + esc(it.name) + " " + eq + '</span><span class="pm"><button class="small" data-q="' + i + '" data-d="-1">−</button><b>' + e.qty + '</b><button class="small" data-q="' + i + '" data-d="1">+</button></span></div>';
+    if (ms.length) h += '<div class="small dim" style="margin:-4px 0 6px 8px">' + ms.map(function(x){ return esc(x.m.name); }).join(", ") +
+      " · " + modPoints(ms) + " crafting pts" + ((C.modNotes[i] || []).length ? "<br>" + C.modNotes[i].map(esc).join("<br>") : "") + "</div>";
   });
   h += '<div class="kv"><span>Burden</span><b class="bdv ' + (C.burden > C.d.burdenMax ? "bad" : "") + '" data-bd="burden" data-bdlabel="Burden limit">' + C.burden + " / " + C.d.burdenMax + "</b></div>" +
     (C.kitExpert ? '<div class="small">Kit Expert: ' + esc(C.kitExpert.name) + " counts " + C.kitExpert.cut + " less Burden.</div>" : "") + "</div>";
@@ -1621,12 +1708,13 @@ function renderLive(){
     cb.onchange = function(){
       var e = B.items[num(this.dataset.eq)], it = ITEMS[e.id];
       // only one body armor at a time (plates and shields are separate)
-      if (this.checked && /^(Light|Medium|Heavy|Clothing)$/.test(it.armor.type || "")) {
+      if (this.checked && it.armor && /^(Light|Medium|Heavy|Clothing)$/.test(it.armor.type || "")) {
         B.items.forEach(function(o){ var oi = ITEMS[o.id]; if (oi && oi.armor && /^(Light|Medium|Heavy|Clothing)$/.test(oi.armor.type || "")) o.equipped = false; });
       }
       e.equipped = this.checked; renderSome([renderStats]);
     };
   });
+  document.querySelectorAll("[data-mods]").forEach(function(b){ b.onclick = function(){ openMods(num(this.dataset.mods)); }; });
 }
 
 /* ---------- Abilities pane ---------- */
@@ -2044,6 +2132,53 @@ function copyText(ta, btn){
   try { if (navigator.clipboard) { navigator.clipboard.writeText(ta.value).then(done, function(){ document.execCommand("copy"); done(); }); return; } } catch (e) {}
   try { document.execCommand("copy"); done(); } catch (e) { btn.textContent = "Select and copy by hand"; }
 }
+/* ---------- Mod picker for one inventory item ---------- */
+function openMods(i){
+  var e = B.items[i], it = e && ITEMS[e.id]; if (!it) return;
+  detailNow = null;
+  var keep = $("dBody").scrollTop;
+  e.mods = e.mods || [];
+  $("dHead").innerHTML = '<span class="t">Mods: ' + esc(it.name) + '</span><span style="flex:1"></span><button id="dClose">Done ✓</button>';
+  var h = '<div class="note">Tick the mods this item has. Numbers (Guard, Block, Burden...) count while it is ' + (it.armor ? "equipped" : it.weapon ? "wielded" : "carried") +
+          "; Burden changes always count. Only one Frame mod per armor." + (e.qty > 1 ? " These mods apply to all " + e.qty + " of this item." : "") + "</div>";
+  modSources(it).forEach(function(src){
+    var body = "";
+    MOD_GROUPS.forEach(function(g){
+      var list = Array.isArray(src.mods[g]) ? src.mods[g] : [];
+      if (!list.length) return;
+      body += '<div class="small" style="margin-top:6px"><b>' + g + " mods</b></div>";
+      list.forEach(function(m){
+        var k = modKey(src.src, g, m.name), fx = MODFX[m.name] || {}, ft = fxText(fx);
+        body += '<label class="small" style="display:block;margin:3px 0"><input type="checkbox" data-mk="' + esc(k) + '"' + (fx.frame || g === "Frame" ? ' data-frame="1"' : "") +
+          (e.mods.indexOf(k) >= 0 ? " checked" : "") + "> <b>" + esc(m.name) + "</b> (" + esc(m.points) + " pts) — " + esc(m.summary) +
+          (ft ? ' <span class="tag good">' + esc(ft) + "</span>" : "") + (fx.needs ? ' <span class="tag">needs ' + esc(fx.needs) + "</span>" : "") + "</label>";
+      });
+    });
+    if (src.mods.note) body += '<div class="small dim">' + esc(src.mods.note) + "</div>";
+    if (body) h += "<h3>" + esc(src.label) + "</h3>" + body;
+  });
+  $("dBody").innerHTML = h;
+  var ms = chosenMods(e);
+  $("dFoot").innerHTML = '<span class="small">' + ms.length + " mod(s) · " + modPoints(ms) + " crafting points · Burden " + itemBurdenFor(e, C.meld) + " each</span>";
+  $("detail").classList.add("open");
+  $("dBody").scrollTop = keep;
+  $("dClose").onclick = closeDetail;
+  document.querySelectorAll("[data-mk]").forEach(function(cb){
+    cb.onchange = function(){
+      var k = this.dataset.mk;
+      e.mods = e.mods.filter(function(x){ return x !== k; });
+      if (this.checked) {
+        if (this.dataset.frame) { // only one frame per armor
+          var frames = [].map.call(document.querySelectorAll("[data-mk][data-frame]"), function(x){ return x.dataset.mk; });
+          e.mods = e.mods.filter(function(x){ return frames.indexOf(x) < 0; });
+        }
+        e.mods.push(k);
+      }
+      render(); openMods(i);
+    };
+  });
+}
+
 function openShare(){
   detailNow = null;
   $("dHead").innerHTML = '<span class="t">Share this build</span><span style="flex:1"></span><button id="dClose">Close ✕</button>';
@@ -2354,7 +2489,7 @@ function sheetValues(){
         .map(function(k){ var v = num(String(it.armor[k]).replace("+", "")); return ab[k] + " " + sign(v); }).join(", "));
     }
     if (!it.weapon && !it.armor && it.summary) desc.push(it.summary[0]);
-    V["CombatInventory" + n] = it.name + (x.e.equipped ? " (worn)" : ""); V["Amount" + n] = x.e.qty; V["Bulk" + n] = itemBurden(it) * x.e.qty; V["Description" + n] = desc.join("; ");
+    V["CombatInventory" + n] = it.name + (x.e.equipped ? (it.armor ? " (worn)" : " (wielded)") : ""); V["Amount" + n] = x.e.qty; V["Bulk" + n] = itemBurdenFor(x.e, C.meld) * x.e.qty; V["Description" + n] = desc.join("; ");
   });
   var itemsTxt = other.map(function(x){ return x.it.name + (x.e.qty > 1 ? " x" + x.e.qty : ""); });
   if (combat.length > invRows.length) itemsTxt = combat.slice(invRows.length).map(function(x){ return x.it.name + " x" + x.e.qty; }).concat(itemsTxt);

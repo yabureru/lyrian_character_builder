@@ -18,6 +18,7 @@ Community tool. No monetization.
 Your build saves automatically in the browser. Use **Save** to download a `.json` copy and **Load** to open one.
 **Share** gives you a text summary (for Discord or your GM) and a one-line build code anyone can paste into their planner.
 **Compare** puts two builds side by side: press *Pin current build*, try some changes, then open Compare again to see exactly what went up or down. You can also compare against a saved file or a build code.
+**Item mods**: press *Mods* on anything in your inventory to tick its mods (its own, plus the Universal weapon/armor/artifice/crafting mods that fit). Mods that change numbers (Guard, Block, Dodge, Burden, Mana, armor penalties, Melding...) are added in; the rest show as notes, with crafting points totalled.
 **Undo / Redo** (or Ctrl+Z / Ctrl+Y) step back through your changes, including Reset and Load.
 **Print sheet** fills your build into the **official fillable character sheet** (Character Sheet 1.2) and downloads it, ready to print.
 The official PDF isn't included here: load your own copy once and the planner remembers it in that browser.
@@ -40,6 +41,7 @@ The official PDF isn't included here: load your own copy once and the planner re
 | `data/classes.js` | All classes: tiers, roles, requirements, 8-step progressions, abilities |
 | `data/races.js` | Main races and sub-races |
 | `data/breakthroughs.js` | Breakthroughs |
+| `data/mods.js` | Which item mods change your numbers (Guard, Block, Burden...) and which Universal mod lists fit which items |
 | `data/requirements.js` | Class unlock rules, in a form the planner can check |
 | `data/items.js` | Items: weapons, armor, alchemy, artifice, mounts, materials |
 | `data/keywords.js` | Keyword definitions (shown when you tap a keyword tag) |
