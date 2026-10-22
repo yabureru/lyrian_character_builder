@@ -5,6 +5,9 @@ plan and min/max a long-term build first, then make the character.
 
 Community tool. No monetization.
 
+> **Unofficial fan tool.** Not affiliated with or endorsed by Angel's Sword Studios.
+> Lyrian Chronicles and its content belong to Angel's Sword Studios.
+
 ## How to use it
 
 - **On a PC:** download the repo (green **Code** button → **Download ZIP**), unzip it, and double-click `planner.html`.
@@ -47,3 +50,8 @@ copy an existing block and change it. After editing data, rebuild the phone vers
 ```
 python tools/build_all_in_one.py
 ```
+
+## License
+
+The planner code, data layout and plain-English summaries are released under the [MIT License](LICENSE).
+This does not cover Lyrian Chronicles itself: the game, its names and its rules belong to Angel's Sword Studios.
