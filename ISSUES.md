@@ -1506,7 +1506,8 @@ When the site version changes, recheck classes already entered.
 - [ ] Smith's Hammer: no weapon effect on the page (rulebook says it counts as bludgeoning).
 - [ ] Giant Dragonfly: no line-movement note (it flies; other fliers have straight-line flight).
 - [ ] Greater Speed Potion and Speed Potion: page metadata says "Materials: 1"/"Materials: 2", which disagrees with the body text. Body text used.
-- [ ] Facilities: page gives only labor and materials, no effects. Rulebook says workshops give +2/+4/+6.
+- [x] Facilities: effects added from the rulebook (workshops +2/+4/+6, uses per level, etc.). Greenhouse effect still MISSING.
+- [ ] Rest and food rules: the static rulebook copy really does stop mid-sentence at "To regain HP a character needs to rest." (the later Housing/Facilities sections mention Rest-action doubling but not the base rules). Needs the user's rulebook file.
 
 ---
 

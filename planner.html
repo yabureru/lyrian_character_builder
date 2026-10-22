@@ -1349,6 +1349,8 @@ function itemDetail(it){
   var m = it.mount;
   if (m) bits.push("Mount: " + Object.keys(m).map(function(k){ return k + " " + m[k]; }).join(", "));
   if (it.fuel) bits.push("Fuel: shell " + it.fuel.shell + ", " + it.fuel.usage);
+  if (it.effects) Object.keys(it.effects).forEach(function(k){ var e = it.effects[k];
+    bits.push(k + ": " + e.effect + (e.uses ? " Uses by level: " + e.uses.join(" / ") + "." : "") + (e.slots ? " Slots by level: " + e.slots.join(" / ") + "." : "")); });
   if (it.crafting) bits.push("Crafting: " + [it.crafting.points, it.crafting.discipline, it.crafting.materials].filter(function(x){ return x !== undefined && x !== null; }).join(" · "));
   var h = '<div class="small dim">' + bits.map(esc).join("<br>") + "</div>" + listHtml(it.summary);
   if (it.mods) {

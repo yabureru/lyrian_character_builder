@@ -887,7 +887,20 @@ IT("facilities", {
     { name: "Shop", labor: [150, 150, 300], mult: [1, 1, 2], materials: { Lumber: 2800, Calligraphy: 2400, Iron: 1600, Alchemy: 800, Food: 400 } },
     { name: "Stable", labor: [120, 120, 120], mult: [1, 1, 1], materials: { Lumber: 3840, Iron: 1280, Alchemy: 640, Food: 640 } }
   ],
-  summary: [ "Labor and material units needed to build each facility level (1/2/3). Level N materials = Level 1 materials x mult[N]. The page gives no effects for the facilities." ]
+  // Effects come from the rulebook's Housing > Facilities section (static copy, read 2026-10-22).
+  effects: {
+    "Crafting Workshop/Atelier": { uses: [2, 3, 4], effect: "+2 / +4 / +6 facility bonus to the matching crafting skill." },
+    "Infirmary": { uses: [2, 4, 6], effect: "You can treat your own injury as an errand action." },
+    "Dojo": { uses: [1, 1, 1], effect: "Mentor 1 / 2 / 4 extra people at the same time." },
+    "Shrine (Meditation Garden)": { uses: [5, 10, 20], effect: "Temporary mana from the Rest action is doubled." },
+    "Sauna (Artifice Heatstone Tub)": { uses: [5, 10, 20], effect: "Temporary HP from the Rest action is doubled." },
+    "Appraiser's Workshop": { uses: [2, 4, 6], effect: "+10 / +20 / +30 facility bonus to the Appraise interlude action in town; one use appraises a single item for 1 EP." },
+    "Shop": { uses: [1, 2, 4], effect: "Use the Open Shop IP action without spending IP." },
+    "Stable": { slots: [2, 4, 6], effect: "Slots for animals: 1 large animal per slot, or 2 medium / 4 small of the same kind sharing a slot." },
+    "Greenhouse (Serene Garden)": { effect: "MISSING - rulebook lists a Facility Bonus but no per-level details." }
+  },
+  summary: [ "Labor and material units needed to build each facility level (1/2/3). Level N materials = Level 1 materials x mult[N].",
+             "The item page gives no effects; the effects above come from the rulebook's Facilities section." ]
 });
 
 IT("falcon-elixir", {
