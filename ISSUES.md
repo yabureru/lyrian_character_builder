@@ -1513,6 +1513,7 @@ When the site version changes, recheck classes already entered.
 # PLANNER (planner.html)
 
 ## Planner - not done yet
+- [x] Roadmap view and build sharing (text summary + build code) added 2026-10-22.
 - [x] Ability bonuses are now added to the Combat numbers (classes.js grants + data/bonuses.js), with tap-to-see breakdowns and toggles for situational ones.
 - [ ] Race hybrids (Faerie-Chimera, 200 EXP, creation only) can't be picked yet.
 - [x] Weapon/armor proficiencies are now tracked (data/proficiencies.js) and checked for class requirements and equipped armor.

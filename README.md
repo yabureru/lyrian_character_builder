@@ -16,6 +16,15 @@ Community tool. No monetization.
   won't load the separate data files.
 
 Your build saves automatically in the browser. Use **Save** to download a `.json` copy and **Load** to open one.
+**Share** gives you a text summary (for Discord or your GM) and a one-line build code anyone can paste into their planner.
+
+### Features
+- Race, sub-race, stats, classes (all 8 steps), skills and expertise, proficiencies, breakthroughs and items
+- Requirement checking for every class, including proficiencies and element masteries
+- Combat numbers with always-on bonuses; tap any number to see where it comes from
+- Toggles for situational bonuses (stances, auras, transformations)
+- **Build roadmap**: every purchase in order with the EXP/IP needed to reach it; turn on *Plan ahead* to plan past your current EXP
+- Details window for any class, race, breakthrough or item, and keyword pop-ups
 
 ## What's in here
 
@@ -30,6 +39,7 @@ Your build saves automatically in the browser. Use **Save** to download a `.json
 | `data/items.js` | Items: weapons, armor, alchemy, artifice, mounts, materials |
 | `data/keywords.js` | Keyword definitions (shown when you tap a keyword tag) |
 | `data/proficiencies.js` | Weapon/armor proficiencies and who grants them |
+| `data/bonuses.js` | Race bonuses, situational (stance/aura/transformation) bonuses and notes |
 | `RULES_REFERENCE.md` | Condensed rules used for the planner's formulas |
 | `ISSUES.md` | Known gaps, unclear rules and things to check |
 

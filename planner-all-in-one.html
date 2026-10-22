@@ -105,6 +105,9 @@ tr.can td:first-child{color:var(--gold2)}
 .kv:last-child{border-bottom:none}
 .kv b{font-variant-numeric:tabular-nums}
 .big{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+table.road tr.future td{color:#8a8e98}
+table.road td{vertical-align:middle}
+@media (max-width:820px){table.road .pm{flex-direction:column}table.road th,table.road td{padding:3px 4px}}
 .bdv{cursor:pointer;border-bottom:1px dotted var(--dim)}
 [data-bd]{cursor:pointer}
 .big div{background:#1f2128;border:1px solid var(--line);border-radius:8px;padding:5px;text-align:center}
@@ -132,6 +135,7 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
 #detail .dh .t{font-size:17px;font-weight:700;color:var(--gold2)}
 #detail .db{padding:12px 14px;overflow:auto}
 #detail .df{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line)}
+#detail textarea{background:#1f2128;border:1px solid var(--line);border-radius:6px;color:var(--text);font:12px/1.4 ui-monospace,Consolas,monospace;padding:6px}
 #detail .stp{border-left:2px solid var(--line);padding:4px 0 6px 10px;margin:6px 0}
 #detail .stp .lbl{font-size:12px;color:var(--dim)}
 @media (max-width:820px){#detail{padding:0}#detail .box{max-height:100vh;height:100vh;border-radius:0;max-width:none}}
@@ -17273,6 +17277,7 @@ LC.bonuses = [
   <span id="dataVer" class="dim small"></span>
   <button id="btnSave" class="gold">Save</button>
   <button id="btnLoad">Load</button>
+  <button id="btnShare">Share</button>
   <input id="fileLoad" type="file" accept=".json,application/json" hidden>
   <button id="btnReset" class="reset danger">Reset</button>
 </header>
@@ -17285,6 +17290,7 @@ LC.bonuses = [
       <section class="card" id="cardStats"></section>
     </div>
     <section class="card" id="cardClasses"></section>
+    <section class="card" id="cardRoad"></section>
     <section class="card" id="cardSkills"></section>
     <section class="card" id="cardProf"></section>
     <section class="card" id="cardBreak"></section>
@@ -17372,7 +17378,9 @@ function newBuild(){
     alloc: {},          // skill spending per source: {sourceId: {sk:{Skill:n}, ex:[{skill,name,pts}]}}
     activeSource: "start",
     profPicks: {},
-    toggles: {},        // conditional bonuses switched on: {"class:monk/serene-water-stance": true}      // proficiency choices: {"class:fighter#0": ["Axes", ...]}
+    toggles: {},
+    order: [],          // roadmap purchase order: "c|<class>|<step index>" and "b|<breakthrough uid>"
+    planAhead: false,   // true = don't block purchases on EXP/IP (plan a long-term build)        // conditional bonuses switched on: {"class:monk/serene-water-stance": true}      // proficiency choices: {"class:fighter#0": ["Axes", ...]}
     notes: ""
   };
 }
@@ -17389,8 +17397,11 @@ function fixBuild(b){ // fill in anything missing from older saves
   var d = newBuild();
   for (var k in d) if (b[k] === undefined) b[k] = d[k];
   b.raceChoice = Object.assign(d.raceChoice, b.raceChoice || {});
+  (b.bts || []).forEach(function(x){ if (!x.u) x.u = uid(); });
   return b;
 }
+function uid(){ return Math.random().toString(36).slice(2, 9); }
+function newBt(id){ return { id: id, pick: {}, u: uid() }; }
 
 /* =====================================================================
    2. CALCULATIONS (everything the page shows is worked out here)
@@ -17558,12 +17569,12 @@ function calc(){
   C.exp.generalSpent = C.exp.classOver + C.exp.btOver;
   C.exp.unspent = C.exp.general - C.exp.generalSpent;
   C.exp.spiritCore = classExp + C.exp.btOver + human;  // the 300 breakthrough EXP is not added (rulebook)
-  if (C.exp.unspent < 0) C.warn.push("You've spent " + (-C.exp.unspent) + " more EXP than you have. Add EXP earned or remove something.");
+  if (C.exp.unspent < 0 && !B.planAhead) C.warn.push("You've spent " + (-C.exp.unspent) + " more EXP than you have. Add EXP earned or remove something.");
 
   // ---- IP ----
   C.ip = { total: 3 + num(B.ipEarned), spent: ipSpent };
   C.ip.left = C.ip.total - C.ip.spent;
-  if (C.ip.left < 0) C.warn.push("Not enough IP for all your classes.");
+  if (C.ip.left < 0 && !B.planAhead) C.warn.push("Not enough IP for all your classes.");
 
   // ---- Clim and burden ----
   var climSpent = 0, burden = 0, unknownCost = [];
@@ -17840,7 +17851,7 @@ function classStatus(id, C){
 var C = null;
 function render(){
   C = calc();
-  renderIdentity(); renderStats(); renderClasses(); renderSkills(); renderProf(); renderBreak(); renderItems();
+  renderIdentity(); renderStats(); renderClasses(); renderRoad(); renderSkills(); renderProf(); renderBreak(); renderItems();
   renderLive(); renderAbil();
   $("hdrName").textContent = B.name ? "— " + B.name : "";
   saveLocal();
@@ -18038,6 +18049,7 @@ function abilityMeta(a){
 }
 // EXP you can still spend on classes / breakthroughs right now
 function expAvailFor(kind){
+  if (B.planAhead) return Infinity;   // planning a future build: don't block on EXP
   var gen = C.exp.unspent;
   return kind === "class" ? C.exp.classLeft + gen : C.exp.btLeft + gen;
 }
@@ -18055,7 +18067,7 @@ function drawClassList(){
     var why = [];
     if (have[c.id]) why.push("already taken");
     if (st.state === "no") why.push("requirements not met");
-    if (ip > C.ip.left) why.push("not enough IP");
+    if (!B.planAhead && ip > C.ip.left) why.push("not enough IP");
     if (cost > expAvailFor("class")) why.push("not enough EXP");
     if (st.state === "no" && !ui.showLocked && !have[c.id]) { hidden++; return; }
     shown++;
@@ -18076,6 +18088,94 @@ function drawClassList(){
   document.querySelectorAll("[data-addcls]").forEach(function(b){
     b.onclick = function(){
       B.classes.push({ id: this.dataset.addcls, owned: [true, false, false, false, false, false, false, false], picks: {} });
+      render();
+    };
+  });
+}
+
+/* ---------- Roadmap: every purchase in order, with the EXP/IP needed to reach it ---------- */
+function roadmap(){
+  var items = [], pos = {};
+  (B.order || []).forEach(function(k, i){ pos[k] = i; });
+  B.classes.forEach(function(c){
+    if (!CLASSES[c.id]) return;
+    c.owned.forEach(function(o, i){ if (o) items.push({ key: "c|" + c.id + "|" + i, kind: "c", cls: c.id, i: i }); });
+  });
+  B.bts.forEach(function(b){ if (BTS[b.id]) items.push({ key: "b|" + b.u, kind: "b", bt: b }); });
+  items.forEach(function(x, n){ x.sort = pos[x.key] !== undefined ? pos[x.key] : 100000 + n; });
+  items.sort(function(a, b){ return a.sort - b.sort; });
+  // a class's steps must stay in order: keep the slots it uses, refill them step 1, 2, 3...
+  var byCls = {};
+  items.forEach(function(x, n){ if (x.kind === "c") (byCls[x.cls] = byCls[x.cls] || []).push(n); });
+  for (var cid in byCls) {
+    var slots = byCls[cid], steps = slots.map(function(n){ return items[n].i; }).sort(function(a, b){ return a - b; });
+    slots.forEach(function(n, j){ items[n] = { key: "c|" + cid + "|" + steps[j], kind: "c", cls: cid, i: steps[j] }; });
+  }
+  B.order = items.map(function(x){ return x.key; });
+  // running totals
+  var classExp = 0, btExp = 0, ipUsed = 0, btSeen = {}, human = raceIds().indexOf("human") >= 0 ? 100 : 0;
+  var startClass = C.exp.startClass, rows = [];
+  items.forEach(function(x){
+    var cost = 0, ip = 0, label = "", sub = "", tag = "";
+    if (x.kind === "c") {
+      var rec = CLASSES[x.cls], st = rec.steps[x.i];
+      cost = stepCost(x.cls, x.i); classExp += cost;
+      if (x.i === 0) { ip = classIpCost(x.cls); ipUsed += ip; }
+      var ab = st.ability && rec.abilities[st.ability];
+      label = rec.name + (x.i === 0 ? " — learn class" : " — step " + st.level);
+      sub = ab ? ab.name : st.label;
+      if (x.i === 7) tag = "Mastered";
+    } else {
+      var r = BTS[x.bt.id], nth = btSeen[x.bt.id] || 0; btSeen[x.bt.id] = nth + 1;
+      cost = btCostAt(x.bt.id, nth); btExp += cost;
+      label = r.name; sub = "Breakthrough"; if (r.creationOnly) tag = "creation only";
+    }
+    var needEarned = Math.max(0, classExp - startClass) + Math.max(0, btExp - 300) - human;
+    rows.push({ key: x.key, cls: x.cls || null, label: label, sub: sub, tag: tag, cost: cost, ip: ip,
+                needEarned: Math.max(0, needEarned), ipNeed: Math.max(0, ipUsed - 3),
+                sc: classExp + Math.max(0, btExp - 300) + human });
+  });
+  return rows;
+}
+function renderRoad(){
+  var rows = roadmap(), earned = num(B.expEarned), ipEarned = num(B.ipEarned);
+  var h = "<h2>Build roadmap</h2>";
+  h += '<div class="note">Everything you\'ve planned, in the order you\'d buy it. "EXP needed" is how much EXP you must earn after character creation ' +
+       "(creation gives 1,000 class EXP and 300 breakthrough EXP). Use ▲▼ to change the order; a class's own steps always stay in order.</div>";
+  h += '<label class="small"><input type="checkbox" id="inPlan"' + (B.planAhead ? " checked" : "") + "> Plan ahead (don't block purchases on EXP or IP)</label>";
+  if (!rows.length) { $("cardRoad").innerHTML = h + '<p class="dim">Add classes or breakthroughs to see your roadmap.</p>'; bindRoad(); return; }
+  var reachedAll = true;
+  h += '<div class="scrollx"><table class="road"><tr><th>#</th><th>Purchase</th><th class="num">Cost</th><th class="num">EXP needed</th><th class="num">IP needed</th><th class="num">Spirit Core</th><th></th></tr>';
+  rows.forEach(function(r, n){
+    var reach = r.needEarned <= earned && r.ipNeed <= ipEarned;
+    // can't swap two steps of the same class (they must stay in order)
+    var canUp = n > 0 && !(r.cls && rows[n - 1].cls === r.cls);
+    var canDown = n < rows.length - 1 && !(r.cls && rows[n + 1].cls === r.cls);
+    if (!reach && reachedAll) { reachedAll = false;
+      h += '<tr><td colspan="7" class="small warn">— beyond your current ' + earned.toLocaleString() + " EXP / " + ipEarned + " IP earned —</td></tr>"; }
+    h += '<tr class="' + (reach ? "" : "future") + '"><td class="dim">' + (n + 1) + "</td>" +
+      "<td><b>" + esc(r.label) + "</b>" + (r.tag ? ' <span class="tag ' + (r.tag === "Mastered" ? "good" : "warn") + '">' + esc(r.tag) + "</span>" : "") +
+      '<div class="small dim">' + esc(r.sub) + "</div></td>" +
+      '<td class="num">' + r.cost + (r.ip ? " + " + r.ip + " IP" : "") + "</td>" +
+      '<td class="num">' + r.needEarned.toLocaleString() + "</td>" +
+      '<td class="num">' + r.ipNeed + "</td>" +
+      '<td class="num">' + r.sc.toLocaleString() + "</td>" +
+      '<td class="num"><span class="pm"><button class="small" data-rmv="' + n + '" data-dir="-1"' + (canUp ? "" : " disabled") + '>▲</button>' +
+      '<button class="small" data-rmv="' + n + '" data-dir="1"' + (canDown ? "" : " disabled") + ">▼</button></span></td></tr>";
+  });
+  h += "</table></div>";
+  var last = rows[rows.length - 1];
+  h += '<div class="note">Whole plan: <b>' + last.needEarned.toLocaleString() + " EXP</b> and <b>" + last.ipNeed + " IP</b> earned after creation · Spirit Core " + last.sc.toLocaleString() + "</div>";
+  $("cardRoad").innerHTML = h;
+  bindRoad();
+}
+function bindRoad(){
+  $("inPlan").onchange = function(){ B.planAhead = this.checked; render(); };
+  document.querySelectorAll("[data-rmv]").forEach(function(b){
+    b.onclick = function(){
+      var i = num(this.dataset.rmv), j = i + num(this.dataset.dir), o = B.order;
+      if (j < 0 || j >= o.length) return;
+      var t = o[i]; o[i] = o[j]; o[j] = t;
       render();
     };
   });
@@ -18204,6 +18304,7 @@ function btPickHtml(r, b, i){
   if (g.statChoice) h += sel("stat", g.statChoice, "+" + (g.amount || 1) + " stat");
   if (g.mainStatChoice) h += sel("main", MAIN, "+1 main stat");
   if (g.subStatChoice) h += sel("sub", SUB, "+1 sub stat");
+  if (r.options && r.options.list === "LC.divines") h += sel("divine", (LC.divines || []).map(function(d){ return d.name; }), "Divine");
   if (g.mastery === "CHOICE") h += sel("element", ["Fire","Water","Earth","Wind","Lightning","Frost","Arcane","Holy","Dark"], "Element");
   if (g.proficiency) h += '<div class="note">Pick the proficiency in the Proficiencies section.</div>';
   if (g.language === "CHOICE") {
@@ -18239,7 +18340,7 @@ function drawBtList(){
       (why.length ? '<div class="small bad">Can\'t add: ' + esc(why.join(", ")) + "</div>" : "") + "</div>";
   });
   $("btList").innerHTML = h || '<div class="li dim">No matches.</div>';
-  document.querySelectorAll("[data-addbt]").forEach(function(b){ b.onclick = function(){ B.bts.push({ id: this.dataset.addbt, pick: {} }); render(); }; });
+  document.querySelectorAll("[data-addbt]").forEach(function(b){ b.onclick = function(){ B.bts.push(newBt(this.dataset.addbt)); render(); }; });
 }
 
 /* ---------- Items ---------- */
@@ -18582,7 +18683,7 @@ function openDetail(spec){
     }
     var why = [];
     if (have) why.push("already taken"); if (st.state === "no") why.push("requirements not met");
-    if (ip > C.ip.left) why.push("not enough IP"); if (cost > expAvailFor("class")) why.push("not enough EXP");
+    if (!B.planAhead && ip > C.ip.left) why.push("not enough IP"); if (cost > expAvailFor("class")) why.push("not enough EXP");
     foot = '<button class="gold" data-dadd="class:' + id + '"' + (why.length ? " disabled" : "") + ">Add class</button>" +
       (why.length ? '<span class="small bad">' + esc(why.join(", ")) + "</span>" : "") + '<span style="flex:1"></span>' + pageLink(c.url);
   }
@@ -18642,7 +18743,9 @@ function openDetail(spec){
       (b.drawback ? '<div class="small bad">Drawback: ' + esc(b.drawback) + "</div>" : "") +
       (b.costNote ? '<div class="small dim">' + esc(b.costNote) + "</div>" : "") +
       (b.removal ? '<div class="small dim">Removal: ' + esc(b.removal) + "</div>" : "") +
-      (b.options ? '<div class="small">Options:<br>' + b.options.map(function(o){ return esc(typeof o === "string" ? o : (o.name || "") + (o.summary ? ": " + o.summary : "")); }).join("<br>") + "</div>" : "");
+      (Array.isArray(b.options) ? '<div class="small">Options:<br>' + b.options.map(function(o){ return esc(typeof o === "string" ? o : (o.name || "") + (o.summary ? ": " + o.summary : "")); }).join("<br>") + "</div>" : "") +
+      (b.options && b.options.list === "LC.divines" ? "<h3>Divines</h3><table>" + (LC.divines || []).map(function(dv){
+        return "<tr><td><b>" + esc(dv.name) + "</b></td><td>" + esc(dv.domain || "") + "</td><td>" + esc(dv.damage || "") + ' damage</td><td class="small dim">' + esc(dv.note || "") + "</td></tr>"; }).join("") + "</table>" : "");
     foot = '<button class="gold" data-dadd="bt:' + id + '"' + (why2.length ? " disabled" : "") + ">Add breakthrough</button>" +
       (why2.length ? '<span class="small bad">' + esc(why2.join(", ")) + "</span>" : "") + '<span style="flex:1"></span>' + pageLink(b.url);
   }
@@ -18664,7 +18767,7 @@ function openDetail(spec){
     btn.onclick = function(){
       var q = this.dataset.dadd.split(":"), k = q[0], v = q[1];
       if (k === "class") B.classes.push({ id: v, owned: [true, false, false, false, false, false, false, false], picks: {} });
-      if (k === "bt") B.bts.push({ id: v, pick: {} });
+      if (k === "bt") B.bts.push(newBt(v));
       if (k === "item") { var e = B.items.filter(function(x){ return x.id === v; })[0]; if (e) e.qty++; else B.items.push({ id: v, qty: 1, equipped: false }); }
       if (k === "race") {
         var rr = RACES[v];
@@ -18734,6 +18837,84 @@ document.addEventListener("mouseout", function(e){
   if (el && !kwPinned) $("kwPop").style.display = "none";
 });
 window.addEventListener("scroll", hideKw, true);
+
+/* ---------- Share: text summary + build code ---------- */
+function buildSummary(){
+  var L = [], r = raceRec(), s = subRec();
+  L.push("== " + (B.name || "Unnamed character") + " ==  (Lyrian Chronicles planner, data v" + ((Object.values(CLASSES)[0] || {}).version || "?") + ")");
+  L.push("Race: " + (r ? r.name : "—") + (s ? " / " + s.name : "") + (B.race === "demon" && B.raceChoice.clan ? " (clan " + B.raceChoice.clan + ")" : "") +
+         (B.raceChoice.element ? " (" + B.raceChoice.element + ")" : "") + (B.gender ? " · " + B.gender : "") + (B.canon ? " · canon campaign" : ""));
+  L.push("Main: " + MAIN.map(function(k){ return k + " " + C.stat[k]; }).join(", "));
+  L.push("Sub: " + SUB.map(function(k){ return k + " " + C.stat[k]; }).join(", "));
+  var d = C.d;
+  L.push("HP " + d.hp + " · Mana " + d.mana + " · AP " + d.ap + " · RP " + d.rp + " · Guard " + d.guard + " (Block " + d.blockGuard + ") · Evasion " + d.evasion +
+         " (Dodge " + d.dodge + ") · Init +" + d.init + " · Speed " + d.speed + "ft · Potency " + d.potency);
+  L.push("Spirit Core " + C.exp.spiritCore.toLocaleString() + " · EXP earned " + num(B.expEarned).toLocaleString() + " · IP " + C.ip.spent + "/" + C.ip.total);
+  if (B.classes.length) {
+    L.push(""); L.push("Classes:");
+    B.classes.forEach(function(c){
+      var rec = CLASSES[c.id]; if (!rec) return;
+      var n = c.owned.filter(Boolean).length;
+      var picks = rec.steps.filter(function(st, i){ return c.owned[i] && (st.type === "heart" || st.type === "soul") && c.picks && c.picks[st.level]; })
+        .map(function(st){ return st.label + " " + c.picks[st.level]; });
+      L.push("- " + rec.name + " (T" + rec.tier + ") " + (n === 8 ? "MASTERED" : n + "/8") + (picks.length ? " [" + picks.join(", ") + "]" : ""));
+    });
+  }
+  if (B.bts.length) {
+    L.push(""); L.push("Breakthroughs: " + B.bts.map(function(b){
+      var r2 = BTS[b.id]; if (!r2) return b.id;
+      var p = b.pick || {}, extra = [p.stat, p.main, p.sub, p.element, p.divine, p.text].filter(Boolean).join(", ");
+      return r2.name + (extra ? " (" + extra + ")" : "");
+    }).join("; "));
+  }
+  var sk = SKILLS.filter(function(x){ return C.pts[x.name]; }).map(function(x){ return x.name + " " + C.pts[x.name]; });
+  if (sk.length) { L.push(""); L.push("Skills: " + sk.join(", ")); }
+  var ex = Object.values(C.ex).map(function(e){ return e.skill + " (" + e.name + ") +" + e.pts; });
+  if (ex.length) L.push("Expertise: " + ex.join(", "));
+  var pr = Object.keys(C.profs).sort();
+  if (pr.length) L.push("Proficiencies: " + pr.join(", "));
+  if (B.items.length) {
+    L.push(""); L.push("Gear: " + B.items.map(function(e){ var it = ITEMS[e.id]; return it ? it.name + (e.qty > 1 ? " x" + e.qty : "") + (e.equipped ? " (equipped)" : "") : e.id; }).join(", "));
+    L.push("Clim left " + C.clim.left.toLocaleString() + " · Burden " + C.burden + "/" + d.burdenMax);
+  }
+  return L.join("\n");
+}
+function buildCode(){ return "LCP1:" + btoa(unescape(encodeURIComponent(JSON.stringify(B)))); }
+function readCode(code){
+  code = String(code || "").trim();
+  if (code.indexOf("LCP1:") !== 0) throw new Error("not a planner code");
+  return fixBuild(JSON.parse(decodeURIComponent(escape(atob(code.slice(5))))));
+}
+function copyText(ta, btn){
+  ta.select();
+  var done = function(){ btn.textContent = "Copied ✓"; setTimeout(function(){ btn.textContent = "Copy"; }, 1500); };
+  try { if (navigator.clipboard) { navigator.clipboard.writeText(ta.value).then(done, function(){ document.execCommand("copy"); done(); }); return; } } catch (e) {}
+  try { document.execCommand("copy"); done(); } catch (e) { btn.textContent = "Select and copy by hand"; }
+}
+function openShare(){
+  detailNow = null;
+  $("dHead").innerHTML = '<span class="t">Share this build</span><span style="flex:1"></span><button id="dClose">Close ✕</button>';
+  $("dBody").innerHTML =
+    "<h3>Text summary</h3><div class=\"note\">For Discord, a forum or your GM.</div>" +
+    '<textarea id="shSum" readonly rows="12" style="width:100%">' + esc(buildSummary()) + "</textarea>" +
+    '<div class="toolbar"><button id="shSumCopy">Copy</button></div>' +
+    "<h3>Build code</h3><div class=\"note\">One line that holds the whole build. Paste it below (in your own planner or a friend's) to load it.</div>" +
+    '<textarea id="shCode" readonly rows="4" style="width:100%;word-break:break-all">' + esc(buildCode()) + "</textarea>" +
+    '<div class="toolbar"><button id="shCodeCopy">Copy</button></div>' +
+    "<h3>Load a build code</h3>" +
+    '<textarea id="shIn" rows="3" style="width:100%" placeholder="Paste a code starting with LCP1:"></textarea>' +
+    '<div class="toolbar"><button id="shLoad" class="gold">Load this build</button><span id="shMsg" class="small"></span></div>';
+  $("dFoot").innerHTML = '<span class="small dim">Loading a code replaces your current build. Save first if you want to keep it.</span>';
+  $("detail").classList.add("open");
+  $("dClose").onclick = closeDetail;
+  $("shSumCopy").onclick = function(){ copyText($("shSum"), this); };
+  $("shCodeCopy").onclick = function(){ copyText($("shCode"), this); };
+  $("shLoad").onclick = function(){
+    try { var nb = readCode($("shIn").value); if (confirm("Replace your current build with this one?")) { B = nb; render(); closeDetail(); } }
+    catch (e) { $("shMsg").textContent = "That doesn't look like a planner build code."; $("shMsg").className = "small bad"; }
+  };
+}
+$("btnShare").onclick = openShare;
 
 /* =====================================================================
    4. SAVE / LOAD / RESET
