@@ -17836,6 +17836,8 @@ function calcDerived(C){
     if (!x.on || !x.b.set) return;
     for (var k in x.b.set) if (map[k]) P(map[k], bonusLabel(x) + " (sets it to " + x.b.set[k] + ")", x.b.set[k] - sum(map[k]));
   });
+  // Guard and Block can't go below 0 (rulebook: Guard reduces damage, never below 1 damage; no negative Guard).
+  ["guard", "blockGuard"].forEach(function(k){ var s = sum(k); if (s < 0) P(k, "Can't go below 0", -s); });
 
   C.parts = parts;
   C.d = {
