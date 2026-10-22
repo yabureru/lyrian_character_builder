@@ -1553,3 +1553,8 @@ When the site version changes, recheck classes already entered.
 ## Refunds - updated 2026-10-22
 - [x] Shared abilities (Wind Master, Controlled Blaze, Tremorsense, Divine Weapon, Status Assessment II, Battle Cast, Aimed Shot, Undying Justice, Lunge): the class pages only say "Refund possible". The rulebook says buying an ability you already have refunds the EXP (IP still paid for a new class). classes.js refund amounts now say "full", and the planner makes the later purchase cost 0 EXP.
 - [ ] Half refunds ("not an exact match but you still gain everything") aren't detected automatically; there's no list of which abilities count as near-matches.
+
+## Data audit - 2026-10-22
+- [x] Spot-check of 20 random classes (highlander, zen-warrior, windbringer, anti-mage, amanita, elementalist, trickster, aurora-blade-style, jewel-idol, agrarian, bard, monk, sage, sanctioner, sniper, duelist, mage, marksman, phosphomancer, daionmyoji) re-read against the static copy: tier, difficulty, roles, requirements and all 8 steps (abilities, skill lists, Heart/Soul options) all matched. 0 errors in 160 steps.
+- [ ] Page typos noted during the audit: Phosphomancer lists "Art Magic" and Daionmyoji "Magic Perception" with a missing comma; the data treats them as two skills each.
+- [ ] Item pages tried and not found (they're abilities that make items, not items): sealing-talisman, purify-elixir, detoxify-elixir, volatile-flask, high-power-shell, shadow-cloak.
