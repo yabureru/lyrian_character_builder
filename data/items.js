@@ -1529,6 +1529,7 @@ IT("photon-shield", {
   name: "Photon Shield", url: "https://rpg.angelssword.com/game/0.13.2/items/photon-shield",
   checked: "2026-10-22", version: "0.13.2", category: "Artifice", tag: "Assist",
   cost: 3000, burden: 1, activation: "1 AP",
+  armor: { type: "Shield (projected)", block: "+4 (Shield bonus)", note: "Works as a normal shield while active; leaves your hand free." },
   fuel: { shell: "S", usage: "1 shell per encounter" },
   crafting: { points: 30, discipline: "Artificing" },
   mods: { A: [ { name: "Quick Activation", points: 20, summary: "Activation costs 0 AP." },

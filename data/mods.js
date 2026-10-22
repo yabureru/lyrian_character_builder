@@ -43,7 +43,8 @@ LC.modEffects = {
   // ---- Shields ----
   "Tower Shield":          { burden: 1, note: "Counts as Low cover for you against ranged attacks." },
   "Shield Formation":      { note: "+1 Guard while next to an ally with a shield or greatshield." },
-  "Photon Greatshield":    { burden: 1, note: "Acts as a Greatshield while on (Greatshield penalties apply)." },
+  "Photon Greatshield":    { burden: 1, guard: 1, block: 4, init: -1, evasion: -2, dodge: -2,
+                             note: "The Photon Shield becomes a Greatshield: +1 Guard, Shield bonus 8 while Blocking, -1 Initiative, -2 Evasion/Dodge." },
 
   // ---- Weapons' own mods (while wielded) ----
   "Winged Lugs":           { guard: 1, block: 2, evasion: -1, dodge: -1 },

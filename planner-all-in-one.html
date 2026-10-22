@@ -16610,6 +16610,7 @@ IT("photon-shield", {
   name: "Photon Shield", url: "https://rpg.angelssword.com/game/0.13.2/items/photon-shield",
   checked: "2026-10-22", version: "0.13.2", category: "Artifice", tag: "Assist",
   cost: 3000, burden: 1, activation: "1 AP",
+  armor: { type: "Shield (projected)", block: "+4 (Shield bonus)", note: "Works as a normal shield while active; leaves your hand free." },
   fuel: { shell: "S", usage: "1 shell per encounter" },
   crafting: { points: 30, discipline: "Artificing" },
   mods: { A: [ { name: "Quick Activation", points: 20, summary: "Activation costs 0 AP." },
@@ -17998,7 +17999,8 @@ LC.modEffects = {
   // ---- Shields ----
   "Tower Shield":          { burden: 1, note: "Counts as Low cover for you against ranged attacks." },
   "Shield Formation":      { note: "+1 Guard while next to an ally with a shield or greatshield." },
-  "Photon Greatshield":    { burden: 1, note: "Acts as a Greatshield while on (Greatshield penalties apply)." },
+  "Photon Greatshield":    { burden: 1, guard: 1, block: 4, init: -1, evasion: -2, dodge: -2,
+                             note: "The Photon Shield becomes a Greatshield: +1 Guard, Shield bonus 8 while Blocking, -1 Initiative, -2 Evasion/Dodge." },
 
   // ---- Weapons' own mods (while wielded) ----
   "Winged Lugs":           { guard: 1, block: 2, evasion: -1, dodge: -1 },
