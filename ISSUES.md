@@ -1532,6 +1532,7 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 - [ ] Other builders to compare with later: the official character builder at clio.angelssword.com (posted by the game designer in #how-to-play), the fan tool lyrian-tools.vercel.app, and a community Google Sheets character sheet (v8).
 
 ## Planner - not done yet
+- [ ] **UI (found while testing 2026-10-24):** a skill-point pot with only one allowed skill (e.g. Artificer's fixed +5 Artificing) should be placed automatically instead of waiting for clicks. The source chips already turn "alert" when they have points left; make that more visible (see the Skills card request below).
 - [ ] **UI (user request 2026-10-24): Skills card.** (1) Highlight the skill-point sources that still have points left (the source picker/list), and highlight the skills that have points in them, so it's easy to see where points are. (2) Show each skill's cap next to it (e.g. "6 / 15"); the cap is already enforced (15 per skill, crafting 10; +5 at 5,000 Spirit Core; none at 10,000) but not visible, so it isn't obvious.
 - [x] **Backstory + roadmap pages (2026-10-24):** Identity has a Backstory box (saved as B.notes, also sent to Lyrian Table). Print sheet can add a Backstory page and a Build roadmap page after the official six, drawn on the official blank page background in the same style; both continue onto extra pages if long.
 - [x] Mixed House (Demon): pick your extra clan; its ability, class unlock and proficiency apply.
