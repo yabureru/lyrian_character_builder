@@ -19622,6 +19622,15 @@ function renderLive(){
 }
 
 /* ---------- Abilities pane ---------- */
+// An ability's text, with any sub-abilities (crafting ability bundles etc.) listed after it
+function abilityLines(a){
+  var out = (a.summary || []).map(function(t){ return String(t).replace(/\s*\(see subAbilities\)/g, " (listed below)"); });
+  (a.subAbilities || []).forEach(function(x){
+    var meta = [x.cost].concat(x.keywords || []).filter(function(v){ return v && v !== "-" && v !== "—"; }).join(", ");
+    out.push(x.name + (meta ? " (" + meta + ")" : "") + ": " + x.summary);
+  });
+  return out;
+}
 function abilityGroups(){
   var groups = [];
   var r = raceRec(), s = subRec();
@@ -19663,7 +19672,7 @@ function renderAbil(){
         '<div class="meta">' + esc([a.cost, a.range].filter(Boolean).join(" · ")) +
         (a.keywords || []).map(kwTag).join("") + "</div>" +
         (a.requires ? '<div class="meta">Requires: ' + esc(a.requires) + "</div>" : "") +
-        (a.usage ? '<div class="meta">' + esc(a.usage) + "</div>" : "") + listHtml(a.summary) + "</div>";
+        (a.usage ? '<div class="meta">' + esc(a.usage) + "</div>" : "") + listHtml(abilityLines(a)) + "</div>";
     });
   });
   h += '<div class="note">Ability text is a plain-English summary. For exact wording, check the official site.</div></div>';
@@ -19787,7 +19796,7 @@ function abilityFull(a, extra){
   return '<div class="ab"><div class="t">' + esc(a.name) + (extra || "") + "</div>" +
     '<div class="meta">' + esc([a.cost, a.range].filter(Boolean).join(" · ")) + (a.keywords || []).map(kwTag).join("") + "</div>" +
     (a.requires ? '<div class="meta">Requires: ' + esc(a.requires) + "</div>" : "") +
-    (a.usage ? '<div class="meta">' + esc(a.usage) + "</div>" : "") + listHtml(a.summary) + "</div>";
+    (a.usage ? '<div class="meta">' + esc(a.usage) + "</div>" : "") + listHtml(abilityLines(a)) + "</div>";
 }
 function pageLink(url, text){ return url ? '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(text || "View on static copy (unofficial)") + "</a>" : ""; }
 var detailNow = null;
@@ -20347,7 +20356,8 @@ function appearance(field, rect, value, opts){
   var base = field.size || 10, size, lines;
   if (!multi) {
     size = Math.min(base, Math.max(4, (h - 2) * 0.82));
-    while (size > 4 && textWidth(value, font, size) > maxW) size -= 0.25;
+    var minS = (opts && opts.minSize) || 4;
+    while (size > minS && textWidth(value, font, size) > maxW) size -= 0.25;
     lines = [fitTrunc(value, font, size, maxW)];
   } else {
     var max = Math.min(base, (opts && opts.maxSize) || 9);
@@ -20367,12 +20377,14 @@ function appearance(field, rect, value, opts){
   cs += "ET\nQ\nEMC";
   return { content: cs, w: w, h: h, font: font, size: size };
 }
-function fillPdf(bytes, values, special, extraPages){
+function fillPdf(bytes, values, special, extraPages, dropPages){
   var objs = [], next = SHEET.size;
   function add(num, body){ objs.push({ num: num, body: body }); }
-  // extra pages (Backstory, Roadmap): each reuses the blank Abilities page background, with our drawing on top
-  if (extraPages && extraPages.length && SHEET.pages && SHEET.blank) {
-    var kids = SHEET.pages.kids.map(function(k){ return k + " 0 R"; });
+  // extra pages (full-size Abilities, Backstory, Roadmap): each reuses the blank Abilities page background, with our drawing on top.
+  // dropPages = official page numbers (0 = page 1) left out of the printout (the boxed ability pages, when full-size pages replace them).
+  if (((extraPages && extraPages.length) || (dropPages && dropPages.length)) && SHEET.pages && SHEET.blank) {
+    extraPages = extraPages || [];
+    var kids = SHEET.pages.kids.filter(function(k, i){ return !dropPages || dropPages.indexOf(i) < 0; }).map(function(k){ return k + " 0 R"; });
     var res = SHEET.blank.resources.replace(/>>\s*$/, "/Font << /Riven " + SHEET.fonts.Riven.ref + " >>\n>>");
     extraPages.forEach(function(cs){
       var cNum = next++, pNum = next++;
@@ -20479,6 +20491,132 @@ function roadmapPages(){
   }
   return pages;
 }
+/* ---------- Full-size pages: abilities, breakthroughs and gear ----------
+   Same look as the official Abilities page (cream boxes on the blue panel), but every box is as tall
+   as its text needs, in two columns, continuing onto more pages. Nothing is cut off. */
+var FS = { pad: 5, gap: 7, title: 9.5, tLh: 11.5, meta: 7.5, mLh: 9.2, body: 8.3, bLh: 10.2 };
+function fsBoxes(){
+  var groups = [], sec;
+  // abilities: race first, then classes (same order as the planner)
+  sec = { name: "Abilities", items: [] };
+  abilityGroups().forEach(function(g){ g.abs.forEach(function(a){
+    var meta = [a.cost, a.range].concat(a.keywords || []).filter(function(v){ return v && v !== "-" && v !== "—"; }).join(" - ");
+    var body = []; if (a.requires) body.push("Requires: " + a.requires); if (a.usage) body.push(a.usage);
+    sec.items.push({ title: a.name, sub: g.title, meta: meta, body: body.concat(abilityLines(a)) });
+  }); });
+  if (sec.items.length) groups.push(sec);
+  sec = { name: "Breakthroughs", items: [] };
+  B.bts.forEach(function(b){
+    var r = BTS[b.id]; if (!r) return;
+    var p = b.pick || {}, extra = [p.stat, p.main, p.sub, p.element, p.divine, p.clan, p.text].filter(Boolean).join(", ");
+    sec.items.push({ title: r.name + (extra ? " (" + extra + ")" : ""), sub: "Breakthrough", meta: "", body: (r.summary || []).slice() });
+  });
+  if (sec.items.length) groups.push(sec);
+  sec = { name: "Gear", items: [] };
+  B.items.forEach(function(e){
+    var it = ITEMS[e.id]; if (!it || it.reference) return;
+    var meta = [], body = [];
+    if (it.weapon) meta.push([it.weapon.range, it.weapon.property].filter(Boolean).join(", "));
+    if (it.armor) {
+      var ab = { type: "", guard: "Guard ", block: "Block ", evasion: "Evasion ", dodge: "Dodge ", initiative: "Init " };
+      meta.push(Object.keys(ab).filter(function(k){ return it.armor[k] !== undefined && it.armor[k] !== null && it.armor[k] !== ""; })
+        .map(function(k){ return ab[k] + it.armor[k]; }).join(", "));
+    }
+    meta.push("Burden " + itemBurdenFor(e, C.meld) + (e.qty > 1 ? " each" : ""));
+    var mods = chosenMods(e);
+    if (mods.length) body.push("Mods: " + mods.map(function(x){ return x.m.name; }).join(", "));
+    sec.items.push({ title: it.name + (e.qty > 1 ? " x" + e.qty : "") + (e.equipped ? (it.armor ? " (worn)" : " (wielded)") : ""),
+                     sub: [it.category, it.tag].filter(Boolean).join(" - "), meta: meta.filter(Boolean).join("; "), body: body.concat(it.summary || []) });
+  });
+  if (sec.items.length) groups.push(sec);
+  return groups;
+}
+function fsPoly(x0, y0, x1, y1, c){
+  return [[x0 + c, y1], [x1 - c, y1], [x1, y1 - c], [x1, y0 + c], [x1 - c, y0], [x0 + c, y0], [x0, y0 + c], [x0, y1 - c]]
+    .map(function(pt, i){ return pdfNum(pt[0]) + " " + pdfNum(pt[1]) + (i ? " l" : " m"); }).join("\n") + "\nh";
+}
+function fullSizePages(){
+  var groups = fsBoxes(); if (!groups.length) return [];
+  var left = XP.x0 + 8, right = XP.x1 - 8, top = XP.y1 - 8, bottom = XP.y0 + 8, gap = FS.gap;
+  var colW = (right - left - gap) / 2, inner = colW - 2 * FS.pad, maxH = top - bottom;
+  // measure every box; a box taller than a whole column gets smaller text
+  function measure(it, k){
+    k = k || 1;
+    var t = wrapLines(sheetText(it.title), "Riven", FS.title * k, inner - 0),
+        s = it.sub ? wrapLines(sheetText(it.sub), "Riven", FS.meta * k, inner) : [],
+        m = it.meta ? wrapLines(sheetText(it.meta), "Riven", FS.meta * k, inner) : [],
+        b = []; it.body.forEach(function(par){ b = b.concat(wrapLines(sheetText(par), "Riven", FS.body * k, inner)); });
+    var h = 2 * FS.pad + (t.length * FS.tLh + (s.length + m.length) * FS.mLh + b.length * FS.bLh) * k + 2;
+    return { t: t, s: s, m: m, b: b, h: h, k: k };
+  }
+  var pages = [], cur = null;
+  function newPage(){ cur = { cs: "", y: [top, top], secs: [] }; pages.push(cur); }
+  function draw(x, y, it, ms){
+    var c = "q 1 0.969 0.816 rg\n" + fsPoly(x, y - ms.h, x + colW, y, 7) + " f Q\n", k = ms.k, ty = y - FS.pad - FS.title * k * 0.8, tx = x + FS.pad;
+    ms.t.forEach(function(l){ c += pdfText(tx, ty, FS.title * k, l); ty -= FS.tLh * k; });
+    ms.s.concat(ms.m).forEach(function(l){ c += pdfText(tx, ty + (FS.tLh - FS.mLh) * k * 0.35, FS.meta * k, l, "0.3"); ty -= FS.mLh * k; });
+    ty -= 1;
+    ms.b.forEach(function(l){ if (l) c += pdfText(tx, ty, FS.body * k, l); ty -= FS.bLh * k; });
+    return c;
+  }
+  groups.forEach(function(g){
+    // a section heading across both columns: a dark bar like the sheet's table headers
+    // (the page title names the first section on a page, so only later sections get a bar)
+    if (!cur || Math.min(cur.y[0], cur.y[1]) - 60 < bottom) newPage();
+    if (cur.secs.length) {
+      var hy = Math.min(cur.y[0], cur.y[1]);
+      cur.cs += "q 0.05 g " + pdfNum(left) + " " + pdfNum(hy - 14) + " " + pdfNum(right - left) + " 14 re f Q\n" + pdfText(left + 5, hy - 10.5, 9.5, g.name, "1");
+      cur.y = [hy - 14 - gap, hy - 14 - gap];
+    }
+    cur.secs.push(g.name);
+    var queue = g.items.map(function(it){
+      var ms = measure(it);
+      for (var k = 0.95; ms.h > maxH - 22 && k > 0.6; k -= 0.05) ms = measure(it, k);
+      return { it: it, ms: ms };
+    });
+    while (queue.length) {
+      // the next box goes in the column with more room; if it doesn't fit, a later (shorter) box from
+      // this section may fill the gap first, so pages aren't left half empty
+      var col = cur.y[0] >= cur.y[1] ? 0 : 1, pick = -1;
+      for (var q = 0; q < queue.length && pick < 0; q++) if (cur.y[col] - queue[q].ms.h >= bottom) pick = q;
+      if (pick < 0) { newPage(); cur.secs.push(g.name + " (continued)"); col = 0; pick = 0; }
+      var b = queue.splice(pick, 1)[0], x = left + col * (colW + gap);
+      cur.cs += draw(x, cur.y[col], b.it, b.ms);
+      cur.y[col] -= b.ms.h + gap;
+    }
+  });
+  return pages.map(function(pg, n){
+    var names = []; pg.secs.forEach(function(s){ if (names.indexOf(s) < 0) names.push(s); });
+    // blue panel over the six official boxes, then our boxes
+    var cs = "q 0.592 0.847 0.918 rg\n" + fsPoly(XP.x0, XP.y0, XP.x1, XP.y1, XP.cut) + " f Q\n";
+    var t = names.join(" & ") + ":", nm = sheetText(B.name || "");
+    cs += "q 0.592 0.847 0.918 rg 37 546.5 300 16 re f Q\n" + pdfText(41.5, 550.5, 11, t);
+    if (pages.length > 1) cs += pdfText(41.5 + textWidth(t, "Riven", 11) + 8, 550.5, 8, "(page " + (n + 1) + " of " + pages.length + ")", "0.25");
+    if (nm) cs += pdfText(47, 576.2, 12, fitTrunc(nm, "Riven", 12, 236));
+    return cs + pg.cs;
+  });
+}
+// The character as she is now: only the roadmap purchases your earned EXP/IP already reach.
+// Returns null when everything planned is already reachable.
+function buildNow(){
+  var rows = roadmap(), earned = num(B.expEarned), ipE = num(B.ipEarned), cut = -1;
+  for (var i = 0; i < rows.length; i++) if (!(rows[i].needEarned <= earned && rows[i].ipNeed <= ipE)) { cut = i; break; }
+  if (cut < 0) return null;
+  var nb = JSON.parse(JSON.stringify(B)), drop = rows.slice(cut).map(function(r){ return r.key; });
+  drop.forEach(function(k){
+    var p = k.split("|");
+    if (p[0] === "c") nb.classes.forEach(function(c){ if (c.id === p[1]) c.owned[+p[2]] = false; });
+    else nb.bts = nb.bts.filter(function(b){ return String(b.u) !== p[1]; });
+  });
+  nb.classes = nb.classes.filter(function(c){ return c.owned.some(Boolean); });
+  return { build: nb, left: rows.length - cut };
+}
+// Run fn with another build in place of yours (numbers and all), then put yours back.
+function withBuild(build, fn){
+  var keepB = B, keepC = C;
+  try { B = fixBuild(JSON.parse(JSON.stringify(build))); C = calc(); return fn(); }
+  finally { B = keepB; C = keepC; }
+}
 function checkSheet(bytes){
   if (!SHEET) return "The sheet map (data/sheet.js) didn't load.";
   if (bytes.length !== SHEET.fileSize) return "This isn't the same file as the official Character Sheet 1.2 the planner was set up for (file size differs).";
@@ -20488,7 +20626,8 @@ function checkSheet(bytes){
   return "";
 }
 // Everything that goes on the sheet, by field name.
-function sheetValues(){
+function sheetValues(opts){
+  opts = opts || {};
   var V = {}, S = {}, d = C.d, r = raceRec(), sr = subRec(), sd = B.sheet || {};
   for (var n = 1; n <= 6; n++) V[n === 1 ? "Name" : "Name" + n] = B.name || "";
   V.HP = d.hp; V.RP = d.rp; V.Mana = d.mana;
@@ -20542,6 +20681,8 @@ function sheetValues(){
     }
     if (!it.weapon && !it.armor && it.summary) desc.push(it.summary[0]);
     V["CombatInventory" + n] = it.name + (x.e.equipped ? (it.armor ? " (worn)" : " (wielded)") : ""); V["Amount" + n] = x.e.qty; V["Bulk" + n] = itemBurdenFor(x.e, C.meld) * x.e.qty; V["Description" + n] = desc.join("; ");
+    // one-line boxes: don't squash below a readable size (cut with "..." instead; the full text is on the Gear page)
+    S["Description" + n] = { minSize: 6.5 }; S["CombatInventory" + n] = { minSize: 6.5 };
   });
   var itemsTxt = other.map(function(x){ return x.it.name + (x.e.qty > 1 ? " x" + x.e.qty : ""); });
   if (combat.length > invRows.length) itemsTxt = combat.slice(invRows.length).map(function(x){ return x.it.name + " x" + x.e.qty; }).concat(itemsTxt);
@@ -20558,20 +20699,35 @@ function sheetValues(){
     var r2 = BTS[b.id]; if (!r2) return;
     var p = b.pick || {}, extra = [p.stat, p.main, p.sub, p.element, p.divine, p.clan, p.text].filter(Boolean).join(", ");
     bn.push(r2.name.replace(/\s*\(.*\)$/, "") + (extra ? " (" + extra + ")" : ""));
-    bd.push((r2.summary || [""])[0]);
+    bd.push(sheetText((r2.summary || []).join(" ")));
   });
-  V.BName = bn.join("\n"); V.BDescription = bd.join("\n");
-  S.BName = { lines: true, maxSize: 8 }; S.BDescription = { lines: true, maxSize: 8 };
-  // abilities: race first, then classes; 24 boxes on pages 3-6
+  // Descriptions wrap onto as many lines as they need; the name column gets blank lines so rows stay lined up.
+  // The text shrinks (down to 6pt) until everything fits the box.
+  var bf = SHEET.fields.BDescription, br = bf && bf.widgets[0] && bf.widgets[0].rect, bsize = 8, nl = [], dl = [];
+  if (br) {
+    var bw = br[2] - br[0] - 4, bh = br[3] - br[1] - 4;
+    for (bsize = 8; bsize >= 6; bsize -= 0.25) {
+      nl = []; dl = [];
+      bd.forEach(function(t, i){
+        var w = wrapLines(t, SHEET.fonts[bf.font] ? bf.font : "Helv", bsize, bw);
+        dl = dl.concat(w); nl.push(bn[i]); for (var j = 1; j < w.length; j++) nl.push("");
+      });
+      if (dl.length * bsize * 1.15 <= bh) break;
+    }
+  } else { nl = bn; dl = bd; }
+  V.BName = nl.join("\n"); V.BDescription = dl.join("\n");
+  S.BName = { lines: true, maxSize: bsize }; S.BDescription = { lines: true, maxSize: bsize };
+  // abilities: race first, then classes; 24 boxes on pages 3-6 (skipped when full-size pages replace them)
+  if (opts.fullPages) return { values: V, special: S };
   var abs = [];
   abilityGroups().forEach(function(g){ g.abs.forEach(function(a){ abs.push({ a: a, from: g.title }); }); });
   for (var q = 1; q <= 24; q++) {
     var x2 = abs[q - 1], key = "Ability" + q;
     if (q === 24 && abs.length > 24) { V[key] = "More abilities (see planner):\n" + abs.slice(23).map(function(y){ return y.a.name; }).join(", "); continue; }
     if (!x2) { V[key] = ""; continue; }
-    var a = x2.a, meta = [a.cost, a.range].filter(Boolean).concat(a.keywords || []).join(" - ");
+    var a = x2.a, meta = [a.cost, a.range].concat(a.keywords || []).filter(function(v){ return v && v !== "-" && v !== "—"; }).join(" - ");
     V[key] = a.name + "  (" + x2.from + ")" + (meta ? "\n" + meta : "") + (a.requires ? "\nRequires: " + a.requires : "") +
-             (a.usage ? "\n" + a.usage : "") + "\n" + (a.summary || []).join("\n");
+             (a.usage ? "\n" + a.usage : "") + "\n" + abilityLines(a).join("\n");
   }
   return { values: V, special: S };
 }
@@ -20597,9 +20753,17 @@ function openSheetDialog(){
     '<div class="field"><label>Official sheet</label><span id="shStatus" class="small">checking…</span></div>' +
     '<div class="toolbar"><input type="file" id="shFile" accept=".pdf,application/pdf"><button id="shForget" class="small">Forget saved sheet</button></div>' +
     '<div class="note">What goes where: stats, combat numbers, skills (Bonus = your total roll bonus: stat + skill points + best expertise), classes with EXP spent, ' +
-    "combat inventory, other items and Clim, proficiencies and languages, breakthroughs, and up to 24 abilities on pages 3-6. " +
+    "combat inventory, other items and Clim, proficiencies and languages, breakthroughs, and abilities (full-size pages, or up to 24 in the official boxes on pages 3-6). " +
     "Age, height, weight, personality and appearance come from Identity → Character sheet details. The filled fields stay editable in any PDF reader.</div>" +
-    '<h3>Extra pages</h3><div class="note">Added after the official six pages, in the same style.</div>' +
+    (function(){ var nw = buildNow(); if (!nw) return "";
+      return '<h3>What to print</h3>' +
+        '<label class="small" style="display:block"><input type="radio" name="shWhen" id="shNow" checked> ' + esc(B.name || "The character") + " as of now " +
+        '<span class="dim">(' + nw.left + " planned purchase" + (nw.left > 1 ? "s" : "") + " beyond your earned EXP/IP left off; they stay on the roadmap page)</span></label>" +
+        '<label class="small" style="display:block"><input type="radio" name="shWhen" id="shAll"> The whole plan, as if everything were bought</label>'; })() +
+    '<h3>Pages</h3>' +
+    '<label class="small" style="display:block"><input type="checkbox" id="shFull" checked> Full-size abilities, breakthroughs and gear pages ' +
+    '<span class="dim">(replace the official boxed ability pages 3-6; every box grows to fit its text)</span></label>' +
+    '<div class="note">Added after the official pages, in the same style.</div>' +
     '<label class="small" style="display:block"><input type="checkbox" id="shBack"' + ((B.notes || "").trim() ? " checked" : " disabled") + "> Backstory page" +
     ((B.notes || "").trim() ? "" : ' <span class="dim">(write one in Identity → Backstory first)</span>') + "</label>" +
     '<label class="small" style="display:block"><input type="checkbox" id="shRoad"' + (roadmap().length ? " checked" : " disabled") + "> Build roadmap page" +
@@ -20624,10 +20788,12 @@ function openSheetDialog(){
   $("shForget").onclick = function(){ sheetDel(); sheetBytes = null; $("shStatus").textContent = "forgotten - choose the PDF"; $("shMake").disabled = true; };
   $("shMake").onclick = function(){
     try {
-      var extra = [];
+      var extra = [], full = $("shFull") && $("shFull").checked, nw = ($("shNow") && $("shNow").checked) ? buildNow() : null, sv;
+      function sheetPart(){ sv = sheetValues({ fullPages: full }); if (full) extra = extra.concat(fullSizePages()); }
+      if (nw) withBuild(nw.build, sheetPart); else sheetPart();
       if ($("shBack") && $("shBack").checked) extra = extra.concat(backstoryPages());
-      if ($("shRoad") && $("shRoad").checked) extra = extra.concat(roadmapPages());
-      var sv = sheetValues(), out = fillPdf(sheetBytes, sv.values, sv.special, extra);
+      if ($("shRoad") && $("shRoad").checked) extra = extra.concat(roadmapPages());   // the roadmap always shows the whole plan
+      var out = fillPdf(sheetBytes, sv.values, sv.special, extra, full ? [2, 3, 4, 5] : null);
       var a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([out], { type: "application/pdf" }));
       a.download = ((B.name || "character").replace(/[^a-z0-9]+/gi, "-").toLowerCase()) + "-character-sheet.pdf";
