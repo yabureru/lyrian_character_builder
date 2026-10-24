@@ -15,7 +15,7 @@ Community tool. No monetization.
 - **On a phone:** use `planner-all-in-one.html`. It has all the data built in, because phone browsers
   won't load the separate data files.
 
-Your build saves automatically in the browser. Use **Save** to download a `.json` copy and **Load** to open one.
+Your build saves automatically in the browser. Use **Save** to keep a `.json` copy (it asks for a file name, starting from the character's name, so saves don't overwrite each other) and **Load** to open one.
 **Share** gives you a text summary (for Discord or your GM) and a one-line build code anyone can paste into their planner.
 **Share → Character data** gives the whole character with every number worked out (HP, Mana, AP, RP, rolls, skills, abilities), as a code or a `.json` file, for use in other tools.
 **Compare** puts two builds side by side: press *Pin current build*, try some changes, then open Compare again to see exactly what went up or down. You can also compare against a saved file or a build code.

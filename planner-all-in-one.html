@@ -20641,12 +20641,30 @@ $("btnSheet").onclick = openSheetDialog;
 /* =====================================================================
    4. SAVE / LOAD / RESET
    ===================================================================== */
+// Save asks for a file name (starting from the character's name) so saves don't overwrite each other.
+// Chrome/Edge open a real "Save as" window (pick folder + name, warns before overwriting);
+// other browsers get a name box, then download as usual.
 $("btnSave").onclick = function(){
-  var blob = new Blob([JSON.stringify(B, null, 2)], { type: "application/json" });
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "lyrian-build-" + ((B.name || "unnamed").replace(/[^a-z0-9]+/gi, "-").toLowerCase()) + ".json";
-  document.body.appendChild(a); a.click(); a.remove();
+  var text = JSON.stringify(B, null, 2);
+  var base = (B.name || "unnamed").replace(/[\\\/:*?"<>|]+/g, "").trim() || "unnamed";
+  var suggested = base + " - lyrian build.json";
+  function download(name){
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+    a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  function askName(){
+    var name = prompt("Save as (file name):", suggested);
+    if (name === null) return;                       // Cancel
+    name = name.replace(/[\\\/:*?"<>|]+/g, "").trim() || suggested;
+    if (!/\.json$/i.test(name)) name += ".json";
+    download(name);
+  }
+  if (window.showSaveFilePicker) {
+    window.showSaveFilePicker({ suggestedName: suggested, types: [{ description: "Planner build", accept: { "application/json": [".json"] } }] })
+      .then(function(h){ return h.createWritable().then(function(w){ return w.write(text).then(function(){ return w.close(); }); }); })
+      .catch(function(e){ if (!e || e.name !== "AbortError") askName(); });  // not allowed here -> name box
+  } else askName();
 };
 $("btnLoad").onclick = function(){ $("fileLoad").click(); };
 $("fileLoad").onchange = function(){
