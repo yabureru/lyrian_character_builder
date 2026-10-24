@@ -25,6 +25,7 @@ Your build saves automatically in the browser. Use **Save** to keep a `.json` co
 The official PDF isn't included here (it belongs to Angel's Sword Studios). Get it free from the [Lyrian Chronicles Discord](https://discord.gg/EFg2EbDnTa), channel **#how-to-play** ([Character Sheet 1.2 post](https://discord.com/channels/909435736351207424/1293704039543996488/1346225007940079656)), then load it once and the planner remembers it in that browser. The Print sheet window shows this link until a sheet is loaded.
 
 ### Features
+- **Mirane Expedition** option (the canon campaign): +1,000 Clim, free Adventurer's Kit, no restricted options at creation, Mirane resting numbers, astra resistance, starting-gear advice. A separate *GM allows restricted* box covers other games.
 - Race, sub-race, stats, classes (all 8 steps), skills and expertise, proficiencies, breakthroughs and items
 - Requirement checking for every class, including proficiencies and element masteries
 - Combat numbers with always-on bonuses; tap any number to see where it comes from

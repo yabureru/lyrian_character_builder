@@ -1517,9 +1517,14 @@ When the site version changes, recheck classes already entered.
 
 # PLANNER (planner.html)
 
-## Mirane campaign (Discord) - notes for a future "Mirane rules" option (gathered 2026-10-24)
+## Mirane campaign - "Mirane Expedition" option (gathered 2026-10-24)
+Done 2026-10-24 from the official Mirane Expedition guide (Google Doc, user-supplied PDF export): the Identity checkbox is now **Mirane Expedition** (B.canon) - +1,000 Clim; free Adventurer's Kit (its 100 Clim refunded); Angelblooded / Curse of Vampirism / Touched by Death (Shinigami Eyes) blocked with "not allowed in Mirane" + warning if already taken; Rest heals shows Mirane numbers (no kit 0, camping kit 1x Toughness, better 2x; rations/basic culinary 1 Mana); Astra resistance (Spirit Core / 500) in Pools; Items card note with the starting-material limits, party kits, food and fuel advice.
+New **GM allows restricted** checkbox (B.gmRestricted) for other games - the old "canon allows restricted" behaviour was wrong for Mirane.
+New items: Food Units and Magical Fuel Units (0.5 Clim per unit, from the rulebook's Material section: 2 units per Clim; 1,000-unit carry limit per exact material; burden not listed), bought and edited in units.
+- [ ] Not built: death/retirement carry-over (half EXP, or SC-1000 above 3,000 SC; 20% item value; modded gear limits), alts, favors, casual mode (half EXP/loot), Human Divine Providence and Oracle changes in Mirane, necromancer corpse storage, Merchant's Procurement 500/week. Weekly EXP/IP estimator still an idea.
+- [ ] Starting materials limit (none worth 1,000+, 2,500 total) is only a note: the planner's material records have no per-unit prices to check against.
 Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WIP Google Doc), #how-to-play, #play-by-post, #downtime-activities. Re-check before building - the guide is a work in progress.
-- [ ] Character creation: standard rules-as-written start, 1,000 EXP, plus an extra 1,000 Clim. New characters only; 1 character per player (more with higher Patreon tiers). Restricted classes (Shinigami Eyes, Vampire, Angelblooded, other GM-only) not allowed at creation. Approval by a lead GM in #ooc-char-approval.
+- [x] Character creation: standard rules-as-written start (no extra EXP; earlier note of +1,000 EXP was wrong), plus an extra 1,000 Clim. New characters only; 1 character per player (more with higher Patreon tiers). Restricted classes (Shinigami Eyes, Vampire, Angelblooded, other GM-only) not allowed at creation. Approval by a lead GM in #ooc-char-approval.
 - [ ] Crafting materials at creation: none worth 1,000+ base value; total ingots + raw materials capped at 2.5k; unused materials are lost after creation.
 - [ ] IP: 1 IP at each Wednesday reset if in Mirane (not on expedition). Unspent IP is lost at the weekly reset or when leaving on expedition. New characters get that week's IP plus an Arrival IP.
 - [ ] EXP: expeditions 75 EXP per week out (casual mode = half EXP and loot); journal up to 25 EXP per week; crafting an item 20 EXP; using natural IP on Appraise, Heal Injury, Open Shop, Repair, Mentor Class or special crafting actions gives 20 EXP once per interlude phase; using IP on an EP action also gives 20 EXP.

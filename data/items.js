@@ -999,6 +999,15 @@ IT("food-bag", {
              "Crafted from Direhide / Primehide / Dragonscale / Astrahide it holds an extra 1000 / 3000 / 6000 / 10000 units of each Food material (page gives both the 2000 base and this table)." ]
 });
 
+IT("food-units", {
+  name: "Food Units", url: "https://rpg.angelssword.com/game/0.13.2/rulebook",
+  checked: "2026-10-24", version: "0.13.2", category: "Crafting", tag: "Units",
+  cost: 0.5, burden: 0, units: true, unitStep: 50,
+  summary: [ "Bulk food (meat, vegetables...), bought by the unit. Materials trade at about 2 units per 1 Clim (rulebook, Material).",
+             "A day of food is 40 units (or 1 ration); cooking with units needs a culinary kit in the party (rulebook resting rules).",
+             "You can carry at most 1,000 units of the exact same material (different foods count separately). Burden for units isn't listed." ]
+});
+
 IT("frying-pan", {
   name: "Frying Pan", url: "https://lyrian.splatpass.net/items/frying-pan/",
   checked: "2026-10-21", version: "0.13.2", category: "Equipment", tag: "Tool",
@@ -1360,6 +1369,15 @@ IT("mages-blood", {
   crafting: { points: 51, discipline: "Alchemy", materials: "1800 Alchemy units, 3x vial of Heartwood Poison Water" },
   summary: [ "Contact poison on a weapon; lasts 1 hit or 1 minute (6 rounds).",
              "When it damages an enemy, the enemy gets Circuit Crash: the next time it uses mana before the encounter ends, it takes 4d6+8 damage.", "Credited: discovered by Beetle Swallower." ]
+});
+
+IT("magical-fuel-units", {
+  name: "Magical Fuel Units", url: "https://rpg.angelssword.com/game/0.13.2/rulebook",
+  checked: "2026-10-24", version: "0.13.2", category: "Crafting", tag: "Units",
+  cost: 0.5, burden: 0, units: true, unitStep: 50,
+  summary: [ "Magic crystals and magical liquids, bought by the unit. Materials trade at about 2 units per 1 Clim (rulebook, Material).",
+             "Used by artifices and some services (in Mirane the teleporter to the outpost costs 100 units; the way back is free).",
+             "You can carry at most 1,000 units of the exact same material. Burden for units isn't listed." ]
 });
 
 IT("mana-vision-goggles", {

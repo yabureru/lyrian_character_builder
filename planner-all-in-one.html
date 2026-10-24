@@ -16080,6 +16080,15 @@ IT("food-bag", {
              "Crafted from Direhide / Primehide / Dragonscale / Astrahide it holds an extra 1000 / 3000 / 6000 / 10000 units of each Food material (page gives both the 2000 base and this table)." ]
 });
 
+IT("food-units", {
+  name: "Food Units", url: "https://rpg.angelssword.com/game/0.13.2/rulebook",
+  checked: "2026-10-24", version: "0.13.2", category: "Crafting", tag: "Units",
+  cost: 0.5, burden: 0, units: true, unitStep: 50,
+  summary: [ "Bulk food (meat, vegetables...), bought by the unit. Materials trade at about 2 units per 1 Clim (rulebook, Material).",
+             "A day of food is 40 units (or 1 ration); cooking with units needs a culinary kit in the party (rulebook resting rules).",
+             "You can carry at most 1,000 units of the exact same material (different foods count separately). Burden for units isn't listed." ]
+});
+
 IT("frying-pan", {
   name: "Frying Pan", url: "https://lyrian.splatpass.net/items/frying-pan/",
   checked: "2026-10-21", version: "0.13.2", category: "Equipment", tag: "Tool",
@@ -16441,6 +16450,15 @@ IT("mages-blood", {
   crafting: { points: 51, discipline: "Alchemy", materials: "1800 Alchemy units, 3x vial of Heartwood Poison Water" },
   summary: [ "Contact poison on a weapon; lasts 1 hit or 1 minute (6 rounds).",
              "When it damages an enemy, the enemy gets Circuit Crash: the next time it uses mana before the encounter ends, it takes 4d6+8 damage.", "Credited: discovered by Beetle Swallower." ]
+});
+
+IT("magical-fuel-units", {
+  name: "Magical Fuel Units", url: "https://rpg.angelssword.com/game/0.13.2/rulebook",
+  checked: "2026-10-24", version: "0.13.2", category: "Crafting", tag: "Units",
+  cost: 0.5, burden: 0, units: true, unitStep: 50,
+  summary: [ "Magic crystals and magical liquids, bought by the unit. Materials trade at about 2 units per 1 Clim (rulebook, Material).",
+             "Used by artifices and some services (in Mirane the teleporter to the outpost costs 100 units; the way back is free).",
+             "You can carry at most 1,000 units of the exact same material. Burden for units isn't listed." ]
 });
 
 IT("mana-vision-goggles", {
@@ -18167,7 +18185,7 @@ function skillOptions(opt){
 function newBuild(){
   return {
     v: 1,
-    name: "", gender: "", race: "", subrace: "", canon: false,
+    name: "", gender: "", race: "", subrace: "", canon: false, gmRestricted: false,
     raceChoice: { clan: "", element: "", main: "", sub: "" },
     mainArr: { Power: 5, Focus: 4, Agility: 4, Toughness: 3 },
     subArr:  { Fitness: 5, Cunning: 4, Reason: 3, Awareness: 2, Presence: 1 },
@@ -18332,6 +18350,14 @@ function btCostAt(id, nth){ // nth = 0 for the first time you take it
   return num(r.cost);
 }
 
+/* Mirane Expedition (the canon campaign) - from its official player guide (Google Doc, checked 2026-10-24).
+   B.canon = playing in Mirane. */
+var MIRANE = {
+  // restricted at creation ("can be accessed through gameplay possibly at a later point"); their breakthroughs can't be taken normally
+  bannedBts: ["angelblooded-human-restricted", "curse-of-vampirism", "touched-by-death"],
+  bannedNote: "not allowed in Mirane (may be unlocked later through play)",
+  freeKit: "adventurers-kit"         // every expeditioner gets one free on arrival
+};
 function itemCost(it){ return typeof it.cost === "number" ? it.cost : (it.cost === null || it.cost === undefined) ? 0 : null; } // no price (relics etc.) = 0
 function itemBurden(it){ return typeof it.burden === "number" ? it.burden : 0; }
 
@@ -18527,12 +18553,19 @@ function calc(){
   });
   B.items.forEach(function(e){
     var it = ITEMS[e.id]; if (!it) return;
-    var c = itemCost(it); if (c === null) unknownCost.push(it.name); else climSpent += c * e.qty;
+    var c = itemCost(it); if (c === null) unknownCost.push(it.name); else climSpent += Math.ceil(c * e.qty);   // units: 0.5 Clim each, rounded up
     burden += itemBurdenFor(e, meld) * e.qty;
   });
   var richClim = btGrants("clim").reduce(function(t, x){ return t + x.g.clim; }, 0);
-  var canonClim = B.canon ? 1000 : 0;  // canon campaign: +1000 starting Clim
-  C.clim = { start: num(B.startClim), added: num(B.climAdded), bonus: richClim, canon: canonClim, spent: climSpent, unknown: unknownCost };
+  var canonClim = B.canon ? 1000 : 0;  // Mirane: +1000 starting Clim
+  var freeKit = 0;
+  if (B.canon && B.items.some(function(e){ return e.id === MIRANE.freeKit; })) freeKit = itemCost(ITEMS[MIRANE.freeKit]) || 0;
+  climSpent -= freeKit;
+  B.bts.forEach(function(b){ var r = BTS[b.id]; if (!r) return;
+    if (B.canon && MIRANE.bannedBts.indexOf(b.id) >= 0) C.warn.push(r.name + ": " + MIRANE.bannedNote + ".");
+    else if (r.restricted && !B.canon && !B.gmRestricted) C.warn.push(r.name + " is restricted: needs GM approval (tick \"GM allows restricted\" in Identity).");
+  });
+  C.clim = { start: num(B.startClim), added: num(B.climAdded), bonus: richClim, canon: canonClim, freeKit: freeKit, spent: climSpent, unknown: unknownCost };
   C.clim.left = C.clim.start + C.clim.added + C.clim.bonus + C.clim.canon - climSpent;
   // Kit Expert breakthrough: one kit costs 2 less Burden. The planner uses your heaviest kit.
   C.kitExpert = null;
@@ -18927,7 +18960,10 @@ function renderIdentity(){
   h += '<div class="field" style="align-items:flex-start;margin-top:8px"><label>Backstory</label><div style="flex:1">' +
     '<textarea id="inNotes" rows="5" placeholder="A short summary of who your character is and where they come from." style="width:100%;box-sizing:border-box;background:#1f2128;border:1px solid var(--line);border-radius:6px;color:var(--text);padding:4px 7px">' +
     esc(B.notes || "") + '</textarea><div class="small dim">Printed on its own page after the official sheet (Print sheet). Also included in Share → Character data.</div></div></div>';
-  h += '<div class="field" style="margin-top:10px"><label>Canon campaign</label><input type="checkbox" id="inCanon"' + (B.canon ? " checked" : "") + '><span class="note">+1,000 starting Clim, and allows restricted options like Angelblooded.</span></div>';
+  h += '<div class="field" style="margin-top:10px"><label>Mirane Expedition</label><input type="checkbox" id="inCanon"' + (B.canon ? " checked" : "") + '><span class="note">The canon campaign: +1,000 starting Clim, free Adventurer\'s Kit, ' +
+       "no restricted options at creation (Angelblooded, Vampire, Shinigami Eyes), starting-material limits, Mirane resting, astra resistance shown.</span></div>";
+  h += '<div class="field"><label>GM allows restricted</label><input type="checkbox" id="inGmRes"' + (B.gmRestricted ? " checked" : "") + (B.canon ? " disabled" : "") +
+       '><span class="note">' + (B.canon ? "Not at creation in Mirane." : "Other games: your GM approved restricted options like Angelblooded.") + "</span></div>";
   $("cardIdentity").innerHTML = h;
 
   $("inName").oninput = function(){ B.name = this.value; $("hdrName").textContent = B.name ? "— " + B.name : ""; saveLocal(); };
@@ -18940,7 +18976,8 @@ function renderIdentity(){
   if ($("rcClan")) $("rcClan").onchange = function(){ B.raceChoice.clan = this.value; render(); };
   if ($("rcDemon")) $("rcDemon").onchange = function(){ B.raceChoice.demonPick = this.value; render(); };
   if ($("rcElem")) $("rcElem").onchange = function(){ B.raceChoice.element = this.value; render(); };
-  $("inCanon").onchange = function(){ B.canon = this.checked; render(); };
+  $("inCanon").onchange = function(){ B.canon = this.checked; if (B.canon) B.gmRestricted = false; render(); };
+  $("inGmRes").onchange = function(){ B.gmRestricted = this.checked; render(); };
   document.querySelectorAll("[data-sheet]").forEach(function(el){
     el.oninput = function(){ B.sheet = B.sheet || {}; B.sheet[this.dataset.sheet] = this.value; saveLocal(); };
   });
@@ -19381,7 +19418,8 @@ function alertNote(msg){ var d = document.createElement("div"); d.className = "w
 function btBlockers(r){
   var why = [];
   if (r.race && r.race.length && !r.race.some(function(x){ return raceIds().indexOf(x) >= 0; })) why.push("race");
-  if (r.restricted && !B.canon) why.push("restricted (tick Canon campaign)");
+  if (B.canon && MIRANE.bannedBts.indexOf(r.id) >= 0) why.push(MIRANE.bannedNote);
+  else if (r.restricted && !B.gmRestricted) why.push("restricted (needs GM approval: tick it in Identity)");
   if (!r.repeatable && !r.costScale && !r.costNote && hasBt(r.id)) why.push("already taken");
   if (r.requiresBreakthrough && !hasBt(r.requiresBreakthrough)) why.push("needs " + (BTS[r.requiresBreakthrough] ? BTS[r.requiresBreakthrough].name : r.requiresBreakthrough));
   var nth = B.bts.filter(function(b){ return b.id === r.id; }).length;
@@ -19444,7 +19482,7 @@ function drawBtList(){
     if (q && (r.name + " " + (r.summary || []).join(" ") + " " + (r.requires || "")).toLowerCase().indexOf(q) < 0) return;
     var why = btBlockers(r);
     if (ui.btOnlyOk && why.length) return;
-    if (r.restricted && !B.canon && !q) return;
+    if (r.restricted && !B.gmRestricted && !q) return;
     var nth = B.bts.filter(function(b){ return b.id === r.id; }).length;
     var tags = "";
     if (r.creationOnly) tags += '<span class="tag warn">creation only</span>';
@@ -19468,6 +19506,9 @@ function renderItems(){
   var cats = {}; Object.values(ITEMS).forEach(function(it){ cats[it.category] = (cats[it.category] || 0) + 1; });
   var h = "<h2>Items</h2>";
   h += '<div class="note">Buy items to track Clim and burden. Tick "equip" on armor and shields in the side panel to apply their stats.</div>';
+  if (B.canon) h += '<div class="note"><b>Mirane:</b> your Adventurer\'s Kit is free. Starting crafting materials: none worth 1,000+ base value (no Mithril or Silver Ingots, Ash Blocks...), ' +
+    "2,500 Clim of ingots/raw materials at most, only what you could gather or use yourself (food is fine). Every party needs a Camping Kit and a Culinary Kit; " +
+    "a Medical Kit and a Cartographer's Kit are strongly recommended. Plan food for 2 weeks (Food Units: about 600u) and 100-200 Magical Fuel Units for the teleporter; buy both below (search for Food Units or Magical Fuel).</div>";
   h += '<div class="toolbar"><input type="search" id="itSearch" placeholder="Search items..." value="' + esc(ui.itemSearch) + '">' +
     '<select id="itCat"><option value="">All types</option>' + Object.keys(cats).sort().map(function(c){ return "<option>" + esc(c) + "</option>"; }).join("") + "</select></div>";
   h += '<div class="list" id="itList"></div>';
@@ -19510,14 +19551,15 @@ function drawItemList(){
     var c = itemCost(it);
     h += '<div class="li"><div class="top"><span class="name" data-info="item:' + it.id + '">' + esc(it.name) + '</span><span class="tag">' + esc(it.category) + (it.tag && it.tag !== it.category ? " · " + esc(it.tag) : "") + "</span>" +
       '<span class="grow"></span>' + (it.reference ? '<span class="dim small">mod list (reference)</span>' :
-      '<span class="dim small">' + (c !== null ? c.toLocaleString() + " Clim" : esc(it.cost == null ? "no price" : it.cost)) + " · burden " + esc(it.burden == null ? "?" : it.burden) + "</span>" +
+      '<span class="dim small">' + (c !== null ? c.toLocaleString() + (it.units ? " Clim per unit (2 units = 1 Clim)" : " Clim") : esc(it.cost == null ? "no price" : it.cost)) + " · burden " + esc(it.burden == null ? "?" : it.burden) + "</span>" +
       ' <button class="small" data-buy="' + it.id + '">Buy</button>') + '</div><details><summary>Details</summary>' + itemDetail(it) + "</details></div>";
   });
   $("itList").innerHTML = h || '<div class="li dim">No matches.</div>';
   document.querySelectorAll("[data-buy]").forEach(function(b){
     b.onclick = function(){
       var id = this.dataset.buy, e = B.items.filter(function(x){ return x.id === id; })[0];
-      if (e) e.qty++; else B.items.push({ id: id, qty: 1, equipped: false });
+      var stp = ITEMS[id].unitStep || 1;
+      if (e) e.qty += stp; else B.items.push({ id: id, qty: stp, equipped: false });
       renderSome([]);
     };
   });
@@ -19533,6 +19575,7 @@ function renderLive(){
   h += '<div class="kv"><span>Breakthrough EXP left</span><b class="' + (e.btLeft ? "warn" : "") + '">' + e.btLeft + " / 300</b></div>";
   h += '<div class="kv"><span>Unspent EXP</span><b class="' + (e.unspent < 0 ? "bad" : "") + '">' + e.unspent.toLocaleString() + "</b></div>";
   h += '<div class="kv"><span>Spirit Core</span><b>' + e.spiritCore.toLocaleString() + "</b></div>";
+  if (B.canon) h += '<div class="kv" title="Mirane: Spirit Core / 500, rounded down. Staying in a zone with a higher astra level than this risks astra poisoning."><span>Astra resistance</span><b>' + Math.floor(e.spiritCore / 500) + "</b></div>";
   h += '<div class="kv"><span>EXP earned since creation</span><input type="number" id="inExp" min="0" step="25" value="' + num(B.expEarned) + '"></div>';
   if (e.human) h += '<div class="note">Includes Human Ambition +100 EXP.</div>';
   else if (B.race === "human" && hybrid()) h += '<div class="note">Human-Chimera hybrid: no Human Ambition +100 EXP.</div>';
@@ -19543,7 +19586,7 @@ function renderLive(){
   h += '<div class="kv"><span>Clim spent</span><b>' + C.clim.spent.toLocaleString() + "</b></div>";
   h += '<div class="kv"><span>Starting Clim</span><input type="number" id="inClimStart" min="0" step="100" value="' + num(B.startClim) + '"></div>';
   h += '<div class="kv"><span>Clim gained since</span><input type="number" id="inClimAdd" step="100" value="' + num(B.climAdded) + '"></div>';
-  if (C.clim.canon) h += '<div class="note">Includes +1,000 Clim for a canon campaign.</div>';
+  if (C.clim.canon) h += '<div class="note">Includes +1,000 Clim for the Mirane Expedition' + (C.clim.freeKit ? "; your Adventurer's Kit is free there (given on arrival)" : "") + ".</div>";
   if (C.clim.bonus) h += '<div class="note">Includes ' + C.clim.bonus.toLocaleString() + " Clim from breakthroughs.</div>";
   h += '<div class="kv"><span>Skill points left</span><b class="' + (C.skillLeft > 0 ? "warn" : C.skillLeft < 0 ? "bad" : "") + '">' + fmt(C.skillLeft) + "</b></div>";
   h += "</div>";
@@ -19561,7 +19604,9 @@ function renderLive(){
   h += '<div class="kv"><span>Dodge evasion</span>' + bd("dodge", d.dodge, "Dodge evasion") + "</div>";
   h += '<div class="kv"><span>Block guard</span>' + bd("blockGuard", d.blockGuard, "Block guard") + "</div>";
   var Tn = C.stat.Toughness || 0;
-  h += '<div class="kv" title="HP regained per rest (rulebook): floor 1x Toughness, camp/basic lodging 2x, luxury 3x"><span>Rest heals (floor / camp / luxury)</span><b>' +
+  if (B.canon) h += '<div class="kv" title="Mirane: resting and eating recover one tier less. No camping kit: no HP. Camping kit: 1x Toughness. Rations and a basic culinary kit restore only 1 Mana."><span>Rest heals (no kit / camping kit / better)</span><b>0 / ' +
+       Tn + " / " + (2 * Tn) + " HP</b></div>";
+  else h += '<div class="kv" title="HP regained per rest (rulebook): floor 1x Toughness, camp/basic lodging 2x, luxury 3x"><span>Rest heals (floor / camp / luxury)</span><b>' +
        Tn + " / " + (2 * Tn) + " / " + (3 * Tn) + " HP</b></div>";
   h += '<div class="kv"><span>Initiative</span>' + bd("init", "1d4 " + sign(d.init), "Initiative bonus") + "</div>";
   h += '<div class="kv"><span>Speed</span>' + bd("speed", d.speed + "ft" + (d.walk ? " (walk " + d.walk + "ft)" : ""), "Speed") + "</div>";
@@ -19592,7 +19637,8 @@ function renderLive(){
     if (canMod) eq += ' <button class="small" data-mods="' + i + '" title="Pick this item\'s mods">Mods' + (ms.length ? " (" + ms.length + ")" : "") + "</button>";
     var need = itemProf(it);
     if (need && !C.profs[need]) eq += ' <span class="tag bad" title="You are not proficient with ' + esc(need) + '">not proficient</span>';
-    h += '<div class="kv"><span>' + esc(it.name) + " " + eq + '</span><span class="pm"><button class="small" data-q="' + i + '" data-d="-1">−</button><b>' + e.qty + '</b><button class="small" data-q="' + i + '" data-d="1">+</button></span></div>';
+    if (it.units) h += '<div class="kv"><span>' + esc(it.name) + '</span><span class="pm"><input type="number" class="small" data-uq="' + i + '" min="0" step="' + (it.unitStep || 10) + '" value="' + e.qty + '" style="width:76px">u</span></div>';
+    else h += '<div class="kv"><span>' + esc(it.name) + " " + eq + '</span><span class="pm"><button class="small" data-q="' + i + '" data-d="-1">−</button><b>' + e.qty + '</b><button class="small" data-q="' + i + '" data-d="1">+</button></span></div>';
     if (ms.length) h += '<div class="small dim" style="margin:-4px 0 6px 8px">' + ms.map(function(x){ return esc(x.m.name); }).join(", ") +
       " · " + modPoints(ms) + " crafting pts" + ((C.modNotes[i] || []).length ? "<br>" + C.modNotes[i].map(esc).join("<br>") : "") + "</div>";
   });
@@ -19605,6 +19651,9 @@ function renderLive(){
     cb.onchange = function(){ B.toggles = B.toggles || {}; if (this.checked) B.toggles[this.dataset.tog] = true; else delete B.toggles[this.dataset.tog]; render(); };
   });
   bindNum("inExp", "expEarned"); bindNum("inIp", "ipEarned"); bindNum("inClimStart", "startClim"); bindNum("inClimAdd", "climAdded");
+  document.querySelectorAll("[data-uq]").forEach(function(inp){
+    inp.onchange = function(){ var i = num(this.dataset.uq), e = B.items[i]; e.qty = Math.max(0, Math.round(num(this.value))); if (e.qty <= 0) B.items.splice(i, 1); render(); };
+  });
   document.querySelectorAll("[data-q]").forEach(function(b){
     b.onclick = function(){ var i = num(this.dataset.q), e = B.items[i]; e.qty += num(this.dataset.d); if (e.qty <= 0) B.items.splice(i, 1); renderSome([]); };
   });
@@ -19906,7 +19955,7 @@ function openDetail(spec){
   else if (kind === "item" && ITEMS[id]) {
     var it = ITEMS[id], ic = itemCost(it), need = itemProf(it);
     head = '<span class="t">' + esc(it.name) + '</span><span class="tag">' + esc(it.category) + (it.tag && it.tag !== it.category ? " · " + esc(it.tag) : "") + "</span>" +
-      '<span class="tag gold">' + (ic !== null ? ic.toLocaleString() + " Clim" : esc(it.cost)) + "</span>" + '<span class="tag">burden ' + esc(it.burden == null ? "?" : it.burden) + "</span>" +
+      '<span class="tag gold">' + (ic !== null ? ic.toLocaleString() + (it.units ? " Clim per unit" : " Clim") : esc(it.cost)) + "</span>" + '<span class="tag">burden ' + esc(it.burden == null ? "?" : it.burden) + "</span>" +
       (need ? '<span class="tag ' + (C.profs[need] ? "good" : "bad") + '">' + esc(need) + (C.profs[need] ? " ✓" : " — not proficient") + "</span>" : "");
     body = itemDetail(it);
     foot = '<button class="gold" data-dadd="item:' + id + '">Buy</button><span class="small dim">Clim left: ' + C.clim.left.toLocaleString() + "</span>";
@@ -19922,7 +19971,7 @@ function openDetail(spec){
       var q = this.dataset.dadd.split(":"), k = q[0], v = q[1];
       if (k === "class") B.classes.push({ id: v, owned: [true, false, false, false, false, false, false, false], picks: {} });
       if (k === "bt") B.bts.push(newBt(v));
-      if (k === "item") { var e = B.items.filter(function(x){ return x.id === v; })[0]; if (e) e.qty++; else B.items.push({ id: v, qty: 1, equipped: false }); }
+      if (k === "item") { var e = B.items.filter(function(x){ return x.id === v; })[0], stp = ITEMS[v] ? ITEMS[v].unitStep || 1 : 1; if (e) e.qty += stp; else B.items.push({ id: v, qty: stp, equipped: false }); }
       if (k === "race") {
         var rr = RACES[v];
         if (rr.kind === "subrace") { if (subraceChoices().indexOf(v) < 0) B.race = rr.parent; B.subrace = v; B.raceChoice.element = ""; }
@@ -19997,7 +20046,7 @@ function buildSummary(){
   var L = [], r = raceRec(), s = subRec();
   L.push("== " + (B.name || "Unnamed character") + " ==  (Lyrian Chronicles planner, data v" + ((Object.values(CLASSES)[0] || {}).version || "?") + ")");
   L.push("Race: " + (r ? r.name : "—") + (s ? " / " + s.name : "") + (B.race === "demon" && B.raceChoice.clan ? " (clan " + B.raceChoice.clan + ")" : "") +
-         (B.raceChoice.element ? " (" + B.raceChoice.element + ")" : "") + (B.gender ? " · " + B.gender : "") + (B.canon ? " · canon campaign" : ""));
+         (B.raceChoice.element ? " (" + B.raceChoice.element + ")" : "") + (B.gender ? " · " + B.gender : "") + (B.canon ? " · Mirane Expedition" : ""));
   L.push("Main: " + MAIN.map(function(k){ return k + " " + C.stat[k]; }).join(", "));
   L.push("Sub: " + SUB.map(function(k){ return k + " " + C.stat[k]; }).join(", "));
   var d = C.d;
@@ -20028,7 +20077,7 @@ function buildSummary(){
   var pr = Object.keys(C.profs).sort();
   if (pr.length) L.push("Proficiencies: " + pr.join(", "));
   if (B.items.length) {
-    L.push(""); L.push("Gear: " + B.items.map(function(e){ var it = ITEMS[e.id]; return it ? it.name + (e.qty > 1 ? " x" + e.qty : "") + (e.equipped ? " (equipped)" : "") : e.id; }).join(", "));
+    L.push(""); L.push("Gear: " + B.items.map(function(e){ var it = ITEMS[e.id]; return it ? it.name + (it.units ? " " + e.qty + "u" : e.qty > 1 ? " x" + e.qty : "") + (e.equipped ? " (equipped)" : "") : e.id; }).join(", "));
     L.push("Clim left " + C.clim.left.toLocaleString() + " · Burden " + C.burden + "/" + d.burdenMax);
   }
   return L.join("\n");
@@ -20522,10 +20571,10 @@ function fsBoxes(){
       meta.push(Object.keys(ab).filter(function(k){ return it.armor[k] !== undefined && it.armor[k] !== null && it.armor[k] !== ""; })
         .map(function(k){ return ab[k] + it.armor[k]; }).join(", "));
     }
-    meta.push("Burden " + itemBurdenFor(e, C.meld) + (e.qty > 1 ? " each" : ""));
+    if (!it.units) meta.push("Burden " + itemBurdenFor(e, C.meld) + (e.qty > 1 ? " each" : ""));
     var mods = chosenMods(e);
     if (mods.length) body.push("Mods: " + mods.map(function(x){ return x.m.name; }).join(", "));
-    sec.items.push({ title: it.name + (e.qty > 1 ? " x" + e.qty : "") + (e.equipped ? (it.armor ? " (worn)" : " (wielded)") : ""),
+    sec.items.push({ title: it.name + (it.units ? " " + e.qty + "u" : e.qty > 1 ? " x" + e.qty : "") + (e.equipped ? (it.armor ? " (worn)" : " (wielded)") : ""),
                      sub: [it.category, it.tag].filter(Boolean).join(" - "), meta: meta.filter(Boolean).join("; "), body: body.concat(it.summary || []) });
   });
   if (sec.items.length) groups.push(sec);
@@ -20692,7 +20741,7 @@ function sheetValues(opts){
     V["CombatInventory" + n] = fits(nm + tag) ? nm + tag : nm; V["Amount" + n] = x.e.qty; V["Bulk" + n] = itemBurdenFor(x.e, C.meld) * x.e.qty; V["Description" + n] = desc;
     S["Description" + n] = { minSize: 8 }; S["CombatInventory" + n] = { minSize: 8 };
   });
-  var itemsTxt = other.map(function(x){ return x.it.name + (x.e.qty > 1 ? " x" + x.e.qty : ""); });
+  var itemsTxt = other.map(function(x){ return x.it.name + (x.it.units ? " " + x.e.qty + "u" : x.e.qty > 1 ? " x" + x.e.qty : ""); });
   if (combat.length > invRows.length) itemsTxt = combat.slice(invRows.length).map(function(x){ return x.it.name + " x" + x.e.qty; }).concat(itemsTxt);
   itemsTxt.push("", "Clim: " + C.clim.left.toLocaleString() + "   Burden: " + C.burden + "/" + d.burdenMax);
   V.Items = itemsTxt.join("\n");
