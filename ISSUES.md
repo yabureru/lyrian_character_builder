@@ -1532,7 +1532,7 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 - [ ] Other builders to compare with later: the official character builder at clio.angelssword.com (posted by the game designer in #how-to-play), the fan tool lyrian-tools.vercel.app, and a community Google Sheets character sheet (v8).
 
 ## Planner - not done yet
-- [ ] User request (2026-10-24): the **Load** button should accept either a saved .json file OR a pasted build code (LCP1:) in one place. Today codes only load from Share -> "Load a build code", which is easy to miss. Compare can also read a code but only compares, it does not load.
+- [ ] User request (2026-10-24): the **Load** button should accept either a saved .json file OR a pasted build code (LCP1:) in one place. Today codes only load from Share -> "Load a build code", which is easy to miss. Compare -> "Load the other build" also loads a pasted code (user found this works), but Load itself should take one too.
 - [x] Share (2026-10-24): the character export is a neutral **Character data** section (`characterData()` / `characterDataCode()`, `LCD1:` codes, `lyrian-character-*.json` files) with no reference to any other tool. planner-all-in-one.html rebuilt.
 - [ ] User request (2026-10-24): Appearance section - let the player upload a character picture (save it with the build; maybe print it on the sheet/backstory page).
 - [ ] User request (2026-10-24): click/tap a main stat (Power, Focus, Agility...) for a short tooltip saying what that stat is used for (pull wording from RULES_REFERENCE.md).
