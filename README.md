@@ -22,7 +22,7 @@ Your build saves automatically in the browser. Use **Save** to keep a `.json` co
 **Item mods**: press *Mods* on anything in your inventory to tick its mods (its own, plus the Universal weapon/armor/artifice/crafting mods that fit). Mods that change numbers (Guard, Block, Dodge, Burden, Mana, armor penalties, Melding...) are added in; the rest show as notes, with crafting points totalled.
 **Undo / Redo** (or Ctrl+Z / Ctrl+Y) step back through your changes, including Reset and Load.
 **Print sheet** fills your build into the **official fillable character sheet** (Character Sheet 1.2) and downloads it, ready to print. It prints the character **as of now** (only what your earned EXP/IP reaches) or, if you choose, the whole plan. **Full-size pages** (on by default) replace the official boxed ability pages: abilities, breakthroughs and gear in the same style, every box as tall as its text, so nothing is cut off. It can also add your **Backstory** (written in Identity) and your **Build roadmap** (every planned purchase in order, with EXP and IP needed) as the last pages.
-The official PDF isn't included here: load your own copy once and the planner remembers it in that browser.
+The official PDF isn't included here (it belongs to Angel's Sword Studios). Get it free from the [Lyrian Chronicles Discord](https://discord.gg/EFg2EbDnTa), channel **#how-to-play** ([Character Sheet 1.2 post](https://discord.com/channels/909435736351207424/1293704039543996488/1346225007940079656)), then load it once and the planner remembers it in that browser. The Print sheet window shows this link until a sheet is loaded.
 
 ### Features
 - Race, sub-race, stats, classes (all 8 steps), skills and expertise, proficiencies, breakthroughs and items

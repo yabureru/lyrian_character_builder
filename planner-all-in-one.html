@@ -20752,6 +20752,9 @@ function sheetGet(cb){ idb(function(db){ if (!db) return cb(null); try { var g =
 function sheetPut(buf){ idb(function(db){ if (!db) return; try { db.transaction("files", "readwrite").objectStore("files").put(buf, "sheet"); } catch (e) {} }); }
 function sheetDel(){ idb(function(db){ if (!db) return; try { db.transaction("files", "readwrite").objectStore("files").delete("sheet"); } catch (e) {} }); }
 var sheetBytes = null;
+// Where players get the official sheet (not included in the planner: it belongs to Angel's Sword Studios)
+var SHEET_LINK = "https://discord.com/channels/909435736351207424/1293704039543996488/1346225007940079656";
+var DISCORD_INVITE = "https://discord.gg/EFg2EbDnTa";
 function openSheetDialog(){
   detailNow = null;
   $("dHead").innerHTML = '<span class="t">Print on the official sheet</span><span style="flex:1"></span><button id="dClose">Close ✕</button>';
@@ -20759,10 +20762,15 @@ function openSheetDialog(){
     '<div class="note">This fills your build into the official fillable character sheet (Character Sheet 1.2) and downloads it, ready to print. ' +
     "The planner doesn't include the sheet itself, so load your copy of the PDF below. It's remembered in this browser.</div>" +
     '<div class="field"><label>Official sheet</label><span id="shStatus" class="small">checking…</span></div>' +
+    // where to get the sheet (shown until one is loaded)
+    '<div id="shGet" class="note" style="display:none"><b>Don\'t have the sheet?</b> It\'s free from Angel\'s Sword Studios: ' +
+    '<a href="' + SHEET_LINK + '" target="_blank" rel="noopener">Character Sheet 1.2 in the Lyrian Chronicles Discord</a> (#how-to-play, posted by Cure). ' +
+    'You need to be in their server: <a href="' + DISCORD_INVITE + '" target="_blank" rel="noopener">join it here</a>. ' +
+    'Download the PDF, then choose it below. You only do this once per browser.</div>' +
     '<div class="toolbar"><input type="file" id="shFile" accept=".pdf,application/pdf"><button id="shForget" class="small">Forget saved sheet</button></div>' +
     '<div class="note">What goes where: stats, combat numbers, skills (Bonus = your total roll bonus: stat + skill points + best expertise), classes with EXP spent, ' +
     "combat inventory, other items and Clim, proficiencies and languages, breakthroughs, and abilities (full-size pages, or up to 24 in the official boxes on pages 3-6). " +
-    "Age, height, weight, personality and appearance come from Identity → Character sheet details. The filled fields stay editable in any PDF reader.</div>" +
+    "Age, height, weight, personality and appearance come from Identity → Character sheet details. The official pages stay editable in any PDF reader; the full-size and extra pages are printed text.</div>" +
     (function(){ var nw = buildNow(); if (!nw) return "";
       return '<h3>What to print</h3>' +
         '<label class="small" style="display:block"><input type="radio" name="shWhen" id="shNow" checked> ' + esc(B.name || "The character") + " as of now " +
@@ -20783,17 +20791,17 @@ function openSheetDialog(){
   function ready(bytes, how){
     var bad = checkSheet(bytes);
     if (bad) { $("shStatus").innerHTML = '<span class="bad">' + esc(bad) + "</span>"; $("shMake").disabled = true; sheetBytes = null; return false; }
-    sheetBytes = bytes; $("shStatus").innerHTML = '<span class="good">Character Sheet 1.2 ' + esc(how) + " ✓</span>"; $("shMake").disabled = false; return true;
+    sheetBytes = bytes; $("shStatus").innerHTML = '<span class="good">Character Sheet 1.2 ' + esc(how) + " ✓</span>"; $("shMake").disabled = false; $("shGet").style.display = "none"; return true;
   }
   if (sheetBytes) ready(sheetBytes, "loaded");
-  else sheetGet(function(buf){ if (buf) ready(new Uint8Array(buf), "remembered from last time"); else $("shStatus").textContent = "not loaded yet - choose the PDF"; });
+  else sheetGet(function(buf){ if (buf) ready(new Uint8Array(buf), "remembered from last time"); else { $("shStatus").textContent = "not loaded yet - choose the PDF"; $("shGet").style.display = ""; } });
   $("shFile").onchange = function(){
     var f = this.files[0]; if (!f) return;
     var rd = new FileReader();
     rd.onload = function(){ var b = new Uint8Array(rd.result); if (ready(b, "loaded")) sheetPut(rd.result); };
     rd.readAsArrayBuffer(f);
   };
-  $("shForget").onclick = function(){ sheetDel(); sheetBytes = null; $("shStatus").textContent = "forgotten - choose the PDF"; $("shMake").disabled = true; };
+  $("shForget").onclick = function(){ sheetDel(); sheetBytes = null; $("shStatus").textContent = "forgotten - choose the PDF"; $("shMake").disabled = true; $("shGet").style.display = ""; };
   $("shMake").onclick = function(){
     try {
       var extra = [], full = $("shFull") && $("shFull").checked, nw = ($("shNow") && $("shNow").checked) ? buildNow() : null, sv;
