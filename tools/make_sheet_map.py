@@ -59,6 +59,17 @@ for ref in acro["/Fields"]:
                     "size": float(dm.group(2)) if dm else 0, "ff": int(fo.get("/Ff", 0)),
                     "value": str(fo["/V"]) if "/V" in fo else None}
 
+# The page list, and the blank "Abilities" page (page 3) whose background picture the planner reuses
+# for its extra Backstory / Roadmap pages.
+pages_ref = r.pages[0].get_object().raw_get("/Parent")
+pages_obj = pages_ref.get_object()
+p3 = r.pages[2].get_object()
+res3 = DictionaryObject({k: v for k, v in p3["/Resources"].items()})
+extra = {
+    "pages": {"obj": pages_ref.idnum, "kids": [k.idnum for k in pages_obj["/Kids"]], "count": int(pages_obj["/Count"])},
+    "blank": {"contents": "%d 0 R" % p3.raw_get("/Contents").idnum, "resources": ser(res3)},
+}
+
 out = {
     "sheet": "Character Sheet 1.2",
     "fileSize": len(raw),
@@ -69,6 +80,8 @@ out = {
     "id": [bytes(x.original_bytes if hasattr(x, "original_bytes") else x).hex() for x in ids] if ids else None,
     "fonts": fonts,
     "fields": fields,
+    "pages": extra["pages"],
+    "blank": extra["blank"],
 }
 js = ("// Field map for the official Lyrian Chronicles fillable character sheet (" + out["sheet"] + ").\n"
       "// Made by tools/make_sheet_map.py from the official PDF. It only describes where each form field is;\n"

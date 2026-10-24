@@ -21,7 +21,7 @@ Your build saves automatically in the browser. Use **Save** to download a `.json
 **Compare** puts two builds side by side: press *Pin current build*, try some changes, then open Compare again to see exactly what went up or down. You can also compare against a saved file or a build code.
 **Item mods**: press *Mods* on anything in your inventory to tick its mods (its own, plus the Universal weapon/armor/artifice/crafting mods that fit). Mods that change numbers (Guard, Block, Dodge, Burden, Mana, armor penalties, Melding...) are added in; the rest show as notes, with crafting points totalled.
 **Undo / Redo** (or Ctrl+Z / Ctrl+Y) step back through your changes, including Reset and Load.
-**Print sheet** fills your build into the **official fillable character sheet** (Character Sheet 1.2) and downloads it, ready to print.
+**Print sheet** fills your build into the **official fillable character sheet** (Character Sheet 1.2) and downloads it, ready to print. It can also add two extra pages in the same style: your **Backstory** (written in Identity) and your **Build roadmap** (every planned purchase in order, with EXP and IP needed).
 The official PDF isn't included here: load your own copy once and the planner remembers it in that browser.
 
 ### Features

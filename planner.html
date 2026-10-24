@@ -1024,10 +1024,14 @@ function renderIdentity(){
     ['personality', 'appearance'].map(function(k){
       return '<div class="field" style="align-items:flex-start"><label>' + k.charAt(0).toUpperCase() + k.slice(1) + '</label><textarea data-sheet="' + k + '" rows="3" style="flex:1;background:#1f2128;border:1px solid var(--line);border-radius:6px;color:var(--text);padding:4px 7px">' + esc(sd[k] || "") + "</textarea></div>"; }).join("") +
     "</details>";
+  h += '<div class="field" style="align-items:flex-start;margin-top:8px"><label>Backstory</label><div style="flex:1">' +
+    '<textarea id="inNotes" rows="5" placeholder="A short summary of who your character is and where they come from." style="width:100%;box-sizing:border-box;background:#1f2128;border:1px solid var(--line);border-radius:6px;color:var(--text);padding:4px 7px">' +
+    esc(B.notes || "") + '</textarea><div class="small dim">Printed on its own page after the official sheet (Print sheet). Also sent with Share → Send to Lyrian Table.</div></div></div>';
   h += '<div class="field" style="margin-top:10px"><label>Canon campaign</label><input type="checkbox" id="inCanon"' + (B.canon ? " checked" : "") + '><span class="note">+1,000 starting Clim, and allows restricted options like Angelblooded.</span></div>';
   $("cardIdentity").innerHTML = h;
 
   $("inName").oninput = function(){ B.name = this.value; $("hdrName").textContent = B.name ? "— " + B.name : ""; saveLocal(); };
+  $("inNotes").oninput = function(){ B.notes = this.value; saveLocal(); };
   $("inGender").onchange = function(){ B.gender = this.value; render(); };
   $("inRace").onchange = function(){ B.race = this.value; B.subrace = ""; B.raceChoice = { clan: "", element: "", main: "", sub: "" }; render(); };
   if ($("inSub")) $("inSub").onchange = function(){ B.subrace = this.value; B.raceChoice.element = ""; render(); };
@@ -2463,9 +2467,22 @@ function appearance(field, rect, value, opts){
   cs += "ET\nQ\nEMC";
   return { content: cs, w: w, h: h, font: font, size: size };
 }
-function fillPdf(bytes, values, special){
+function fillPdf(bytes, values, special, extraPages){
   var objs = [], next = SHEET.size;
   function add(num, body){ objs.push({ num: num, body: body }); }
+  // extra pages (Backstory, Roadmap): each reuses the blank Abilities page background, with our drawing on top
+  if (extraPages && extraPages.length && SHEET.pages && SHEET.blank) {
+    var kids = SHEET.pages.kids.map(function(k){ return k + " 0 R"; });
+    var res = SHEET.blank.resources.replace(/>>\s*$/, "/Font << /Riven " + SHEET.fonts.Riven.ref + " >>\n>>");
+    extraPages.forEach(function(cs){
+      var cNum = next++, pNum = next++;
+      add(cNum, "<< /Length " + cs.length + " >>\nstream\n" + cs + "\nendstream");
+      add(pNum, "<< /Type /Page /Parent " + SHEET.pages.obj + " 0 R /MediaBox [0 0 612 792] /CropBox [0 0 612 792] /Rotate 0 " +
+        "/Resources " + res + " /Contents [" + SHEET.blank.contents + " " + cNum + " 0 R] >>");
+      kids.push(pNum + " 0 R");
+    });
+    add(SHEET.pages.obj, "<< /Type /Pages /Kids [" + kids.join(" ") + "] /Count " + kids.length + " >>");
+  }
   Object.keys(values).forEach(function(name){
     var f = SHEET.fields[name]; if (!f) return;
     var val = sheetText(values[name]);
@@ -2495,6 +2512,72 @@ function fillPdf(bytes, values, special){
   var res = new Uint8Array(bytes.length + tail.length);
   res.set(bytes, 0); res.set(tail, bytes.length);
   return res;
+}
+/* ---------- Extra sheet pages (same look as the official pages) ----------
+   Drawn over the blank "Abilities" page: one big cream panel replaces the six ability boxes,
+   the "Abilities:" label is swapped for our title, and the character's name goes in the Name box.
+   Measurements come from the official page (points, origin bottom-left). */
+var XP = { x0: 35.5, x1: 576.25, y0: 112.5, y1: 543.75, cut: 11 };
+function pdfNum(n){ return (+n).toFixed(2); }
+function pdfText(x, y, size, s, gray){ return "BT /Riven " + pdfNum(size) + " Tf " + (gray || "0.05") + " g 1 0 0 1 " + pdfNum(x) + " " + pdfNum(y) + " Tm " + pdfStr(s) + " Tj ET\n"; }
+function pageFrame(title, sub){
+  var p = XP, c = p.cut, cs = "q\n1 0.969 0.816 rg\n" +
+    [[p.x0 + c, p.y1], [p.x1 - c, p.y1], [p.x1, p.y1 - c], [p.x1, p.y0 + c], [p.x1 - c, p.y0], [p.x0 + c, p.y0], [p.x0, p.y0 + c], [p.x0, p.y1 - c]]
+      .map(function(pt, i){ return pdfNum(pt[0]) + " " + pdfNum(pt[1]) + (i ? " l" : " m"); }).join("\n") + "\nh f\n";
+  cs += "0.592 0.847 0.918 rg 37 546.5 110 16 re f\nQ\n";   // cover the old "Abilities:" label
+  var t = sheetText(title) + ":";
+  cs += pdfText(41.5, 550.5, 11, t);
+  if (sub) cs += pdfText(41.5 + textWidth(t, "Riven", 11) + 8, 550.5, 8, sheetText(sub), "0.25");
+  var nm = sheetText(B.name || "");
+  if (nm) cs += pdfText(47, 576.2, 12, fitTrunc(nm, "Riven", 12, 236));
+  return cs;
+}
+// Backstory: wrapped text, continuing onto more pages if needed
+function backstoryPages(){
+  var txt = sheetText((B.notes || "").replace(/\r/g, "")).trim(); if (!txt) return [];
+  var size = 10.5, lh = 14, left = XP.x0 + 10, maxW = XP.x1 - XP.x0 - 20, top = XP.y1 - 22, bottom = XP.y0 + 12;
+  var lines = wrapLines(txt, "Riven", size, maxW), per = Math.floor((top - bottom) / lh) + 1, pages = [];
+  for (var i = 0; i < lines.length; i += per) {
+    var chunk = lines.slice(i, i + per), n = pages.length;
+    var cs = pageFrame("Backstory", Math.ceil(lines.length / per) > 1 ? "(page " + (n + 1) + " of " + Math.ceil(lines.length / per) + ")" : "");
+    chunk.forEach(function(l, k){ if (l) cs += pdfText(left, top - k * lh, size, l); });
+    pages.push(cs);
+  }
+  return pages;
+}
+// Roadmap: the planner's purchase order as a table, continuing onto more pages if needed
+function roadmapPages(){
+  var rows = roadmap(); if (!rows.length) return [];
+  var size = 8.5, rh = 11.5, x0 = XP.x0 + 6, x1 = XP.x1 - 6, top = XP.y1 - 10, bottom = XP.y0 + 22;
+  var cols = [ { t: "#", x: x0 + 2, w: 16 }, { t: "Purchase", x: x0 + 22, w: 318 },
+               { t: "Cost", x: 438, right: true }, { t: "EXP needed", x: 494, right: true },
+               { t: "IP", x: 516, right: true }, { t: "Spirit Core", x: x1 - 2, right: true } ];
+  var per = Math.floor((top - 16 - bottom) / rh), pages = [], total = Math.ceil(rows.length / per);
+  function cell(col, s, y, gray){
+    s = sheetText(s);
+    if (col.right) return pdfText(col.x - textWidth(s, "Riven", size), y, size, s, gray);
+    return pdfText(col.x, y, size, col.w ? fitTrunc(s, "Riven", size, col.w) : s, gray);
+  }
+  for (var i = 0; i < rows.length; i += per) {
+    var cs = pageFrame("Build roadmap", "EXP needed = EXP to earn after character creation" + (total > 1 ? " (page " + (pages.length + 1) + " of " + total + ")" : ""));
+    cs += "q 0.05 g " + pdfNum(x0) + " " + pdfNum(top - 13) + " " + pdfNum(x1 - x0) + " 13 re f Q\n";   // header bar, like the Breakthroughs table
+    cols.forEach(function(c){ cs += cell(c, c.t, top - 9.5, "1"); });
+    rows.slice(i, i + per).forEach(function(r, k){
+      var y = top - 16 - (k + 1) * rh + 3, n = i + k;
+      if (k % 2) cs += "q 0.97 0.92 0.76 rg " + pdfNum(x0) + " " + pdfNum(y - 3) + " " + pdfNum(x1 - x0) + " " + pdfNum(rh) + " re f Q\n";
+      var label = r.label + (r.sub ? " - " + r.sub : "") + (r.tag ? "  [" + r.tag + "]" : "");
+      cs += cell(cols[0], String(n + 1), y, "0.35") + cell(cols[1], label, y) +
+            cell(cols[2], r.cost + (r.ip ? " +" + r.ip + " IP" : ""), y) + cell(cols[3], r.needEarned.toLocaleString("en-US"), y) +
+            cell(cols[4], String(r.ipNeed), y) + cell(cols[5], r.sc.toLocaleString("en-US"), y);
+    });
+    if (i + per >= rows.length) {
+      var last = rows[rows.length - 1];
+      cs += pdfText(x0 + 2, XP.y0 + 8, 8.5, "Whole plan: " + last.needEarned.toLocaleString("en-US") + " EXP and " + last.ipNeed +
+        " IP earned after creation - Spirit Core " + last.sc.toLocaleString("en-US"), "0.25");
+    }
+    pages.push(cs);
+  }
+  return pages;
 }
 function checkSheet(bytes){
   if (!SHEET) return "The sheet map (data/sheet.js) didn't load.";
@@ -2616,6 +2699,11 @@ function openSheetDialog(){
     '<div class="note">What goes where: stats, combat numbers, skills (Bonus = your total roll bonus: stat + skill points + best expertise), classes with EXP spent, ' +
     "combat inventory, other items and Clim, proficiencies and languages, breakthroughs, and up to 24 abilities on pages 3-6. " +
     "Age, height, weight, personality and appearance come from Identity → Character sheet details. The filled fields stay editable in any PDF reader.</div>" +
+    '<h3>Extra pages</h3><div class="note">Added after the official six pages, in the same style.</div>' +
+    '<label class="small" style="display:block"><input type="checkbox" id="shBack"' + ((B.notes || "").trim() ? " checked" : " disabled") + "> Backstory page" +
+    ((B.notes || "").trim() ? "" : ' <span class="dim">(write one in Identity → Backstory first)</span>') + "</label>" +
+    '<label class="small" style="display:block"><input type="checkbox" id="shRoad"' + (roadmap().length ? " checked" : " disabled") + "> Build roadmap page" +
+    (roadmap().length ? " (" + roadmap().length + " purchases)" : ' <span class="dim">(nothing planned yet)</span>') + "</label>" +
     '<div id="shErr"></div>';
   $("dFoot").innerHTML = '<button id="shMake" class="gold" disabled>Fill and download sheet</button><span class="small dim">Open the downloaded PDF and print it.</span>';
   $("detail").classList.add("open");
@@ -2636,7 +2724,10 @@ function openSheetDialog(){
   $("shForget").onclick = function(){ sheetDel(); sheetBytes = null; $("shStatus").textContent = "forgotten - choose the PDF"; $("shMake").disabled = true; };
   $("shMake").onclick = function(){
     try {
-      var sv = sheetValues(), out = fillPdf(sheetBytes, sv.values, sv.special);
+      var extra = [];
+      if ($("shBack") && $("shBack").checked) extra = extra.concat(backstoryPages());
+      if ($("shRoad") && $("shRoad").checked) extra = extra.concat(roadmapPages());
+      var sv = sheetValues(), out = fillPdf(sheetBytes, sv.values, sv.special, extra);
       var a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([out], { type: "application/pdf" }));
       a.download = ((B.name || "character").replace(/[^a-z0-9]+/gi, "-").toLowerCase()) + "-character-sheet.pdf";
