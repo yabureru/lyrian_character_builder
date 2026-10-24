@@ -18971,6 +18971,13 @@ function renderIdentity(){
     ['personality', 'appearance'].map(function(k){
       return '<div class="field" style="align-items:flex-start"><label>' + k.charAt(0).toUpperCase() + k.slice(1) + '</label><textarea data-sheet="' + k + '" rows="3" style="flex:1;background:#1f2128;border:1px solid var(--line);border-radius:6px;color:var(--text);padding:4px 7px">' + esc(sd[k] || "") + "</textarea></div>"; }).join("") +
     "</details>";
+  // character picture: shrunk to a small JPEG and kept with the build (printed on the Backstory page)
+  h += '<div class="field" style="align-items:flex-start;margin-top:8px"><label>Picture</label><div style="flex:1">' +
+    (B.portrait ? '<img src="' + B.portrait + '" alt="Character picture" style="max-width:120px;max-height:150px;border-radius:6px;border:1px solid var(--line);display:block;margin-bottom:4px">' : "") +
+    '<button class="small" id="picPick">' + (B.portrait ? "Change picture" : "Add a picture") + "</button>" +
+    (B.portrait ? ' <button class="small" id="picDel">Remove</button>' : "") +
+    '<input type="file" id="picFile" accept="image/*" hidden>' +
+    '<div class="small dim">Saved with your build (Save file), printed on the Backstory page. Not included in build codes.</div></div></div>';
   h += '<div class="field" style="align-items:flex-start;margin-top:8px"><label>Backstory</label><div style="flex:1">' +
     '<textarea id="inNotes" rows="5" placeholder="A short summary of who your character is and where they come from." style="width:100%;box-sizing:border-box;background:#1f2128;border:1px solid var(--line);border-radius:6px;color:var(--text);padding:4px 7px">' +
     esc(B.notes || "") + '</textarea><div class="small dim">Printed on its own page after the official sheet (Print sheet). Also included in Share → Character data.</div></div></div>';
@@ -18990,6 +18997,24 @@ function renderIdentity(){
   if ($("rcClan")) $("rcClan").onchange = function(){ B.raceChoice.clan = this.value; render(); };
   if ($("rcDemon")) $("rcDemon").onchange = function(){ B.raceChoice.demonPick = this.value; render(); };
   if ($("rcElem")) $("rcElem").onchange = function(){ B.raceChoice.element = this.value; render(); };
+  $("picPick").onclick = function(){ $("picFile").click(); };
+  if ($("picDel")) $("picDel").onclick = function(){ delete B.portrait; render(); };
+  $("picFile").onchange = function(){
+    var f = this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        var k = Math.min(1, 600 / Math.max(img.width, img.height)), cv = document.createElement("canvas");
+        cv.width = Math.max(1, Math.round(img.width * k)); cv.height = Math.max(1, Math.round(img.height * k));
+        var g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(img, 0, 0, cv.width, cv.height);
+        B.portrait = cv.toDataURL("image/jpeg", 0.85); B.portraitSize = [cv.width, cv.height]; render();
+      };
+      img.onerror = function(){ alert("That picture couldn't be read."); };
+      img.src = rd.result;
+    };
+    rd.readAsDataURL(f); this.value = "";
+  };
   $("inCanon").onchange = function(){ B.canon = this.checked; if (B.canon) B.gmRestricted = false; render(); };
   $("inGmRes").onchange = function(){ B.gmRestricted = this.checked; render(); };
   document.querySelectorAll("[data-sheet]").forEach(function(el){
@@ -20123,7 +20148,10 @@ function buildSummary(){
   }
   return L.join("\n");
 }
-function buildCode(){ return "LCP1:" + btoa(unescape(encodeURIComponent(JSON.stringify(B)))); }
+function buildCode(){ // the picture is left out to keep codes short (it's in Save files)
+  var c = JSON.parse(JSON.stringify(B)); delete c.portrait; delete c.portraitSize;
+  return "LCP1:" + btoa(unescape(encodeURIComponent(JSON.stringify(c))));
+}
 function readCode(code){
   code = String(code || "").trim();
   if (code.indexOf("LCP1:") !== 0) throw new Error("not a planner code");
@@ -20476,11 +20504,19 @@ function fillPdf(bytes, values, special, extraPages, dropPages){
     extraPages = extraPages || [];
     var kids = SHEET.pages.kids.filter(function(k, i){ return !dropPages || dropPages.indexOf(i) < 0; }).map(function(k){ return k + " 0 R"; });
     var res = SHEET.blank.resources.replace(/>>\s*$/, "/Font << /Riven " + SHEET.fonts.Riven.ref + " >>\n>>");
-    extraPages.forEach(function(cs){
+    extraPages.forEach(function(pg){
+      // a page is its drawing (string), or { cs, image: { bin (JPEG bytes as a binary string), w, h } } drawn as /Por
+      var cs = typeof pg === "string" ? pg : pg.cs, r = res;
+      if (pg.image) {
+        var iNum = next++;
+        add(iNum, "<< /Type /XObject /Subtype /Image /Width " + pg.image.w + " /Height " + pg.image.h +
+          " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + pg.image.bin.length + " >>\nstream\n" + pg.image.bin + "\nendstream");
+        r = /\/XObject\s*<</.test(res) ? res.replace(/\/XObject\s*<</, "/XObject <<\n/Por " + iNum + " 0 R") : res.replace(/>>\s*$/, "/XObject << /Por " + iNum + " 0 R >>\n>>");
+      }
       var cNum = next++, pNum = next++;
       add(cNum, "<< /Length " + cs.length + " >>\nstream\n" + cs + "\nendstream");
       add(pNum, "<< /Type /Page /Parent " + SHEET.pages.obj + " 0 R /MediaBox [0 0 612 792] /CropBox [0 0 612 792] /Rotate 0 " +
-        "/Resources " + res + " /Contents [" + SHEET.blank.contents + " " + cNum + " 0 R] >>");
+        "/Resources " + r + " /Contents [" + SHEET.blank.contents + " " + cNum + " 0 R] >>");
       kids.push(pNum + " 0 R");
     });
     add(SHEET.pages.obj, "<< /Type /Pages /Kids [" + kids.join(" ") + "] /Count " + kids.length + " >>");
@@ -20534,16 +20570,40 @@ function pageFrame(title, sub){
   if (nm) cs += pdfText(47, 576.2, 12, fitTrunc(nm, "Riven", 12, 236));
   return cs;
 }
-// Backstory: wrapped text, continuing onto more pages if needed
+// Backstory: wrapped text, continuing onto more pages if needed. The character picture (if any) sits top-right
+// of the first page, with the text running beside it.
 function backstoryPages(){
-  var txt = sheetText((B.notes || "").replace(/\r/g, "")).trim(); if (!txt) return [];
-  var size = 10.5, lh = 14, left = XP.x0 + 10, maxW = XP.x1 - XP.x0 - 20, top = XP.y1 - 22, bottom = XP.y0 + 12;
-  var lines = wrapLines(txt, "Riven", size, maxW), per = Math.floor((top - bottom) / lh) + 1, pages = [];
-  for (var i = 0; i < lines.length; i += per) {
+  var txt = sheetText((B.notes || "").replace(/\r/g, "")).trim(), pic = null;
+  if (B.portrait && B.portraitSize && /^data:image\/jpeg;base64,/.test(B.portrait)) {
+    var pw = B.portraitSize[0], ph = B.portraitSize[1], k = Math.min(150 / pw, 190 / ph);
+    pic = { bin: atob(B.portrait.split(",")[1]), w: pw, h: ph, dw: pw * k, dh: ph * k };
+  }
+  if (!txt && !pic) return [];
+  var size = 10.5, lh = 14, left = XP.x0 + 10, fullW = XP.x1 - XP.x0 - 20, top = XP.y1 - 22, bottom = XP.y0 + 12;
+  var picX = 0, picY = 0, narrowW = fullW;
+  if (pic) { picX = XP.x1 - 12 - pic.dw; picY = XP.y1 - 12 - pic.dh; narrowW = picX - left - 12; }
+  // wrap line by line: lines level with the picture use the narrow width
+  var lines = [], per = Math.floor((top - bottom) / lh) + 1;
+  function widthFor(n){ return (pic && n < per && top - n * lh > picY - 4) ? narrowW : fullW; }
+  (txt ? txt.split("\n") : []).forEach(function(par){
+    if (!par.trim()) { lines.push(""); return; }
+    var words = par.split(/ +/), line = "";
+    words.forEach(function(wd){
+      var t = line ? line + " " + wd : wd;
+      if (!line || textWidth(t, "Riven", size) <= widthFor(lines.length)) line = t; else { lines.push(line); line = wd; }
+    });
+    lines.push(line);
+  });
+  var pages = [], total = Math.max(1, Math.ceil(lines.length / per));
+  for (var i = 0; i < Math.max(lines.length, 1); i += per) {
     var chunk = lines.slice(i, i + per), n = pages.length;
-    var cs = pageFrame("Backstory", Math.ceil(lines.length / per) > 1 ? "(page " + (n + 1) + " of " + Math.ceil(lines.length / per) + ")" : "");
+    var cs = pageFrame("Backstory", total > 1 ? "(page " + (n + 1) + " of " + total + ")" : "");
     chunk.forEach(function(l, k){ if (l) cs += pdfText(left, top - k * lh, size, l); });
-    pages.push(cs);
+    if (n === 0 && pic) {
+      cs += "q " + pdfNum(pic.dw) + " 0 0 " + pdfNum(pic.dh) + " " + pdfNum(picX) + " " + pdfNum(picY) + " cm /Por Do Q\n" +
+            "q 0.05 G 0.8 w " + pdfNum(picX) + " " + pdfNum(picY) + " " + pdfNum(pic.dw) + " " + pdfNum(pic.dh) + " re S Q\n";
+      pages.push({ cs: cs, image: pic });
+    } else pages.push(cs);
   }
   return pages;
 }
@@ -20870,8 +20930,8 @@ function openSheetDialog(){
     '<label class="small" style="display:block"><input type="checkbox" id="shFull" checked> Full-size abilities, breakthroughs and gear pages ' +
     '<span class="dim">(replace the official boxed ability pages 3-6; every box grows to fit its text)</span></label>' +
     '<div class="note">Added after the official pages, in the same style.</div>' +
-    '<label class="small" style="display:block"><input type="checkbox" id="shBack"' + ((B.notes || "").trim() ? " checked" : " disabled") + "> Backstory page" +
-    ((B.notes || "").trim() ? "" : ' <span class="dim">(write one in Identity → Backstory first)</span>') + "</label>" +
+    '<label class="small" style="display:block"><input type="checkbox" id="shBack"' + ((B.notes || "").trim() || B.portrait ? " checked" : " disabled") + "> Backstory page" +
+    ((B.notes || "").trim() || B.portrait ? (B.portrait ? " (with your picture)" : "") : ' <span class="dim">(write one in Identity → Backstory, or add a picture, first)</span>') + "</label>" +
     '<label class="small" style="display:block"><input type="checkbox" id="shRoad"' + (roadmap().length ? " checked" : " disabled") + "> Build roadmap page" +
     (roadmap().length ? " (" + roadmap().length + " purchases)" : ' <span class="dim">(nothing planned yet)</span>') + "</label>" +
     '<div id="shErr"></div>';

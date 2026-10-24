@@ -1542,7 +1542,7 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 - [x] User request (2026-10-24): Save asks for a file name (suggests "<Name> - lyrian build.json"). Chrome/Edge show a real Save-as window (folder + overwrite warning); other browsers get a name box.
 - [x] User request (2026-10-24): **Load** takes a saved .json file or a pasted build code (LCP1:) in one window; a .txt file holding a code works too. Undo brings back the previous build.
 - [x] Share (2026-10-24): the character export is a neutral **Character data** section (`characterData()` / `characterDataCode()`, `LCD1:` codes, `lyrian-character-*.json` files) with no reference to any other tool. planner-all-in-one.html rebuilt.
-- [ ] User request (2026-10-24): Appearance section - let the player upload a character picture (save it with the build; maybe print it on the sheet/backstory page).
+- [x] User request (2026-10-24): character picture - Identity → Picture (shrunk to a 600px JPEG, saved as B.portrait in the build/Save file, left out of build codes), printed top-right of the Backstory page with the text beside it.
 - [x] User request (2026-10-24): tap any stat name (main or sub) for a short pop-up of what it does (STAT_INFO in planner.html, from RULES_REFERENCE section 3).
 - [ ] User request (2026-10-24): the Build roadmap page should always be the LAST page of the printout. Done today (order: official sheet, Backstory, Roadmap); keep it that way if more extra pages are added.
 - [x] **UI (2026-10-24):** a skill-point pot with only one allowed skill (e.g. Artificer's +5 Artificing) is placed automatically, once; points you take back out stay out (alloc.auto).
