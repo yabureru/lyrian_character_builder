@@ -1516,6 +1516,20 @@ When the site version changes, recheck classes already entered.
 
 # PLANNER (planner.html)
 
+## Mirane campaign (Discord) - notes for a future "Mirane rules" option (gathered 2026-10-24)
+Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WIP Google Doc), #how-to-play, #play-by-post, #downtime-activities. Re-check before building - the guide is a work in progress.
+- [ ] Character creation: standard rules-as-written start, 1,000 EXP, plus an extra 1,000 Clim. New characters only; 1 character per player (more with higher Patreon tiers). Restricted classes (Shinigami Eyes, Vampire, Angelblooded, other GM-only) not allowed at creation. Approval by a lead GM in #ooc-char-approval.
+- [ ] Crafting materials at creation: none worth 1,000+ base value; total ingots + raw materials capped at 2.5k; unused materials are lost after creation.
+- [ ] IP: 1 IP at each Wednesday reset if in Mirane (not on expedition). Unspent IP is lost at the weekly reset or when leaving on expedition. New characters get that week's IP plus an Arrival IP.
+- [ ] EXP: expeditions 75 EXP per week out (casual mode = half EXP and loot); journal up to 25 EXP per week; crafting an item 20 EXP; using natural IP on Appraise, Heal Injury, Open Shop, Repair, Mentor Class or special crafting actions gives 20 EXP once per interlude phase; using IP on an EP action also gives 20 EXP.
+- [ ] Town economy (differs from the rulebook): Job 150 Clim, +50 with a mastered Artisan class (rulebook: 300, +300). Gather 300 units, +300 with the related T1 gathering class mastered (rulebook: 600, x2). Merchant's Procurement 500 points each week. Hunting: 30 + Survival roll food units per player per day.
+- [ ] Favors: class training (1 favor for T1/T2, 2 for T3), land (500 Clim per favor), Secret Shop access, co-crafting, Intense Training; Aniela's Special Drink turns 5 favors + 1 EP into 1 IP.
+- [ ] Land: tiny plot 3,000c, small plot 7,000c; one plot per character or guild. Food ~0.5 Clim per unit. Teleport Mirane -> outpost costs 100u magical fuel (return free).
+- [ ] Spirit Core -> astra resistance: Spirit Core / 500, rounded down.
+- [ ] Play styles: live expeditions are scheduled by each party with a DM (Roll20); an emergency-fill system lets players join short groups; #play-by-post runs gathering/expedition threads by post with a dice bot; #downtime-activities is for in-character write-ups when spending EXP.
+- [ ] Ideas for the planner: a "Mirane rules" checkbox (Job/Gather numbers, +1,000 Clim, restricted-class warning at creation, astra resistance shown), and a weekly EXP/IP estimator for town play (IP per week, crafting EXP, journal EXP).
+- [ ] Other builders to compare with later: the official character builder at clio.angelssword.com (posted by the game designer in #how-to-play), the fan tool lyrian-tools.vercel.app, and a community Google Sheets character sheet (v8).
+
 ## Planner - not done yet
 - [x] **Backstory + roadmap pages (2026-10-24):** Identity has a Backstory box (saved as B.notes, also sent to Lyrian Table). Print sheet can add a Backstory page and a Build roadmap page after the official six, drawn on the official blank page background in the same style; both continue onto extra pages if long.
 - [x] Mixed House (Demon): pick your extra clan; its ability, class unlock and proficiency apply.
