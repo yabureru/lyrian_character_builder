@@ -145,6 +145,7 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
 #kwPop b{color:var(--gold2)}
 #kwPop ul{margin:4px 0 0;padding-left:18px}
 .errbox{border:1px solid #6b3a35;background:#2c1b19;color:var(--bad);border-radius:8px;padding:6px 9px;font-size:12px;margin:6px 0}
+.statname{cursor:pointer;border-bottom:1px dotted var(--dim)}
 </style>
 
 <!-- ALL-IN-ONE VERSION: the data files are copied inside this page so it works on phones. -->
@@ -19008,12 +19009,34 @@ function renderStats(){
     };
   });
 }
+// What each stat does (tap a stat name). From the rulebook's formulas, in plain words (RULES_REFERENCE.md section 3).
+var STAT_INFO = {
+  Power:     ["Damage and Mana.", "Light and Precise attacks: 2d4 + Power. Heavy attacks: 4d6 + 2 x Power (two-handed melee 5d6 + 2 x Power).", "Max Mana = 6 + Power."],
+  Focus:     ["Hitting and Potency.", "Accuracy = 1d20 + Focus (Precise attacks: 1d20 + 2 x Focus).", "Potency, the DC of saves against your effects = 11 + Focus."],
+  Agility:   ["Avoiding hits and acting fast.", "Evasion = 7 + Agility; Dodge evasion = 20 + Agility.", "Max RP (reactions) = 2 + Agility.", "Initiative = 1d4 + Agility."],
+  Toughness: ["Staying alive.", "HP = 20 + 10 x Toughness.", "Guard gets + Toughness; Block guard = 2 x Toughness + armor Block.", "Saves = 2d10 + Toughness.", "Resting heals a multiple of Toughness."],
+  Fitness:   ["Body skills: Athletics, Riding."],
+  Cunning:   ["Sneaky skills: Deception, Roguecraft, Stealth."],
+  Reason:    ["Knowledge skills: Appraise, Artifice, Common Knowledge, Flight, History, Linguistics, Magic, Medicine, Religion."],
+  Awareness: ["Senses skills: Animal Husbandry, Insight, Perception, Survival."],
+  Presence:  ["Social skills: Art, Intimidation, Negotiation."]
+};
+function showStatInfo(el){
+  var k = el.dataset.statinfo, lines = (STAT_INFO[k] || []).slice(), pop = $("kwPop");
+  if (SUB.indexOf(k) >= 0) lines.push("A skill check = d20 + this stat + skill points + your best expertise.");
+  pop.innerHTML = "<b>" + esc(k) + " " + (C.stat[k] !== undefined ? C.stat[k] : "") + "</b>" + listHtml(lines);
+  pop.style.display = "block";
+  var r = el.getBoundingClientRect(), w = pop.offsetWidth, hgt = pop.offsetHeight;
+  pop.style.left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8) + "px";
+  var y = r.bottom + 6; if (y + hgt > window.innerHeight - 8) y = Math.max(8, r.top - hgt - 6);
+  pop.style.top = y + "px";
+}
 function statTable(title, names, arr, grp){
   var vals = arr.filter(function(v, i, a){ return a.indexOf(v) === i; });
   var h = "<h3>" + title + '</h3><table class="statgrid"><tr><th></th><th>Base</th><th>Bonus</th><th class="num">Total</th></tr>';
   names.forEach(function(s){
     var b = C.bonus[s], bt = b.reduce(function(t, x){ return t + x.n; }, 0);
-    h += "<tr><td>" + s + "</td><td><select data-grp=\"" + grp + "\" data-stat=\"" + s + "\">" +
+    h += '<tr><td><span class="statname" data-statinfo="' + s + '" title="Tap: what ' + s + ' does">' + s + "</span></td><td><select data-grp=\"" + grp + "\" data-stat=\"" + s + "\">" +
       vals.map(function(v){ return "<option" + (B[grp][s] === v ? " selected" : "") + ">" + v + "</option>"; }).join("") + "</select></td>" +
       '<td title="' + esc(b.map(function(x){ return sign(x.n) + " " + x.why; }).join("\n")) + '">' + (bt ? '<span class="good">' + sign(bt) + "</span>" : '<span class="dim">—</span>') + "</td>" +
       '<td class="num final">' + C.stat[s] + "</td></tr>";
@@ -20027,6 +20050,8 @@ function showBreakdown(el){
 document.addEventListener("click", function(e){
   var bdEl = e.target.closest ? e.target.closest("[data-bd]") : null;
   if (bdEl) { if (kwPinned === bdEl) { hideKw(); return; } showBreakdown(bdEl); kwPinned = bdEl; e.stopPropagation(); return; }
+  var stEl = e.target.closest ? e.target.closest("[data-statinfo]") : null;
+  if (stEl) { if (kwPinned === stEl) { hideKw(); return; } showStatInfo(stEl); kwPinned = stEl; e.stopPropagation(); return; }
   var el = e.target.closest ? e.target.closest("[data-kw]") : null;
   if (el) { if (kwPinned === el) { hideKw(); return; } showKw(el); kwPinned = el; e.stopPropagation(); return; }
   if (!e.target.closest || !e.target.closest("#kwPop")) hideKw();
