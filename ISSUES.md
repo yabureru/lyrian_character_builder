@@ -1532,6 +1532,8 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 - [ ] Other builders to compare with later: the official character builder at clio.angelssword.com (posted by the game designer in #how-to-play), the fan tool lyrian-tools.vercel.app, and a community Google Sheets character sheet (v8).
 
 ## Planner - not done yet
+- [ ] User request (2026-10-24): Appearance section - let the player upload a character picture (save it with the build; maybe print it on the sheet/backstory page).
+- [ ] User request (2026-10-24): click/tap a main stat (Power, Focus, Agility...) for a short tooltip saying what that stat is used for (pull wording from RULES_REFERENCE.md).
 - [ ] User request (2026-10-24): the Build roadmap page should always be the LAST page of the printout. Done today (order: official sheet, Backstory, Roadmap); keep it that way if more extra pages are added.
 - [ ] **UI (found while testing 2026-10-24):** a skill-point pot with only one allowed skill (e.g. Artificer's fixed +5 Artificing) should be placed automatically instead of waiting for clicks. The source chips already turn "alert" when they have points left; make that more visible (see the Skills card request below).
 - [ ] **UI (user request 2026-10-24): Skills card.** (1) Highlight the skill-point sources that still have points left (the source picker/list), and highlight the skills that have points in them, so it's easy to see where points are. (2) Show each skill's cap next to it (e.g. "6 / 15"); the cap is already enforced (15 per skill, crafting 10; +5 at 5,000 Spirit Core; none at 10,000) but not visible, so it isn't obvious.
