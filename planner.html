@@ -1026,7 +1026,7 @@ function renderIdentity(){
     "</details>";
   h += '<div class="field" style="align-items:flex-start;margin-top:8px"><label>Backstory</label><div style="flex:1">' +
     '<textarea id="inNotes" rows="5" placeholder="A short summary of who your character is and where they come from." style="width:100%;box-sizing:border-box;background:#1f2128;border:1px solid var(--line);border-radius:6px;color:var(--text);padding:4px 7px">' +
-    esc(B.notes || "") + '</textarea><div class="small dim">Printed on its own page after the official sheet (Print sheet). Also sent with Share → Send to Lyrian Table.</div></div></div>';
+    esc(B.notes || "") + '</textarea><div class="small dim">Printed on its own page after the official sheet (Print sheet). Also included in Share → Character data.</div></div></div>';
   h += '<div class="field" style="margin-top:10px"><label>Canon campaign</label><input type="checkbox" id="inCanon"' + (B.canon ? " checked" : "") + '><span class="note">+1,000 starting Clim, and allows restricted options like Angelblooded.</span></div>';
   $("cardIdentity").innerHTML = h;
 
@@ -2130,10 +2130,10 @@ function readCode(code){
   if (code.indexOf("LCP1:") !== 0) throw new Error("not a planner code");
   return fixBuild(JSON.parse(decodeURIComponent(escape(atob(code.slice(5))))));
 }
-/* ---------- Send to Lyrian Table (the session tool) ----------
-   A snapshot of the character with every number already worked out by calc(), so the session tool
-   shows exactly what the planner shows. Format "lyrian-character/1"; the code form is "LCS1:" + base64. */
-function sessionCharacter(){
+/* ---------- Character data export ----------
+   The whole character with every number already worked out by calc(), for other tools and sheets.
+   Format "lyrian-character/1"; the code form is "LCD1:" + base64 of the JSON. */
+function characterData(){
   var C2 = calc(), d = C2.d, st = C2.stat;
   var race = raceRec(), sub = subRec();
   var skills = {};
@@ -2186,7 +2186,7 @@ function sessionCharacter(){
     buildCode: buildCode()
   };
 }
-function sessionCode(){ return "LCS1:" + btoa(unescape(encodeURIComponent(JSON.stringify(sessionCharacter())))); }
+function characterDataCode(){ return "LCD1:" + btoa(unescape(encodeURIComponent(JSON.stringify(characterData())))); }
 function copyText(ta, btn){
   ta.select();
   var done = function(){ btn.textContent = "Copied ✓"; setTimeout(function(){ btn.textContent = "Copy"; }, 1500); };
@@ -2250,10 +2250,10 @@ function openShare(){
     "<h3>Build code</h3><div class=\"note\">One line that holds the whole build. Paste it below (in your own planner or a friend's) to load it.</div>" +
     '<textarea id="shCode" readonly rows="4" style="width:100%;word-break:break-all">' + esc(buildCode()) + "</textarea>" +
     '<div class="toolbar"><button id="shCodeCopy">Copy</button></div>' +
-    "<h3>Send to Lyrian Table</h3><div class=\"note\">For the session tool. Holds this character with every number worked out " +
-    "(HP, Mana, AP, RP, Guard, skills, abilities). In Lyrian Table press <b>Add from planner</b> and paste it, or load the downloaded file.</div>" +
-    '<textarea id="shSess" readonly rows="3" style="width:100%;word-break:break-all">' + esc(sessionCode()) + "</textarea>" +
-    '<div class="toolbar"><button id="shSessCopy">Copy</button><button id="shSessFile">Download file</button></div>' +
+    "<h3>Character data</h3><div class=\"note\">The whole character with every number worked out " +
+    "(HP, Mana, AP, RP, Guard, rolls, skills, abilities, gear), as a code or a .json file, for other tools and character sheets.</div>" +
+    '<textarea id="shData" readonly rows="3" style="width:100%;word-break:break-all">' + esc(characterDataCode()) + "</textarea>" +
+    '<div class="toolbar"><button id="shDataCopy">Copy</button><button id="shDataFile">Download file</button></div>' +
     "<h3>Load a build code</h3>" +
     '<textarea id="shIn" rows="3" style="width:100%" placeholder="Paste a code starting with LCP1:"></textarea>' +
     '<div class="toolbar"><button id="shLoad" class="gold">Load this build</button><span id="shMsg" class="small"></span></div>';
@@ -2262,12 +2262,12 @@ function openShare(){
   $("dClose").onclick = closeDetail;
   $("shSumCopy").onclick = function(){ copyText($("shSum"), this); };
   $("shCodeCopy").onclick = function(){ copyText($("shCode"), this); };
-  $("shSessCopy").onclick = function(){ copyText($("shSess"), this); };
-  $("shSessFile").onclick = function(){
-    var blob = new Blob([JSON.stringify(sessionCharacter(), null, 2)], { type: "application/json" });
+  $("shDataCopy").onclick = function(){ copyText($("shData"), this); };
+  $("shDataFile").onclick = function(){
+    var blob = new Blob([JSON.stringify(characterData(), null, 2)], { type: "application/json" });
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "lyrian-session-" + ((B.name || "unnamed").replace(/[^a-z0-9]+/gi, "-").toLowerCase()) + ".json";
+    a.download = "lyrian-character-" + ((B.name || "unnamed").replace(/[^a-z0-9]+/gi, "-").toLowerCase()) + ".json";
     document.body.appendChild(a); a.click(); a.remove();
   };
   $("shLoad").onclick = function(){
