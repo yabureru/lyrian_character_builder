@@ -96,7 +96,9 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .chip{border:1px solid var(--line);border-radius:14px;padding:3px 10px;cursor:pointer;background:#1f2128;font-size:12px}
 .chip.on{border-color:var(--gold);color:var(--gold2)}
 .chip .left{font-weight:700;margin-left:4px}
-.chip.alert{box-shadow:0 0 0 1px var(--warn) inset}
+.chip.alert{box-shadow:0 0 0 1px var(--warn) inset;background:rgba(224,170,60,.14)}
+tr.has td{background:rgba(212,175,90,.10);color:var(--text)} tr.has td:first-child{box-shadow:3px 0 0 var(--gold) inset;font-weight:600}
+.chiplink{cursor:pointer;text-decoration:underline dotted}
 .pm{display:inline-flex;gap:3px}
 tr.off td{color:#6c707a}
 tr.can td:first-child{color:var(--gold2)}
@@ -18767,6 +18769,17 @@ function calcSkills(C){
   // forget spending from sources that no longer exist (e.g. class removed)
   for (var k in B.alloc) if (!ids[k]) delete B.alloc[k];
   if (!ids[B.activeSource]) B.activeSource = srcs.length ? srcs[0].id : "start";
+  // A pot that can only go to one skill (e.g. Artificer's +5 Artificing) is placed for you, once.
+  // (a.auto remembers it, so if you take points back out - e.g. to make expertise - they stay out.)
+  srcs.forEach(function(s){
+    var a = allocOf(s.id);
+    if (a.auto || s.options.length !== 1 || srcUsed(a) > 0) return;
+    var sk = s.options[0], other = 0;
+    srcs.forEach(function(o){ if (o !== s && B.alloc[o.id] && B.alloc[o.id].sk[sk]) other += B.alloc[o.id].sk[sk]; });
+    var put = Math.max(0, Math.min(Math.floor(s.points), skillCap(sk, C.exp.spiritCore) - other));
+    if (put) a.sk[sk] = put;
+    a.auto = true;
+  });
   C.pts = {}; C.ex = {}; C.srcLeft = {}; var leftTotal = 0;
   srcs.forEach(function(s){
     var a = allocOf(s.id);
@@ -19370,18 +19383,21 @@ function renderSkills(){
     return '<span class="chip' + (s.id === act ? " on" : "") + (left > 0 ? " alert" : "") + '" data-src="' + esc(s.id) + '">' + esc(s.label) +
       '<span class="left ' + (left < 0 ? "bad" : left > 0 ? "warn" : "good") + '">' + fmt(left) + " left</span></span>";
   }).join("") + "</div>";
+  var waiting = srcs.filter(function(s){ return C.srcLeft[s.id] > 0; });
+  if (waiting.length) h += '<div class="warnbox" style="margin:6px 0">Points still to place: ' + waiting.map(function(s){
+    return '<span class="chiplink" data-src="' + esc(s.id) + '">' + esc(s.label) + " (" + fmt(C.srcLeft[s.id]) + ")</span>"; }).join(", ") + "</div>";
   if (src) h += '<div class="note">' + esc(src.note) + "</div>";
   var sc = C.exp.spiritCore, a = src ? allocOf(src.id) : { sk: {}, ex: [] }, left = src ? C.srcLeft[src.id] : 0;
-  h += '<div class="scrollx"><table><tr><th>Skill</th><th>Stat</th><th class="num">Points</th><th>Best expertise</th><th class="num">Roll bonus</th><th class="num">From this source</th></tr>';
+  h += '<div class="scrollx"><table><tr><th>Skill</th><th>Stat</th><th class="num">Points / cap</th><th>Best expertise</th><th class="num">Roll bonus</th><th class="num">From this source</th></tr>';
   SKILLS.forEach(function(s){
     var pts = C.pts[s.name] || 0, ok = src && src.options.indexOf(s.name) >= 0, mine = a.sk[s.name] || 0;
     if (!pts && !ok && !C.bestEx[s.name]) return;
     var be = C.bestEx[s.name], stat = s.stat ? C.stat[s.stat] : 0;
     var cap = skillCap(s.name, sc);
     var total = stat + pts + (be ? be.pts : 0);
-    h += '<tr class="' + (ok ? "can" : "off") + '"><td>' + esc(s.name) + (s.kind !== "main" ? ' <span class="tag">' + s.kind + "</span>" : "") + "</td>" +
+    h += '<tr class="' + (ok ? "can" : "off") + (pts ? " has" : "") + '"><td>' + esc(s.name) + (s.kind !== "main" ? ' <span class="tag">' + s.kind + "</span>" : "") + "</td>" +
       "<td>" + (s.stat ? esc(s.stat) + " " + stat : '<span class="dim">—</span>') + "</td>" +
-      '<td class="num">' + pts + (pts > cap ? ' <span class="bad">(cap ' + cap + ")</span>" : "") + "</td>" +
+      '<td class="num">' + (pts ? "<b>" + pts + "</b>" : '<span class="dim">0</span>') + '<span class="' + (pts > cap ? "bad" : pts >= cap ? "warn" : "dim") + '"> / ' + (cap >= 999 ? "∞" : cap) + "</span></td>" +
       "<td>" + (be ? esc(be.name) + " +" + be.pts : '<span class="dim">—</span>') + "</td>" +
       '<td class="num"><b>' + sign(total) + "</b></td>" +
       '<td class="num">' + (ok ? '<span class="pm"><button class="small" data-sk="' + esc(s.name) + '" data-d="-1"' + (mine > 0 ? "" : " disabled") + '>−</button>' +
