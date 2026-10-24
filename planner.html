@@ -2771,18 +2771,26 @@ function sheetValues(opts){
   invRows.forEach(function(n, j){
     var x = combat[j];
     if (!x) { V["CombatInventory" + n] = ""; V["Amount" + n] = ""; V["Bulk" + n] = ""; V["Description" + n] = ""; return; }
-    var it = x.it, desc = [];
-
-    if (it.weapon) desc.push([it.weapon.range, it.weapon.property].filter(Boolean).join(", "));
-    if (it.armor) {
-      var ab = { guard: "Guard", block: "Block", evasion: "Eva", dodge: "Dodge", initiative: "Init" };
-      desc.push(Object.keys(ab).filter(function(k){ return it.armor[k] !== undefined && num(String(it.armor[k]).replace("+", "")); })
-        .map(function(k){ var v = num(String(it.armor[k]).replace("+", "")); return ab[k] + " " + sign(v); }).join(", "));
+    // One-line boxes, kept at a normal 8pt: short wording that fits, the full text is on the Gear page.
+    var it = x.it, IW = 84, fits = function(t){ return textWidth(sheetText(t), "Riven", 8) <= IW; };
+    var nm = it.name, desc = "";
+    if (it.weapon) {
+      nm = nm.replace(/\s*\((One|Two)-Handed\)/i, "");          // hands go in the description instead
+      var hands = it.weapon.hands ? it.weapon.hands + "H" : "";
+      desc = [hands, it.weapon.range, it.weapon.property].filter(Boolean).join(", ");
+      if (!fits(desc)) desc = [hands, it.weapon.range].filter(Boolean).join(", ");
+    } else if (it.armor) {
+      var ab = { guard: "Guard", block: "Block", evasion: "Eva", initiative: "Init" }, parts = [];
+      Object.keys(ab).forEach(function(k){ var v = num(String(it.armor[k] === undefined ? "" : it.armor[k]).replace("+", "")); if (v) parts.push(ab[k] + " " + sign(v)); });
+      desc = parts.join(", ");
+      while (parts.length > 1 && !fits(desc)) { parts.pop(); desc = parts.join(", "); }   // keep the bonuses, drop penalties first
+    } else {
+      desc = (it.summary && it.summary[0]) || "";
+      if (!fits(desc)) desc = [it.tag || it.category || ""].join("");
     }
-    if (!it.weapon && !it.armor && it.summary) desc.push(it.summary[0]);
-    V["CombatInventory" + n] = it.name + (x.e.equipped ? (it.armor ? " (worn)" : " (wielded)") : ""); V["Amount" + n] = x.e.qty; V["Bulk" + n] = itemBurdenFor(x.e, C.meld) * x.e.qty; V["Description" + n] = desc.join("; ");
-    // one-line boxes: don't squash below a readable size (cut with "..." instead; the full text is on the Gear page)
-    S["Description" + n] = { minSize: 6.5 }; S["CombatInventory" + n] = { minSize: 6.5 };
+    var tag = x.e.equipped ? (it.armor ? " (worn)" : " (wielded)") : "";
+    V["CombatInventory" + n] = fits(nm + tag) ? nm + tag : nm; V["Amount" + n] = x.e.qty; V["Bulk" + n] = itemBurdenFor(x.e, C.meld) * x.e.qty; V["Description" + n] = desc;
+    S["Description" + n] = { minSize: 8 }; S["CombatInventory" + n] = { minSize: 8 };
   });
   var itemsTxt = other.map(function(x){ return x.it.name + (x.e.qty > 1 ? " x" + x.e.qty : ""); });
   if (combat.length > invRows.length) itemsTxt = combat.slice(invRows.length).map(function(x){ return x.it.name + " x" + x.e.qty; }).concat(itemsTxt);
