@@ -1532,6 +1532,7 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 - [ ] Other builders to compare with later: the official character builder at clio.angelssword.com (posted by the game designer in #how-to-play), the fan tool lyrian-tools.vercel.app, and a community Google Sheets character sheet (v8).
 
 ## Planner - not done yet
+- [ ] User request (2026-10-24): remove every reference to the Lyrian Table session tool from the public planner - players won't have access to it. Covers the "Send to Lyrian Table" part of the Share dialog (sessionCharacter / sessionCode, LCS1: codes) and the README line linking yabureru/lyrian-session-tool. That code was added by the other agent (PR #1): check with it before removing, and rebuild planner-all-in-one.html afterwards.
 - [ ] User request (2026-10-24): Appearance section - let the player upload a character picture (save it with the build; maybe print it on the sheet/backstory page).
 - [ ] User request (2026-10-24): click/tap a main stat (Power, Focus, Agility...) for a short tooltip saying what that stat is used for (pull wording from RULES_REFERENCE.md).
 - [ ] User request (2026-10-24): the Build roadmap page should always be the LAST page of the printout. Done today (order: official sheet, Backstory, Roadmap); keep it that way if more extra pages are added.
