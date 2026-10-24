@@ -1335,6 +1335,7 @@ When the site version changes, recheck classes already entered.
 - [ ] Downburst range 720ft - recorded as shown.
 
 ## High Fae
+- [ ] Open question (2026-10-24): does Faerie Flash II replace the Fae race's basic Faerie Flash, or does she have both? The planner lists both for now (user: "leave both in; worst case use the higher of the two"). The Faerie-Chimera hybrid text ("High Fae gives Fae Flash instead of Fae Flash II") hints at replacing.
 - [ ] Faerie Flash II replaces Faerie Flash? Page lists both (inherited + unique). Hybrid page says High Fae normally gets Faerie Flash II.
 
 ## Horse-Folk
