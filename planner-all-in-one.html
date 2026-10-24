@@ -20026,6 +20026,63 @@ function readCode(code){
   if (code.indexOf("LCP1:") !== 0) throw new Error("not a planner code");
   return fixBuild(JSON.parse(decodeURIComponent(escape(atob(code.slice(5))))));
 }
+/* ---------- Send to Lyrian Table (the session tool) ----------
+   A snapshot of the character with every number already worked out by calc(), so the session tool
+   shows exactly what the planner shows. Format "lyrian-character/1"; the code form is "LCS1:" + base64. */
+function sessionCharacter(){
+  var C2 = calc(), d = C2.d, st = C2.stat;
+  var race = raceRec(), sub = subRec();
+  var skills = {};
+  SKILLS.forEach(function(s){
+    var pts = C2.pts[s.name] || 0, ex = C2.bestEx[s.name] || null;
+    if (!pts && !ex && s.kind !== "main") return;
+    skills[s.name] = { stat: s.stat || null, points: pts, bonus: (s.stat ? st[s.stat] : 0) + pts,
+                       expertise: ex ? { name: ex.name, pts: ex.pts } : null };
+  });
+  var abilities = [];
+  raceIds().forEach(function(rid){
+    var r = RACES[rid]; if (!r || !r.abilities) return;
+    for (var k in r.abilities) { var a = r.abilities[k];
+      abilities.push({ source: r.name, kind: "race", name: a.name, cost: a.cost || null, range: a.range || null,
+                       keywords: a.keywords || [], usage: a.usage || null, summary: [].concat(a.summary || []) }); }
+  });
+  C2.ownedAbs.forEach(function(o){ var a = o.a;
+    abilities.push({ source: o.rec.name, kind: a.kind || "ability", name: a.name, cost: a.cost || null, range: a.range || null,
+                     keywords: a.keywords || [], usage: a.usage || null, summary: [].concat(a.summary || []), url: o.rec.url || null });
+  });
+  B.bts.forEach(function(b){ var r = BTS[b.id]; if (!r) return;
+    abilities.push({ source: "Breakthrough", kind: "breakthrough", name: r.name, summary: [].concat(r.summary || []) });
+  });
+  return {
+    schema: "lyrian-character/1",
+    exported: new Date().toISOString(),
+    gameVersion: "0.13.2",
+    name: B.name || "Unnamed",
+    race: [race && race.name, sub && sub.name].filter(Boolean).join(" / "),
+    classes: B.classes.filter(function(c){ return CLASSES[c.id]; }).map(function(c){
+      var rec = CLASSES[c.id], n = c.owned.filter(Boolean).length;
+      return { id: c.id, name: rec.name, tier: rec.tier, role: rec.role, steps: n, mastered: n === 8 };
+    }),
+    spiritCore: C2.exp.spiritCore,
+    stats: st,
+    derived: { hp: d.hp, mana: d.mana, ap: d.ap, rp: d.rp, guard: d.guard, blockGuard: d.blockGuard,
+               evasion: d.evasion, dodge: d.dodge, init: d.init, speed: d.speed, potency: d.potency, burdenMax: d.burdenMax },
+    rolls: { initiative: "1d4+" + d.init, accuracy: "1d20+" + st.Focus, precise: "1d20+" + (2 * st.Focus),
+             light: "2d4+" + st.Power, heavy: "4d6+" + (2 * st.Power), heavy2h: "5d6+" + (2 * st.Power), save: "2d10+" + st.Toughness },
+    skills: skills,
+    proficiencies: Object.keys(C2.profs).sort(),
+    abilities: abilities,
+    equipment: B.items.filter(function(e){ return ITEMS[e.id]; }).map(function(e){
+      var it = ITEMS[e.id];
+      return { name: it.name, qty: e.qty, equipped: !!e.equipped, tag: it.tag || null,
+               weapon: it.weapon || null, armor: it.armor || null };
+    }),
+    toggles: activeBonuses(C2).filter(function(x){ return x.on && x.b.type === "toggle"; }).map(function(x){ return bonusLabel(x); }),
+    notes: B.notes || "",
+    buildCode: buildCode()
+  };
+}
+function sessionCode(){ return "LCS1:" + btoa(unescape(encodeURIComponent(JSON.stringify(sessionCharacter())))); }
 function copyText(ta, btn){
   ta.select();
   var done = function(){ btn.textContent = "Copied ✓"; setTimeout(function(){ btn.textContent = "Copy"; }, 1500); };
@@ -20089,6 +20146,10 @@ function openShare(){
     "<h3>Build code</h3><div class=\"note\">One line that holds the whole build. Paste it below (in your own planner or a friend's) to load it.</div>" +
     '<textarea id="shCode" readonly rows="4" style="width:100%;word-break:break-all">' + esc(buildCode()) + "</textarea>" +
     '<div class="toolbar"><button id="shCodeCopy">Copy</button></div>' +
+    "<h3>Send to Lyrian Table</h3><div class=\"note\">For the session tool. Holds this character with every number worked out " +
+    "(HP, Mana, AP, RP, Guard, skills, abilities). In Lyrian Table press <b>Add from planner</b> and paste it, or load the downloaded file.</div>" +
+    '<textarea id="shSess" readonly rows="3" style="width:100%;word-break:break-all">' + esc(sessionCode()) + "</textarea>" +
+    '<div class="toolbar"><button id="shSessCopy">Copy</button><button id="shSessFile">Download file</button></div>' +
     "<h3>Load a build code</h3>" +
     '<textarea id="shIn" rows="3" style="width:100%" placeholder="Paste a code starting with LCP1:"></textarea>' +
     '<div class="toolbar"><button id="shLoad" class="gold">Load this build</button><span id="shMsg" class="small"></span></div>';
@@ -20097,6 +20158,14 @@ function openShare(){
   $("dClose").onclick = closeDetail;
   $("shSumCopy").onclick = function(){ copyText($("shSum"), this); };
   $("shCodeCopy").onclick = function(){ copyText($("shCode"), this); };
+  $("shSessCopy").onclick = function(){ copyText($("shSess"), this); };
+  $("shSessFile").onclick = function(){
+    var blob = new Blob([JSON.stringify(sessionCharacter(), null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "lyrian-session-" + ((B.name || "unnamed").replace(/[^a-z0-9]+/gi, "-").toLowerCase()) + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+  };
   $("shLoad").onclick = function(){
     try { var nb = readCode($("shIn").value); if (confirm("Replace your current build with this one?")) { B = nb; render(); closeDetail(); } }
     catch (e) { $("shMsg").textContent = "That doesn't look like a planner build code."; $("shMsg").className = "small bad"; }
