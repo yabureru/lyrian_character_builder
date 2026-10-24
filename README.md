@@ -17,7 +17,7 @@ Community tool. No monetization.
 
 Your build saves automatically in the browser. Use **Save** to download a `.json` copy and **Load** to open one.
 **Share** gives you a text summary (for Discord or your GM) and a one-line build code anyone can paste into their planner.
-**Share → Send to Lyrian Table** gives a code (or file) that loads this character into the [Lyrian Table session tool](https://github.com/yabureru/lyrian-session-tool) with HP, Mana, AP, RP, skills and abilities already worked out.
+**Share → Character data** gives the whole character with every number worked out (HP, Mana, AP, RP, rolls, skills, abilities), as a code or a `.json` file, for use in other tools.
 **Compare** puts two builds side by side: press *Pin current build*, try some changes, then open Compare again to see exactly what went up or down. You can also compare against a saved file or a build code.
 **Item mods**: press *Mods* on anything in your inventory to tick its mods (its own, plus the Universal weapon/armor/artifice/crafting mods that fit). Mods that change numbers (Guard, Block, Dodge, Burden, Mana, armor penalties, Melding...) are added in; the rest show as notes, with crafting points totalled.
 **Undo / Redo** (or Ctrl+Z / Ctrl+Y) step back through your changes, including Reset and Load.
