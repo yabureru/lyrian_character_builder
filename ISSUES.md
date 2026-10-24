@@ -1517,7 +1517,7 @@ When the site version changes, recheck classes already entered.
 # PLANNER (planner.html)
 
 ## Planner - not done yet
-- [ ] **TODO (user request 2026-10-24): Backstory summary.** Add a box in Identity for a short backstory, saved with the build and included in Share and Print sheet. The official sheet (1.2) has no backstory field - only Personality and Appearance (page 2, each about 245 x 65 pt at font size 12). Options: add an extra printed page after the sheet, or ask whether it should share the Personality/Appearance space. Decide with the user before building.
+- [ ] **TODO (user request 2026-10-24): Backstory summary.** Add a box in Identity for a short backstory, saved with the build and included in Share and Print sheet. The official sheet (1.2) has no backstory field - only Personality and Appearance (page 2, each about 245 x 65 pt at font size 12). Options: add an extra printed page after the sheet, or ask whether it should share the Personality/Appearance space. Decide with the user before building. Store it as B.notes: the "Send to Lyrian Table" export (added by the session-tool agent) already sends B.notes, so the backstory would show up in Lyrian Table too.
 - [x] Mixed House (Demon): pick your extra clan; its ability, class unlock and proficiency apply.
 - [x] Roadmap view and build sharing (text summary + build code) added 2026-10-22.
 - [x] Ability bonuses are now added to the Combat numbers (classes.js grants + data/bonuses.js), with tap-to-see breakdowns and toggles for situational ones.
