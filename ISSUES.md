@@ -46,6 +46,8 @@ From the official rulebook:
 - An ability you'd get twice is a full EXP refund (handled automatically); a near-match is a half refund (shown as a note).
 - Artifice (a Reason skill) and Artificing (Artificer crafting) are two different skills.
 - Mirane Expedition rules come from the official Mirane guide (Google Doc): +1,000 Clim, free Adventurer's Kit, no restricted options at creation, resting one tier lower, astra resistance = Spirit Core / 500.
+- Mirane new-character guide (supplement doc, 2026-10-25): food units 0.5 Clim (40u = 1 day = 20 Clim; a ration is 40 Clim), Arrival IP on arrival (Train +25 EXP, Job 150 Clim or Rest), Armor Plates suggested over Light Armor for light builds, regular clothing is free. Shown as notes in the planner.
+- A costs table found 2026-10-25 lists Skill Training 50 and Secondary Stat Training 250; the official site (0.13.2) says 25 and 200, so the planner uses 25 and 200.
 
 How unclear page wording is read (change here and in the data if a GM says otherwise):
 - "X" in an ability with a "Variable MP" / "X MP" cost = Mana spent (confirmed on the official site for Glacial Wall and Time Dilation).
