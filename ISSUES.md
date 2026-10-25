@@ -1555,7 +1555,7 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 
 ## Planner - not done yet
 - [x] Print test with Elara (2026-10-24), fixed: sheet printed the whole plan (Scout's Art (Cartography), Exp -4300) -> prints the character as of now by default; combat inventory text squashed -> min 6.5pt then "..." (full text on the Gear page); breakthrough descriptions cut -> wrap with names lined up; abilities cut off / "more abilities (see planner)" -> full-size Abilities/Breakthroughs/Gear pages replace official pages 3-6 (boxes grow, two columns, gaps filled); "- - -" placeholder ranges dropped; crafting bundles now list their sub-abilities (planner screen too - it showed "(see subAbilities)" before).
-- [ ] Print: compare a real paper printout with the PDF (user printing 2026-10-24).
+- [x] Print: compare a real paper printout with the PDF (user printing 2026-10-24). → **Done:** user confirmed the paper printout works with the full-size pages and the shorter inventory text (2026-10-24).
 - [x] User request (2026-10-24): Save asks for a file name (suggests "<Name> - lyrian build.json"). Chrome/Edge show a real Save-as window (folder + overwrite warning); other browsers get a name box.
 - [x] User request (2026-10-24): **Load** takes a saved .json file or a pasted build code (LCP1:) in one window; a .txt file holding a code works too. Undo brings back the previous build.
 - [x] Share (2026-10-24): the character export is a neutral **Character data** section (`characterData()` / `characterDataCode()`, `LCD1:` codes, `lyrian-character-*.json` files) with no reference to any other tool. planner-all-in-one.html rebuilt.
