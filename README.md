@@ -74,7 +74,8 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
 | `data/sheet.js` | Field map of the official Character Sheet 1.2 (positions only, no artwork) |
 | `data/bonuses.js` | Race bonuses, situational (stance/aura/transformation) bonuses and notes |
 | `RULES_REFERENCE.md` | Condensed rules used for the planner's formulas |
-| `ISSUES.md` | Known gaps, unclear rules and things to check |
+| `ISSUES.md` | What's still open: GM questions, to-dos, and the rule readings the planner uses |
+| `ISSUES_ARCHIVE.md` | Full history of the data check (every fix and page oddity, by class) |
 
 ## About the data
 
