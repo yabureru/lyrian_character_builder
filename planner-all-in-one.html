@@ -18348,6 +18348,8 @@ function skillOptions(opt){
 /* =====================================================================
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
+// Planner release (date of the last update). Shown in the header and in Share summaries.
+var PLANNER_VERSION = "2026-10-25";
 function newBuild(){
   return {
     v: 1,
@@ -20356,7 +20358,7 @@ window.addEventListener("scroll", hideKw, true);
 /* ---------- Share: text summary + build code ---------- */
 function buildSummary(){
   var L = [], r = raceRec(), s = subRec();
-  L.push("== " + (B.name || "Unnamed character") + " ==  (Lyrian Chronicles planner, data v" + ((Object.values(CLASSES)[0] || {}).version || "?") + ")");
+  L.push("== " + (B.name || "Unnamed character") + " ==  (Lyrian Chronicles planner " + PLANNER_VERSION + ", data v" + ((Object.values(CLASSES)[0] || {}).version || "?") + ")");
   L.push("Race: " + (r ? r.name : "—") + (s ? " / " + s.name : "") + (B.race === "demon" && B.raceChoice.clan ? " (clan " + B.raceChoice.clan + ")" : "") +
          (B.raceChoice.element ? " (" + B.raceChoice.element + ")" : "") + (B.gender ? " · " + B.gender : "") + (B.canon ? " · Mirane Expedition" : ""));
   L.push("Main: " + MAIN.map(function(k){ return k + " " + C.stat[k]; }).join(", "));
@@ -21296,7 +21298,7 @@ $("btnReset").onclick = function(){
   if (!LC.sheetMap) missing.push("data/sheet.js");
   if (missing.length) $("dataErr").innerHTML = '<div class="errbox">Couldn\'t load: ' + missing.join(", ") + '. Keep planner.html next to the "data" folder.</div>';
   var any = Object.values(CLASSES)[0];
-  $("dataVer").textContent = "Data v" + (any ? any.version : "?") + " · " + Object.keys(CLASSES).length + " classes · " +
+  $("dataVer").textContent = "Planner " + PLANNER_VERSION + " · Data v" + (any ? any.version : "?") + " · " + Object.keys(CLASSES).length + " classes · " +
     Object.keys(ITEMS).length + " items";
   render();
 })();

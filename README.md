@@ -8,12 +8,27 @@ Community tool. No monetization.
 > **Unofficial fan tool.** Not affiliated with or endorsed by Angel's Sword Studios.
 > Lyrian Chronicles and its content belong to Angel's Sword Studios.
 
-## How to use it
+## Quick start
 
-- **On a PC:** download the repo (green **Code** button → **Download ZIP**), unzip it, and double-click `planner.html`.
-  Keep `planner.html` next to the `data` folder.
-- **On a phone:** use `planner-all-in-one.html`. It has all the data built in, because phone browsers
-  won't load the separate data files.
+1. Download **[planner-all-in-one.html](planner-all-in-one.html)** (open it, then the **download** button at the top right).
+   That one file is the whole planner. It works offline on a PC or a phone, with nothing to install.
+2. Double-click it to open it in your browser (Chrome, Edge or Firefox).
+3. Build from top to bottom: **Identity** (race, name), **Stats**, **Classes** (tick the steps you buy),
+   **Skills**, **Proficiencies**, **Breakthroughs**, **Items**. Warnings at the top of Pools tell you what still needs picking.
+4. Planning ahead? Tick **Plan ahead** in Build roadmap and keep adding classes. The roadmap shows the EXP and IP you need for each step.
+5. **Save** your character to a file, **Share** it as a text summary or a build code, or **Print sheet** onto the official character sheet.
+
+Your build also saves automatically in the browser. When a new version of the planner comes out, download the new file
+and use **Load** to open your saved character.
+
+(Prefer separate files? Download the whole repo with **Code → Download ZIP** and open `planner.html`; keep it next to the `data` folder.)
+
+## Questions, mistakes and ideas
+
+This is a community tool, and the game updates often. If a number looks wrong, a class is missing something, or you'd like a feature,
+say so in the Lyrian Chronicles Discord or open an issue on GitHub. Rules questions that still need a GM's answer are listed at the top of [ISSUES.md](ISSUES.md).
+
+## What it does
 
 Your build saves automatically in the browser. Use **Save** to keep a `.json` copy (it asks for a file name, starting from the character's name, so saves don't overwrite each other) and **Load** to open a saved file or paste a build code.
 **Share** gives you a text summary (for Discord or your GM) and a one-line build code anyone can paste into their planner.
@@ -21,7 +36,7 @@ Your build saves automatically in the browser. Use **Save** to keep a `.json` co
 **Compare** puts two builds side by side: press *Pin current build*, try some changes, then open Compare again to see exactly what went up or down. You can also compare against a saved file or a build code.
 **Item mods**: press *Mods* on anything in your inventory to tick its mods (its own, plus the Universal weapon/armor/artifice/crafting mods that fit). Mods that change numbers (Guard, Block, Dodge, Burden, Mana, armor penalties, Melding...) are added in; the rest show as notes, with crafting points totalled.
 **Undo / Redo** (or Ctrl+Z / Ctrl+Y) step back through your changes, including Reset and Load.
-**Print sheet** fills your build into the **official fillable character sheet** (Character Sheet 1.2) and downloads it, ready to print. It prints the character **as of now** (only what your earned EXP/IP reaches) or, if you choose, the whole plan. **Full-size pages** (on by default) replace the official boxed ability pages: abilities, breakthroughs and gear in the same style, every box as tall as its text, so nothing is cut off. It can also add your **Backstory** (written in Identity, with your character picture if you added one) and your **Build roadmap** (every planned purchase in order, with EXP and IP needed) as the last pages.
+**Print sheet** fills your build into the **official fillable character sheet** (Character Sheet 1.2) and downloads it, ready to print. It prints the character **as of now** (only what your earned EXP/IP reaches) or, if you choose, the whole plan. **Full-size pages** (on by default) replace the official boxed ability pages: abilities, breakthroughs, companions and gear in the same style, every box as tall as its text, so nothing is cut off. It can also add your **Backstory** (written in Identity, with your character picture if you added one) and your **Build roadmap** (every planned purchase in order, with EXP and IP needed) as the last pages.
 The official PDF isn't included here (it belongs to Angel's Sword Studios). Get it free from the [Lyrian Chronicles Discord](https://discord.gg/EFg2EbDnTa), channel **#how-to-play** ([Character Sheet 1.2 post](https://discord.com/channels/909435736351207424/1293704039543996488/1346225007940079656)), then load it once and the planner remembers it in that browser. The Print sheet window shows this link until a sheet is loaded.
 
 ### Features
@@ -40,8 +55,8 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
 
 | File | What it is |
 |---|---|
-| `planner.html` | The planner page (PC version, reads the `data` folder) |
-| `planner-all-in-one.html` | Phone version with the data built in (rebuild with `tools/build_all_in_one.py`) |
+| `planner.html` | The planner page that reads the `data` folder (for editing the data) |
+| `planner-all-in-one.html` | The whole planner in one file, for PC or phone (rebuild with `tools/build_all_in_one.py`) |
 | `data/classes.js` | All classes: tiers, roles, requirements, 8-step progressions, abilities |
 | `data/races.js` | Main races and sub-races |
 | `data/breakthroughs.js` | Breakthroughs |
@@ -59,8 +74,10 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
 ## About the data
 
 - Official site: https://rpg.angelssword.com/
-- The data was checked page by page against an **unofficial static copy** of the rules
-  (https://lyrian.splatpass.net/), game version **0.13.2**. Spot-check anything important against the official site.
+- Game version **0.13.2**. The data was first read page by page from an **unofficial static copy** of the rules
+  (https://lyrian.splatpass.net/), then cross-checked against the official site (same version): the full class and item lists,
+  51 items only the official site had, the class steps that were blank, the monster stat blocks, and spot checks of abilities.
+  Spot-check anything important against the official site.
 - Ability and item descriptions are plain-English summaries written for this tool, not the official wording.
   Numbers, costs, ranges and keywords are exact.
 - Anything that couldn't be found is marked `MISSING` and listed in `ISSUES.md`.
