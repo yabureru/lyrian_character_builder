@@ -191,7 +191,7 @@ Everything else in this file is either done, checked against the official site (
 ## Animal Summoner
 
 - [x] Role read as "Main" + "Specialist" - recorded Specialist only (matches class index). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
-- [ ] Wolf, Boar and Giant Spider stat blocks are NOT on the class page. Need monster pages. → Still to collect: Wolf, Boar and Giant Spider stat blocks (monster pages).
+- [x] Wolf, Boar and Giant Spider stat blocks are NOT on the class page. Need monster pages. → Still to collect: Wolf, Boar and Giant Spider stat blocks (monster pages). → **Done (2026-10-24):** stat blocks collected from the official monster pages into data/companions.js; shown under Companions in the Abilities pane and on the printed full-size pages, with a link to the full monster page.
 - [x] "Summon limit" and "slots" - need rulebook. → **Done:** Summon keyword defined in keywords.js.
 - [x] Summon Animal picks a random animal - how it's rolled isn't stated. Needs rulebook. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
@@ -868,8 +868,8 @@ Everything else in this file is either done, checked against the official site (
 
 - [x] Role read as "Main" + "Utility" - recorded Utility only. → *Noted, no action needed.* Matches the class index.
 - [x] Lord of Mercenary weekly fees: Archer listed as "250" (no "c"), others with "c". Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
-- [ ] Mercenary / Sniper NPC stats are in the Monster guide - not captured. "Expert Summoner" and
-      "Instinct" mentioned - need other pages/rulebook. → Monster-page stat blocks still to collect (see Animal Summoner).
+- [x] Mercenary / Sniper NPC stats are in the Monster guide - not captured. "Expert Summoner" and
+      "Instinct" mentioned - need other pages/rulebook. → Monster-page stat blocks still to collect (see Animal Summoner). → **Done (2026-10-24):** stat blocks collected from the official monster pages into data/companions.js; shown under Companions in the Abilities pane and on the printed full-size pages, with a link to the full monster page.
 - [x] Shot From The Blue costs 500 Clim per use (in its requirement line). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Monk
@@ -913,7 +913,7 @@ Everything else in this file is either done, checked against the official site (
 - [x] Role read as "Main" + "Specialist" - recorded Specialist only. → *Noted, no action needed.* Matches the class index.
 - [x] Undead Mastery says "Create Undead" (the ability is named Raise Undead) - site inconsistency. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 - [x] Undead Mastery uses "spirit core" values - needs rulebook. → **Rulebook:** Spirit Core = total EXP spent (shown in Pools).
-- [ ] Skeletal Champion stats are on the Monster page - not captured. → Monster-page stat block still to collect (see Animal Summoner).
+- [x] Skeletal Champion stats are on the Monster page - not captured. → Monster-page stat block still to collect (see Animal Summoner). → **Done (2026-10-24):** stat blocks collected from the official monster pages into data/companions.js; shown under Companions in the Abilities pane and on the printed full-size pages, with a link to the full monster page.
 
 ## Ninja
 
@@ -1122,7 +1122,7 @@ Everything else in this file is either done, checked against the official site (
 
 - [x] Found via the abilities index (not in the sitemap). → **Done:** Class list confirmed complete against the official site.
 - [x] Role read as "Main" + Specialist only - recorded Specialist. → *Noted, no action needed.* Matches the class index.
-- [ ] Eidolon-specific costs, upkeep and abilities live on Eidolon pages (not collected). Needed for the planner. → Still to collect (see Breakthroughs: Eidolon contracts).
+- [x] Eidolon-specific costs, upkeep and abilities live on Eidolon pages (not collected). Needed for the planner. → Still to collect (see Breakthroughs: Eidolon contracts). → **Done (2026-10-24):** stat blocks collected from the official monster pages into data/companions.js; shown under Companions in the Abilities pane and on the printed full-size pages, with a link to the full monster page.
 - [x] "Playing Summoner" guidance says "Soon". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Swashbuckler
@@ -1247,7 +1247,7 @@ Everything else in this file is either done, checked against the official site (
 - [x] Found via the Secret Art keyword page (Bestial Wrath) - not in the sitemap. → **Done:** Class list confirmed complete against the official site.
 - [x] Role read as "Main" + Specialist only - recorded Specialist. → *Noted, no action needed.* Matches the class index.
 - [x] Requirement "Animal summoner mastered." (lowercase s) - recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
-- [ ] Cheetah and Landshark stat blocks not on the page. X-Attack has no duration. → Monster-page stat blocks still to collect (see Animal Summoner).
+- [x] Cheetah and Landshark stat blocks not on the page. X-Attack has no duration. → Monster-page stat blocks still to collect (see Animal Summoner). → **Done (2026-10-24):** stat blocks collected from the official monster pages into data/companions.js; shown under Companions in the Abilities pane and on the printed full-size pages, with a link to the full monster page.
 
 ## Windbringer
 
@@ -1454,7 +1454,7 @@ Everything else in this file is either done, checked against the official site (
 - [ ] **GM question.** **Stat caps:** no page says whether stat-training breakthroughs have a maximum (stats beyond the creation arrays). Rulebook doesn't say either. → The rulebook doesn't give a stat maximum.
 - [x] **"Must be a Fae / Youkai / Chimera / Demon"** is stored as the main-race id, meaning any sub-race qualifies. "Lamia" (Drag along) = Lamiafolk; "Red Panda" = Red Pandafolk; "Willowisp" = Willo Wisp; "Raijin Youkai"/"Sylph Fae" = those sub-races. → *Noted, no action needed.* Data note.
 - [x] **"Speciality weapon" groups** aren't listed on the breakthrough pages. I used the rulebook's "Specialized Weapons" (Pistol, Shotgun, Sniper Rifle, Saboteur Thread Daggers, Lance, Whip, Gauntlets, plus channeling and artisan weapons). Confirm they're the same thing. → **Rulebook:** the Specialized Weapons section calls them "Specialty weapons" too (Pistol, Shotgun, Sniper Rifle, Saboteur Thread Daggers, Lance, Whip, Gauntlets, channeling and gatherer/crafter weapons) - same thing.
-- [ ] **Eidolon contracts** (Fortuna, Ixilune, Pipoltr): eidolon stats and the Channel Eidolon abilities (Draw Luck, Distracting Swarm, Vine Wall Cover) live on Monster/Ability pages - not collected yet. Needed for Summoner. → Still to collect: eidolon stats and Channel Eidolon abilities (Monster/Ability pages) for Summoner.
+- [x] **Eidolon contracts** (Fortuna, Ixilune, Pipoltr): eidolon stats and the Channel Eidolon abilities (Draw Luck, Distracting Swarm, Vine Wall Cover) live on Monster/Ability pages - not collected yet. Needed for Summoner. → Still to collect: eidolon stats and Channel Eidolon abilities (Monster/Ability pages) for Summoner. → **Done (2026-10-24):** stat blocks collected from the official monster pages into data/companions.js; shown under Companions in the Abilities pane and on the printed full-size pages, with a link to the full monster page.
 - [x] Divine list (9 divines with damage types) stored as `LC.divines`. → *Noted, no action needed.* Data note.
 
 ## Breakthroughs - specific items

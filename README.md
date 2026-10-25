@@ -33,6 +33,8 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
 - **Build roadmap**: every purchase in order with the EXP/IP needed to reach it; turn on *Plan ahead* to plan past your current EXP
 - **What can I unlock next?**: classes available now, one step away (grouped by what you need, with the EXP cost) and two steps away
 - Details window for any class, race, breakthrough or item, and keyword pop-ups
+- **Companions**: summons, hirelings and eidolons your classes bring, with their stat blocks
+- Tap any stat name to see what it does; the Skills card shows caps and highlights where points still need placing
 
 ## What's in here
 
@@ -43,6 +45,7 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
 | `data/classes.js` | All classes: tiers, roles, requirements, 8-step progressions, abilities |
 | `data/races.js` | Main races and sub-races |
 | `data/breakthroughs.js` | Breakthroughs |
+| `data/companions.js` | Summons, hired mercenaries and eidolons (stat blocks from the official monster pages) |
 | `data/mods.js` | Which item mods change your numbers (Guard, Block, Burden...) and which Universal mod lists fit which items |
 | `data/requirements.js` | Class unlock rules, in a form the planner can check |
 | `data/items.js` | Items: weapons, armor, alchemy, artifice, mounts, materials |

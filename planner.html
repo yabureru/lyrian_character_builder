@@ -160,6 +160,7 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
 <script src="data/proficiencies.js"></script>
 <script src="data/bonuses.js"></script>
 <script src="data/mods.js"></script>
+<script src="data/companions.js"></script>
 <script src="data/sheet.js"></script>
 </head>
 <body>
@@ -1902,6 +1903,33 @@ function abilityGroups(){
   });
   return groups;
 }
+// Summons, hirelings and eidolons your classes / breakthroughs bring (data/companions.js)
+function myCompanions(){
+  return Object.values(LC.companions || {}).map(function(m){
+    var why = (m.usedBy || []).filter(function(u){
+      if (u.cls) return B.classes.some(function(c){
+        if (c.id !== u.cls) return false;
+        if (!u.ab) return !!c.owned[0];
+        var rec = CLASSES[c.id], i = rec ? rec.steps.findIndex(function(st){ return st.ability === u.ab; }) : -1;
+        return i >= 0 && !!c.owned[i];
+      });
+      if (u.bt) return hasBt(u.bt);
+      return false;
+    }).map(function(u){ return (u.cls ? (CLASSES[u.cls] || {}).name : (BTS[u.bt] || {}).name) + ": " + u.how; });
+    return why.length ? { m: m, why: why } : null;
+  }).filter(Boolean).sort(function(a, b){ return a.m.name < b.m.name ? -1 : 1; });
+}
+function companionLines(m){
+  var st = m.stats;
+  return [ "HP " + st.hp + " · Mana " + st.mana + " · AP " + st.ap + " · RP " + st.rp + " · Initiative " + st.init + " · Speed " + m.move,
+           "Evasion " + st.evasion + " · Guard " + st.guard + " (normal / Dodge or Block)",
+           "Focus " + st.Focus + ", Power " + st.Power + ", Agility " + st.Agility + ", Toughness " + st.Toughness +
+             " · Fit " + st.Fitness + ", Cun " + st.Cunning + ", Rea " + st.Reason + ", Awa " + st.Awareness + ", Pre " + st.Presence,
+           "Light attack " + m.light + " · Heavy attack " + m.heavy ]
+    .concat(m.skills ? ["Skills: " + m.skills] : [])
+    .concat(m.strong || m.weak ? ["Strong against: " + (m.strong || "-") + " · Weak against: " + (m.weak || "-")] : [])
+    .concat(["Abilities: " + m.abilities.map(function(a){ return a[0] + (a[1] === "passive" ? "" : " (" + [a[1], a[2], a[3]].filter(Boolean).join(", ") + ")"); }).join("; ")]);
+}
 function renderAbil(){
   var h = '<div class="card"><h2>Abilities</h2>';
   var groups = abilityGroups();
@@ -1916,6 +1944,16 @@ function renderAbil(){
         (a.usage ? '<div class="meta">' + esc(a.usage) + "</div>" : "") + listHtml(abilityLines(a)) + "</div>";
     });
   });
+  var comp = myCompanions();
+  if (comp.length) {
+    h += "<h3>Companions</h3>";
+    comp.forEach(function(x){
+      var m = x.m;
+      h += '<div class="ab"><div class="t">' + esc(m.name) + ' <span class="tag">' + esc(m.type) + "</span></div>" +
+        '<div class="src">' + esc(x.why.join(" · ")) + "</div>" + listHtml(companionLines(m)) +
+        '<div class="meta"><a href="' + esc(m.url) + '" target="_blank" rel="noopener">Full stat block and ability text (official site)</a></div></div>';
+    });
+  }
   h += '<div class="note">Ability text is a plain-English summary. For exact wording, check the official site.</div></div>';
   $("paneAbil").innerHTML = h;
 }
@@ -2789,6 +2827,9 @@ function fsBoxes(){
     var p = b.pick || {}, extra = [p.stat, p.main, p.sub, p.element, p.divine, p.clan, p.text].filter(Boolean).join(", ");
     sec.items.push({ title: r.name + (extra ? " (" + extra + ")" : ""), sub: "Breakthrough", meta: "", body: (r.summary || []).slice() });
   });
+  if (sec.items.length) groups.push(sec);
+  sec = { name: "Companions", items: [] };
+  myCompanions().forEach(function(x){ sec.items.push({ title: x.m.name + " (" + x.m.type + ")", sub: x.why.join(" - "), meta: "", body: companionLines(x.m) }); });
   if (sec.items.length) groups.push(sec);
   sec = { name: "Gear", items: [] };
   B.items.forEach(function(e){
