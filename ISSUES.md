@@ -261,11 +261,11 @@ Everything else in this file is either done, checked against the official site (
       `ability: null, missing: "MISSING - ..."`. Planner must show these as missing (Botanist L8). → **Done:** The blank steps were filled from the official site on 2026-10-24.
 - [x] **Abilities not in the progression.** Some pages list an ability under "Abilities unlocked"
       that no step grants. Stored with kind: "unlisted" (Botanist: Forager's Eye). → **Done:** Those abilities are now the missing steps (filled 2026-10-24).
-- [ ] **Gene inventory / other counters.** Biochemist adds a gene-inventory counter
+- [x] **Gene inventory / other counters.** Biochemist adds a gene-inventory counter
       (`grants: { geneInventory: 1 }`) from two abilities. Planner may want to total these. → Still to do: total gene inventory in the planner (Biochemist only).
 
 ## Bard
-
+ → **Done (2026-10-24):** Pools shows "Gene inventory" (1 from Transmuter of Life, +1 from the ultimate).
 - [x] Role read as "Main" + "Support" - recorded Support only (matches class index). → *Noted, no action needed.* Matches the class index.
 - [x] Toss a coin: cost recorded as "Errand" (page says it's an Errand action, no cost line). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 - [x] Inspiring Song +1d4 / Dirge -1d4 - dice, needs rulebook. → *Noted, no action needed.* Dice described in the ability text.
@@ -1597,7 +1597,7 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 - [ ] **GM question.** Blocking: the rules say Block *replaces* Guard with 2 x Toughness + armor Block. Not stated whether armor Guard, or Guard bonuses from abilities (Stoneskin, stances), also count while Blocking. The planner keeps them separate: "guard" bonuses -> Guard, "block" bonuses -> Block guard. → Rulebook: Block "increases your Guard to 2 x Toughness + armor Block value". Do armor Guard and Guard bonuses from abilities also count while Blocking?
 - [x] Evasion vs Dodge: bonuses that only say "evasion" (Serene Water Stance) are added to Evasion only, not to Dodge evasion. Ones that say "evasion and dodge" (Stoneskin, Hardening Fist, Dog Form) change both. → *Noted, no action needed.* Reading kept.
 - [ ] **GM question.** Unholy Strength (+2 Power/Focus) is added to your stats, which also raises Mana and HP-related numbers while on. Check whether it should only affect attacks. → Unholy Strength: does +2 Power also raise max Mana (stat bonus) or only attacks?
-- [ ] Craft expertise grants (Forgemaster, Magitechnician, Master Armorer, Timberwright: "5 points in each of 3 crafts") are shown as text only, not tracked. → Still to do: track "5 points in each of 3 crafts" expertise grants.
+- [x] Craft expertise grants (Forgemaster, Magitechnician, Master Armorer, Timberwright: "5 points in each of 3 crafts") are shown as text only, not tracked. → Still to do: track "5 points in each of 3 crafts" expertise grants. **Done (2026-10-24):** the class step now has boxes to name each craft (with suggestions from the rulebook's expertise lists); each named one adds +5 expertise in that craft skill, shown in Skills and on the printed sheet. Warns until they're named.
 - [x] Magitechnician and Onmyoji pages wouldn't load on 2026-10-22; their bonuses use the data checked on 2026-10-20. → **Done:** both rechecked on the official site 2026-10-24 (slugs magitechnician- and onmyoji-): steps, costs, keywords, ranges and requirements match.
 - [x] Unlisted abilities (Botanist Forager's Eye, Jonin En-dama, Ninja Kage Shuriken no Jutsu, Shadowbringer Hide in Shadows, Warding Mage Hidden Wards) aren't tied to a step, so the planner never counts them as owned. They show in the class details window. → **Done:** These five abilities are now the class steps (filled 2026-10-24), so they count as owned.
 

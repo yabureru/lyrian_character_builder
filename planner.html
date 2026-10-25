@@ -887,6 +887,14 @@ function calcSkills(C){
   }
   C.bon.forEach(function(x){ if (x.on && x.b.expertise) flatEx(x.b.expertise.skill, x.b.expertise.name, x.b.expertise.amount, bonusLabel(x)); });
   C.grants.forEach(function(x){
+    var ce = x.g.craftExpertise;
+    if (ce) {   // "5 expertise in each of 3 different <craft> crafts": you name the crafts on the class step
+      var cc = B.classes.filter(function(c){ return c.id === x.o.cls; })[0], names = ((cc && cc.picks && cc.picks.craftEx) || []).slice(0, ce.count);
+      names.forEach(function(n){ if (n && n.trim()) flatEx(ce.skill, n.trim(), ce.amount, x.label); });
+      var miss = ce.count - names.filter(function(n){ return n && n.trim(); }).length;
+      if (miss > 0) C.warn.push(x.label + ": name " + miss + " more " + ce.skill + " expertise" + (miss > 1 ? "s" : "") + " (class step).");
+      return;
+    }
     var e = x.g.expertise; if (!e) return;
     var m = /^([A-Za-z ]+?)\s*[(:]\s*([^)+]+?)\)?\s*(?:\+(\d+))?(?:\s*\(.*\))?$/.exec(e);
     var amt = x.g.amount || (m && m[3] ? num(m[3]) : 0);
@@ -1203,6 +1211,10 @@ function renderClasses(){
       render();
     };
   });
+  document.querySelectorAll("[data-cex]").forEach(function(inp){
+    inp.onchange = function(){ var c = B.classes[num(this.dataset.cex)]; c.picks = c.picks || {}; c.picks.craftEx = (c.picks.craftEx || []).slice();
+      c.picks.craftEx[num(this.dataset.slot)] = this.value.trim(); render(); };
+  });
   document.querySelectorAll("[data-pick]").forEach(function(sel){
     sel.onchange = function(){ var c = B.classes[num(this.dataset.cls)]; c.picks = c.picks || {}; c.picks[this.dataset.pick] = this.value; render(); };
   });
@@ -1269,6 +1281,18 @@ function classBlock(c, idx){
       '<input type="checkbox" data-cls="' + idx + '" data-step="' + i + '"' + (owned ? " checked" : "") + (i === 0 || (!owned && !canBuy) ? " disabled" : "") + ">" +
       '<div class="body">' + body + "</div><span class=\"cost\">" + (cost ? cost + " EXP" : (dupOf(c.id, i) ? '<span title="You already have this ability from ' + esc(dupOf(c.id, i)) + ': EXP refunded">refunded</span>' : "free")) + "</span></div>";
   });
+  // craft expertise picks ("5 expertise in each of 3 different crafts")
+  var rec0 = CLASSES[c.id];
+  rec0.steps.forEach(function(st, si){
+    var ab = st.ability && rec0.abilities[st.ability], ce = ab && ab.grants && ab.grants.craftExpertise; if (!ce) return;
+    var have = (c.picks && c.picks.craftEx) || [], on = !!c.owned[si];
+    h += '<div class="step' + (on ? " owned" : "") + '"><span class="lv">' + st.level + '</span><div class="body"><span class="nm">' + esc(ab.name) + "</span>: +" + ce.amount + " expertise in each of " + ce.count + " " + esc(ce.skill) + " crafts ";
+    for (var q = 0; q < ce.count; q++)
+      h += '<input type="text" list="cexList-' + esc(ce.skill) + '" data-cex="' + idx + '" data-slot="' + q + '" value="' + esc(have[q] || "") + '" placeholder="craft ' + (q + 1) + '" style="width:110px"' + (on ? "" : " disabled") + "> ";
+    h += '<datalist id="cexList-' + esc(ce.skill) + '">' + (CRAFT_EX[ce.skill] || []).map(function(o){ return '<option value="' + esc(o) + '">'; }).join("") + "</datalist>";
+    if (on && have.filter(function(n){ return n && n.trim(); }).length < ce.count) h += ' <span class="warn small">name them</span>';
+    h += "</div></div>";
+  });
   var mom = (LC.masteryOnMastery || {})[c.id];
   if (mom) {
     var mp = (c.picks || {}).mastery || "";
@@ -1279,6 +1303,13 @@ function classBlock(c, idx){
   }
   return h + "</div>";
 }
+// Expertise choices per craft (rulebook, Artisan skills) - suggestions; any name can be typed
+var CRAFT_EX = {
+  Artificing: ["Pistol", "Shotgun", "Musket", "Sniper Rifle", "Airships", "Weapon Artifice", "Assist Artifice", "Basic Artifice"],
+  Blacksmithing: ["Light Swords", "Longswords", "Katana", "Heavy Blades", "Axes", "Bludgeoning", "Polearms", "Dueling Weapons", "Small Weapons", "Twinblades", "Thrown Weapons", "Tools", "Artisan Weapons"],
+  Armorsmithing: ["Clothing", "Light Armor", "Medium Armor", "Heavy Armor", "Shields"],
+  Carpentry: ["Bows", "Crossbows", "Staves", "Wands", "Slings", "Whips", "Buildings"]
+};
 function abilityMeta(a){
   var bits = [];
   if (a.cost) bits.push(a.cost); if (a.range) bits.push(a.range);
@@ -1732,6 +1763,8 @@ function renderLive(){
   h += '<div class="kv"><span>Breakthrough EXP left</span><b class="' + (e.btLeft ? "warn" : "") + '">' + e.btLeft + " / 300</b></div>";
   h += '<div class="kv"><span>Unspent EXP</span><b class="' + (e.unspent < 0 ? "bad" : "") + '">' + e.unspent.toLocaleString() + "</b></div>";
   h += '<div class="kv"><span>Spirit Core</span><b>' + e.spiritCore.toLocaleString() + "</b></div>";
+  var genes = (C.grants || []).reduce(function(t, x){ return t + (num(x.g.geneInventory) || 0); }, 0);
+  if (genes) h += '<div class="kv" title="Biochemist: genes you can store for Biohacking / Gene Activation."><span>Gene inventory</span><b>' + genes + "</b></div>";
   if (C.mysticEyes && C.mysticEyes.used) h += '<div class="kv" title="Each Mystic Eye replaces one of your eyes."><span>Mystic Eye slots</span><b class="' + (C.mysticEyes.used > C.mysticEyes.slots ? "bad" : "") + '">' + C.mysticEyes.used + " / " + C.mysticEyes.slots + "</b></div>";
   if (B.canon) h += '<div class="kv" title="Mirane: Spirit Core / 500, rounded down. Staying in a zone with a higher astra level than this risks astra poisoning."><span>Astra resistance</span><b>' + Math.floor(e.spiritCore / 500) + "</b></div>";
   h += '<div class="kv"><span>EXP earned since creation</span><input type="number" id="inExp" min="0" step="25" value="' + num(B.expEarned) + '"></div>';

@@ -5260,7 +5260,7 @@ CL("forgemaster", {
     "expertise-study-blacksmithing": {
       name: "Expertise Study (Blacksmithing)", kind: "ability",
       cost: "No listed cost", range: null, keywords: [], requires: null,
-      grants: { expertise: "5 points in each of 3 different blacksmithing crafts", proficiency: "one smithing melee weapon (may be specialized)" },
+      grants: { craftExpertise: { skill: "Blacksmithing", count: 3, amount: 5 }, expertise: "5 points in each of 3 different blacksmithing crafts", proficiency: "one smithing melee weapon (may be specialized)" },
       summary: [ "Gain 5 Expertise Points in each of 3 different blacksmithing crafts, plus proficiency with one smithing melee weapon of your choice (can be specialized)." ]
     },
     "secret-art-shatter": {
@@ -7056,7 +7056,7 @@ CL("magitechnician", {
     "expertise-study-artificing": {
       name: "Expertise Study (Artificing)", kind: "ability",
       cost: "No listed cost", range: null, keywords: [], requires: null,
-      grants: { expertise: "5 points in each of 3 different Artificing crafts", proficiency: "one basic or specialized weapon of your choice" },
+      grants: { craftExpertise: { skill: "Artificing", count: 3, amount: 5 }, expertise: "5 points in each of 3 different Artificing crafts", proficiency: "one basic or specialized weapon of your choice" },
       summary: [ "Gain 5 Expertise Points in each of 3 different Artificing crafts, plus one basic or specialized weapon proficiency of your choice." ]
     },
     "secret-art-entropic-magic-pulse": {
@@ -7412,7 +7412,7 @@ CL("master-armorer", {
     "expertise-study-armorsmithing": {
       name: "Expertise Study (Armorsmithing)", kind: "ability",
       cost: "No listed cost", range: null, keywords: [], requires: null,
-      grants: { expertise: "5 points in each of 2 different armorsmithing crafts", proficiencyChoice: ["Heavy Armor", "Greatshields"] },
+      grants: { craftExpertise: { skill: "Armorsmithing", count: 2, amount: 5 }, expertise: "5 points in each of 2 different armorsmithing crafts", proficiencyChoice: ["Heavy Armor", "Greatshields"] },
       summary: [
         "Gain 5 Expertise Points in 2 different armorsmithing crafts, and proficiency in Heavy Armor OR Greatshields.",
         "You always get the expertise bonus crafting armor for yourself, but that armor can't be worn by others and is worth 0 clim."
@@ -11291,7 +11291,7 @@ CL("timberwright", {
     "expertise-study-carpentry": {
       name: "Expertise Study (Carpentry)", kind: "ability",
       cost: "No listed cost", range: null, keywords: [], requires: null,
-      grants: { expertise: "5 in each of 3 different carpentry crafts", proficiency: "One carpentry weapon (including specialized) or artifice chainsaws" },
+      grants: { craftExpertise: { skill: "Carpentry", count: 3, amount: 5 }, expertise: "5 in each of 3 different carpentry crafts", proficiency: "One carpentry weapon (including specialized) or artifice chainsaws" },
       summary: [ "Gain 5 expertise points in each of 3 different carpentry crafts, and proficiency with one carpentry weapon of your choice (including specialized) or artifice chainsaws." ]
     },
     "secret-art-beaver-timber-fang": {
