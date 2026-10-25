@@ -12,7 +12,7 @@ Everything else in this file is either done, checked against the official site (
 1. **"+5 skill points in either A, B, C..."** (every race, and some classes like Fae Knight: Willow Style): can the 5 points be split, or must they all go into one skill? *(Planner: split allowed.)*
 2. **Crafting classes' Level 3** (Alchemist, Armorsmith, Carpenter, Forager): "exchange any skill point for 2 expertise points... in these skills" - does that include the fixed +5 in the crafting skill? *(Planner: allows it.)*
 3. **Stat training breakthroughs:** is there a maximum for a stat? *(Planner: no cap.)*
-4. **"Any tier 2 class mastered":** does a mastered tier 3 class count? *(Planner: yes.)*
+4. ~~**"Any tier 2 class mastered"**~~ **Answered (user, 2026-10-24): doesn't matter.** Checked the data: every tier 3 class's entry needs a tier 2 mastered (Sword Saint needs Iai Style, which is tier 2), so anyone with a tier 3 mastered already has a tier 2 mastered.
 5. **Executor** ("any mastered class + any points in Acolyte"): does that mean Acolyte unlocked, and can the mastered class be Acolyte itself? *(Planner: Acolyte unlocked + one mastered class, which may be Acolyte.)*
 6. ~~**Mystic Eye slots**~~ **Answered (user, 2026-10-24):** anything with the Mystic Eye keyword is a Mystic Eye; each eye replaces one of your real eyes and takes a slot - 2 normally, 3 with Third Eye, 8 with 8 Eyes. The planner counts one per eye class (its key, or any owned ability with the keyword), shows "Mystic Eye slots used / max" in Pools and warns when over.
 7. **Blocking:** Block sets Guard to 2 x Toughness + armor Block value. Do armor Guard and Guard bonuses from abilities (Stoneskin, stances) also add while Blocking? *(Planner: no, kept separate.)*
@@ -1484,7 +1484,7 @@ Everything else in this file is either done, checked against the official site (
 - [x] **Generic routes** (any class mastered, element masteries, "have a spell", weapon proficiency, skill points) are checked live by the planner, not listed in the reverse index. The site's "Helps unlock" lists include those (e.g. Sorcerer lists 26 classes; 9 name Sorcerer directly, the rest come through Arcane/element mastery, spells, etc.). That matches. → *Noted, no action needed.* Data note.
 - [x] **Proficiency categories** used: "ANY_MELEE", "ANY_TWO_HANDED_MELEE", "ANY_WEAPON", and group names (Light Swords, Longsword, Katana, Dueling Weapons, Polearms, Lance, Scythe, Heavy Blades, Small Weapons, Thrown, Shields, Medium/Heavy Armor). Needs a weapon-group list (items data) for the planner to check "ANY_MELEE". → **Done:** Weapon groups are in proficiencies.js and items.js.
 - [x] **Mystic eye slots** ("at least 1 open"): base 2 slots (Third Eye -> 3, 8 Eyes -> 8). What uses up a slot (Evil Eye, Wave Palm's Life Perception Eye, Shinigami Eye, Faerie Light Eyes...) isn't spelled out anywhere I read. → Same as the Mystic Eye slot question above. → **Answered (user 2026-10-24):** each Mystic Eye (anything with the Mystic Eye keyword) takes a slot; 2 normally, 3 with Third Eye, 8 with 8 Eyes.
-- [ ] **GM question.** **"Any class mastered"** - does a Tier 1 count? Assumed yes (any class). "Any tier 2 class mastered" assumed to also accept tier 3 - confirm. → "Any tier 2 class mastered" - does a tier 3 mastery count? (The planner counts it.)
+- [x] **"Any class mastered"** - does a Tier 1 count? Assumed yes (any class). "Any tier 2 class mastered" assumed to also accept tier 3 - confirm. → "Any tier 2 class mastered" - does a tier 3 mastery count? (The planner counts it.) → **Answered:** no difference in practice - every tier 3 class needs a tier 2 mastered to enter.
 
 ## Requirements - ambiguous lines
 
@@ -1574,7 +1574,7 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 - [x] Element mastery requirements still show "check" (not "locked") when no tracked source gives the element, in case a race ability or something untracked gives it. → *Noted, no action needed.* Kept on purpose, in case an untracked source gives the element.
 - [x] Aeromancer's Wind Master grant (Wind Mastery) was missing from classes.js; added 2026-10-22 after re-checking the page. → **Done:** Added 2026-10-22.
 - [x] Canon campaign starting Clim: +1,000 on top of the normal 3,000 (confirmed by user 2026-10-21).
-- [ ] **GM question.** "Any tier 2 class mastered" is counted as tier 2 or higher. Confirm whether a tier 3 mastery counts. → Duplicate of the "any tier 2 class mastered" question.
+- [x] "Any tier 2 class mastered" is counted as tier 2 or higher. Confirm whether a tier 3 mastery counts. → Duplicate of the "any tier 2 class mastered" question. → **Answered:** no difference in practice - every tier 3 class needs a tier 2 mastered to enter.
 - [x] Transmuter/Alkahest: pick the crafting discipline for your Transmuter points on the class step.
 - [x] Slow Starter: -200 creation class EXP applied; enter EXP already doubled (note shown in Pools).
 
