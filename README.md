@@ -86,7 +86,7 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
   Spot-check anything important against the official site.
 - Ability and item descriptions are plain-English summaries written for this tool, not the official wording.
   Numbers, costs, ranges and keywords are exact.
-- Anything that couldn't be found is marked `MISSING` and listed in `ISSUES.md`.
+- Anything that couldn't be found was marked `MISSING`; the history is in `ISSUES_ARCHIVE.md`.
 
 ## Updating
 
