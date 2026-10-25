@@ -710,9 +710,9 @@ CL("alchemeister", {
     },
     "counter-potion": {
       name: "Counter-Potion", kind: "ability",
-      cost: "Variable RP", range: "Self", keywords: [], requires: null,
+      cost: "X RP", range: "Self", keywords: [], requires: null,
       summary: [
-        "Immediately use a Potion, Elixir, Salve, Poison or Flask in your hand. X = the AP cost of that action."
+        "Immediately use a Potion, Elixir, Salve, Poison or Flask in your hand. You pay X RP, where X = the AP cost of that action."
       ]
     },
     "detailed-finish": {
@@ -1198,7 +1198,7 @@ CL("anti-mage", {
     },
     "counterspell": {
       name: "Counterspell", kind: "ultimate",
-      cost: "1 or 2 RP", range: "60ft", keywords: ["Arcane", "Counter", "Spell"],
+      cost: "Variable RP", range: "60ft", keywords: ["Arcane", "Counter", "Spell"],
       requires: "An enemy casts a spell within range.",
       summary: [
         "Cancel the spell by paying RP equal to half its AP cost (rounded up), or equal to the RP it cost. Can't counter it if its AP cost is higher than your RP.",
@@ -1700,7 +1700,8 @@ CL("assassin", {
       name: "Devastating Strike III", kind: "ability",
       cost: "1 AP", range: "Melee Weapon Range", keywords: ["Full Pierce", "Sure Hit"],
       requires: "Target has 0 RP left and is marked by Death Mark. One-handed weapons only.",
-      summary: [ "Light (1 AP) or Heavy (2 AP) attack against the target that deals guaranteed maximum damage." ]
+      summary: [ "Light (1 AP) or Heavy (2 AP) attack against the target." ],
+      notes: "Official page rechecked 2026-10-24: no maximum-damage clause (an earlier read had one)."
     },
     "secret-art-assassinate": {
       name: "Secret Art: Assassinate", kind: "ultimate",

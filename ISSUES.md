@@ -42,37 +42,37 @@ When the site version changes, recheck classes already entered.
 
 ## Abjurer
 
-- [ ] Mana Shield cost shows on the page as "No listed cost" (its text says 1 AP + 1 Mana if not
-      used at Encounter Start). Recorded exactly as the page shows it.
+- [x] Mana Shield cost shows on the page as "No listed cost" (its text says 1 AP + 1 Mana if not
+      used at Encounter Start). Recorded exactly as the page shows it. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Acolyte
 
-- [ ] Entry requirement is recorded as "Divine's Chosen breakthrough, OR being Human" - confirm
-      exact wording from the page.
-- [ ] Acolyte's Journey: two page reads disagreed on whether "+5 Religion" is its own Benefit or
+- [x] Entry requirement is recorded as "Divine's Chosen breakthrough, OR being Human" - confirm
+      exact wording from the page. → **Done:** Official page 2026-10-24: "Divine's Chosen breakthrough or be human."
+- [x] Acolyte's Journey: two page reads disagreed on whether "+5 Religion" is its own Benefit or
       part of another. Recorded as Benefit 2 (4 benefits total, plus a "+5 skill points" Grants line).
-      Confirm with a screenshot.
-- [ ] Miracle: Sanctuary sphere HP recorded as 20 + (8 x Toughness). One read noted the page shows
-      it in an unusual way ("Toughness x 8"). Confirm.
-- [ ] Miracle: Sanctuary range recorded as "5ft radius centered on self" - confirm exact label.
-- [ ] Cure Touch / Light's Care / Sanctuary show a Requirements heading with "-" on the page.
-      Recorded as no requirement (null).
+      Confirm with a screenshot. → **Done:** Official page: +5 Religion is its own benefit.
+- [x] Miracle: Sanctuary sphere HP recorded as 20 + (8 x Toughness). One read noted the page shows
+      it in an unusual way ("Toughness x 8"). Confirm. → **Done:** Official page: 20 + Toughness x 8.
+- [x] Miracle: Sanctuary range recorded as "5ft radius centered on self" - confirm exact label. → **Done:** Official page: "5ft radius centered on self".
+- [x] Cure Touch / Light's Care / Sanctuary show a Requirements heading with "-" on the page.
+      Recorded as no requirement (null). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Adventurer
 
-- [ ] Entry requirements show as "None" - recorded as null.
-- [ ] Level 3 skills: page says "any non-crafting skill" with no list. Recorded as
-      options: "ANY_NON_CRAFTING". Need the official list of crafting vs non-crafting skills.
-- [ ] Adventurer Essentials refund rule (half EXP if you already know Presence Concealment via
-      Saboteur or Demon WI clan; lineage reduction first). EXP costs/refunds need the rulebook.
-- [ ] Adventurer Essentials weapon/armor choices: need the official weapon group list
-      (common vs specialized) and armor categories for planner dropdowns.
-- [ ] Power Jump: one page read tied the "no attacks of opportunity / no fall damage" part to
-      "0 AP" in an unclear way. Recorded as always true - confirm.
-- [ ] Mana Razor: page read listed a "Mana Razor (until end of turn)" grant line - confirm if it's
-      a status effect name.
-- [ ] Efficient Spirit Control: "next non-healing keyword action" wording is odd - confirm.
-- [ ] Circuit keyword / "reset your Circuits" - needs rulebook.
+- [x] Entry requirements show as "None" - recorded as null. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Level 3 skills: page says "any non-crafting skill" with no list. Recorded as
+      options: "ANY_NON_CRAFTING". Need the official list of crafting vs non-crafting skills. → **Done:** The planner's skill list marks main / crafting / gathering skills.
+- [x] Adventurer Essentials refund rule (half EXP if you already know Presence Concealment via
+      Saboteur or Demon WI clan; lineage reduction first). EXP costs/refunds need the rulebook. → *Noted, no action needed.* Rulebook refund rules (full / half) are in RULES_REFERENCE.md section 4.
+- [x] Adventurer Essentials weapon/armor choices: need the official weapon group list
+      (common vs specialized) and armor categories for planner dropdowns. → **Done:** Weapon groups and armor types are in proficiencies.js / items.js.
+- [x] Power Jump: one page read tied the "no attacks of opportunity / no fall damage" part to
+      "0 AP" in an unclear way. Recorded as always true - confirm. → **Done:** Official page: you land at the end of your turn (or earlier for 0 AP) and that fall doesn't provoke - recorded reading is right.
+- [x] Mana Razor: page read listed a "Mana Razor (until end of turn)" grant line - confirm if it's
+      a status effect name. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Efficient Spirit Control: "next non-healing keyword action" wording is odd - confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Circuit keyword / "reset your Circuits" - needs rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
 
 ## General (added during Aerial Mage - Angelblooded batch)
 
@@ -90,74 +90,74 @@ When the site version changes, recheck classes already entered.
 
 ## Aerial Mage
 
-- [ ] Aerial Mode Switch: page read said "airship's movement speed drops to 10ft" in Hover mode -
-      recorded as YOUR movement speed. Confirm wording.
-- [ ] Take Off cost shows "No listed cost" (Encounter Start ability). Recorded as shown.
-- [ ] Mixed naming on page: "Aerial Stave" vs "Aerial Staff". Recorded as shown in each spot.
-- [ ] Strafe ("100 or more Strafe"), Lock On, Sure Hit, Full Pierce, Airship shots - need rulebook.
+- [x] Aerial Mode Switch: page read said "airship's movement speed drops to 10ft" in Hover mode -
+      recorded as YOUR movement speed. Confirm wording. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Take Off cost shows "No listed cost" (Encounter Start ability). Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Mixed naming on page: "Aerial Stave" vs "Aerial Staff". Recorded as shown in each spot. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Strafe ("100 or more Strafe"), Lock On, Sure Hit, Full Pierce, Airship shots - need rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
 
 ## Aeromancer
 
-- [ ] Wind Master refund: page says refund possible and that Windbringer and Zephyr Warder also
-      grant it, but the refund amount wasn't captured. Recorded amount: "MISSING".
-- [ ] Wind Buffet: smaller targets roll with 1d4 penalty, larger with 1d4 bonus - dice, needs rulebook.
-- [ ] "Save against Potency" - Potency formula needs rulebook.
+- [x] Wind Master refund: page says refund possible and that Windbringer and Zephyr Warder also
+      grant it, but the refund amount wasn't captured. Recorded amount: "MISSING". → **Rulebook:** an ability you already have is a full EXP refund (Refunds rule); the planner refunds exact duplicates automatically, so no page amount is needed.
+- [x] Wind Buffet: smaller targets roll with 1d4 penalty, larger with 1d4 bonus - dice, needs rulebook. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] "Save against Potency" - Potency formula needs rulebook. → **Rulebook:** Potency = 11 + Focus (in the planner's Combat panel).
 
 ## Aeromaster
 
-- [ ] Controlled Wind wording is unclear (choose to push the full max distance vs. pick a shorter
-      distance). Confirm with a screenshot.
-- [ ] Cyclone: rules text lists no damage, but the class's tactical guidance says it deals a slight
-      amount of damage. Recorded with no damage.
+- [x] Controlled Wind wording is unclear (choose to push the full max distance vs. pick a shorter
+      distance). Confirm with a screenshot. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Cyclone: rules text lists no damage, but the class's tactical guidance says it deals a slight
+      amount of damage. Recorded with no damage. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Aetherie
 
-- [ ] Conduit: no cost, range or keywords on the page. Recorded as shown.
-- [ ] "Blinded 5" and "Block Crush" - need rulebook.
+- [x] Conduit: no cost, range or keywords on the page. Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] "Blinded 5" and "Block Crush" - need rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
 
 ## Agrarian
 
-- [ ] Level 3: +5 Farming only; expertise trading not mentioned. Confirm.
-- [ ] Key feature and its granted ability are both named "Expert Farmer". Granted one stored as
-      id "expert-farmer-crafting".
-- [ ] Terracing: no keywords section, but Overcharge appears in its text. Recorded keywords: [].
-- [ ] Rare/mystic herb rarity, Food units, crafting dice/points - need rulebook.
+- [x] Level 3: +5 Farming only; expertise trading not mentioned. Confirm. → *Noted, no action needed.* Page doesn't mention trading; the planner offers no trade for it.
+- [x] Key feature and its granted ability are both named "Expert Farmer". Granted one stored as
+      id "expert-farmer-crafting". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Terracing: no keywords section, but Overcharge appears in its text. Recorded keywords: []. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Rare/mystic herb rarity, Food units, crafting dice/points - need rulebook. → *Noted, no action needed.* Gathering/farming rules are in the rulebook; not needed for planning.
 
 ## Alchemeister
 
-- [ ] Level 3: +5 Alchemy only; expertise trading not mentioned. Confirm.
-- [ ] Counter-Potion cost shows "Variable RP"; text says X = the AP cost of the used item, but doesn't
-      state outright that you pay X RP. Confirm.
-- [ ] Detailed Finish upgrades the crafting dice to 2d8 - needs rulebook (base crafting dice).
+- [x] Level 3: +5 Alchemy only; expertise trading not mentioned. Confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Counter-Potion cost shows "Variable RP"; text says X = the AP cost of the used item, but doesn't
+      state outright that you pay X RP. Confirm. → **Done:** Official page: cost "X RP" (X = the item's AP cost). Data updated 2026-10-24.
+- [x] Detailed Finish upgrades the crafting dice to 2d8 - needs rulebook (base crafting dice). → *Noted, no action needed.* Rulebook crafting dice are covered in RULES_REFERENCE.md; not needed for planning.
 
 ## Alchemist
 
-- [ ] Level 3 has fixed +5 Alchemy plus +5 choice; trade rule wording covers "these skills" -
-      confirm it applies to the Alchemy points too.
-- [ ] "1 IP" / "EP action" / interlude points - need rulebook.
+- [ ] **GM question.** Level 3 has fixed +5 Alchemy plus +5 choice; trade rule wording covers "these skills" -
+      confirm it applies to the Alchemy points too. → Level 3 trade wording "these skills": can the fixed crafting points be traded for expertise too?
+- [x] "1 IP" / "EP action" / interlude points - need rulebook. → **Rulebook:** IP and EP actions are in the rulebook's Interlude section.
 
 ## Alkahest
 
-- [ ] Level 3 isn't a normal skill step (10 Transmuter points + discipline choice). Confirm details.
-- [ ] Difficulty shows 2/5. Recorded 2.
-- [ ] Transmutation Tricks Benefit 3 text only says you may use "the following abilities" and
-      links Transmuter Tricks. Recorded as granting Transmuter Tricks.
-- [ ] Siphon Material: ability shows no cost, but tactical guidance says it costs an interlude point.
-- [ ] Proto Armatae HP shows "–" in its stat block but text gives 15 + 5 x Focus. Recorded formula.
-- [ ] Evasion 9/19 and Guard 4/14 - meaning of the two numbers needs rulebook.
+- [x] Level 3 isn't a normal skill step (10 Transmuter points + discipline choice). Confirm details. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Difficulty shows 2/5. Recorded 2. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Transmutation Tricks Benefit 3 text only says you may use "the following abilities" and
+      links Transmuter Tricks. Recorded as granting Transmuter Tricks. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Siphon Material: ability shows no cost, but tactical guidance says it costs an interlude point. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Proto Armatae HP shows "–" in its stat block but text gives 15 + 5 x Focus. Recorded formula. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Evasion 9/19 and Guard 4/14 - meaning of the two numbers needs rulebook. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Amanita
 
-- [ ] Mushroomize cost: 2 AP, with "1 RP instead of 2 AP" in the text. Recorded cost "2 AP".
-- [ ] Spore Symbiote comes from Mycomancer (the required class) - planner may need to link them.
-- [ ] Damage Reduction, Amoxicillin, Downed state - need rulebook.
+- [x] Mushroomize cost: 2 AP, with "1 RP instead of 2 AP" in the text. Recorded cost "2 AP". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Spore Symbiote comes from Mycomancer (the required class) - planner may need to link them. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Damage Reduction, Amoxicillin, Downed state - need rulebook. → **Rulebook:** Damage reduction and the Downed state are in the rulebook (RULES_REFERENCE.md section 7).
 
 ## Angelblooded
 
-- [ ] Role read as "Main: Main, Secondary: Utility" - recorded role Utility, no secondary
-      (matches the class index). Confirm.
-- [ ] Angelic Presence grants +1 Presence (stored as `grants`). Planner should add it to stats.
-- [ ] God's Blessing: no cost and range "-" on the page. Recorded as shown.
+- [x] Role read as "Main: Main, Secondary: Utility" - recorded role Utility, no secondary
+      (matches the class index). Confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Angelic Presence grants +1 Presence (stored as `grants`). Planner should add it to stats. → **Done:** +1 Presence is added to stats.
+- [x] God's Blessing: no cost and range "-" on the page. Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## General (added during Animal Summoner - Bajiquan Style batch)
 
@@ -173,70 +173,70 @@ When the site version changes, recheck classes already entered.
 
 ## Animal Summoner
 
-- [ ] Role read as "Main" + "Specialist" - recorded Specialist only (matches class index).
-- [ ] Wolf, Boar and Giant Spider stat blocks are NOT on the class page. Need monster pages.
-- [ ] "Summon limit" and "slots" - need rulebook.
-- [ ] Summon Animal picks a random animal - how it's rolled isn't stated. Needs rulebook.
+- [x] Role read as "Main" + "Specialist" - recorded Specialist only (matches class index). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [ ] Wolf, Boar and Giant Spider stat blocks are NOT on the class page. Need monster pages. → Still to collect: Wolf, Boar and Giant Spider stat blocks (monster pages).
+- [x] "Summon limit" and "slots" - need rulebook. → **Done:** Summon keyword defined in keywords.js.
+- [x] Summon Animal picks a random animal - how it's rolled isn't stated. Needs rulebook. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Anti-Mage
 
-- [ ] Role read as "Main" + "Support" - recorded Support only (matches class index).
-- [ ] Counterspell cost shows "1 or 2 RP" but its text describes a variable RP cost. Confirm.
-- [ ] "Grunt" enemy type, Bounded Fields, Enchantment keyword - need rulebook.
+- [x] Role read as "Main" + "Support" - recorded Support only (matches class index). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Counterspell cost shows "1 or 2 RP" but its text describes a variable RP cost. Confirm. → **Done:** Official page shows the cost as "NaN RP" (a site glitch); text: half the spell's AP (rounded up) or its RP. Data now says "Variable RP" (2026-10-24).
+- [x] "Grunt" enemy type, Bounded Fields, Enchantment keyword - need rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
 
 ## Arcanist
 
-- [ ] Magic Missile II has no Requirements heading on the page (others show "-"). Recorded null.
-- [ ] Expanded Circuits grants +2 max Mana (stored as `grants: { maxMana: 2 }`).
+- [x] Magic Missile II has no Requirements heading on the page (others show "-"). Recorded null. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Expanded Circuits grants +2 max Mana (stored as `grants: { maxMana: 2 }`). → **Done:** +2 max Mana is added.
 
 ## Archer
 
-- [ ] Status Assessment II key: refund possible, also granted by Marksman. Amount MISSING.
-- [ ] Unerring Aim: no cost, range, keywords or requirements on the page.
-- [ ] Snap Shot II: "Focus isn't added to this roll" - roll math needs rulebook.
+- [x] Status Assessment II key: refund possible, also granted by Marksman. Amount MISSING. → **Rulebook:** an ability you already have is a full EXP refund (Refunds rule); the planner refunds exact duplicates automatically, so no page amount is needed.
+- [x] Unerring Aim: no cost, range, keywords or requirements on the page. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Snap Shot II: "Focus isn't added to this roll" - roll math needs rulebook. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Archsage
 
-- [ ] Role read as "Main" + "Utility" - recorded Utility only (matches class index).
-- [ ] Battle Cast (Level 2) shows refund possible; also granted by Battle Mage. Amount MISSING.
+- [x] Role read as "Main" + "Utility" - recorded Utility only (matches class index). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Battle Cast (Level 2) shows refund possible; also granted by Battle Mage. Amount MISSING. → **Rulebook:** an ability you already have is a full EXP refund (Refunds rule); the planner refunds exact duplicates automatically, so no page amount is needed.
 
 ## Armorsmith
 
-- [ ] Level 3: expertise trade wording names Athletics, Riding, Common Knowledge only - unclear
-      if the fixed Armorsmithing points can be traded too. Confirm.
-- [ ] Heart step also grants proficiency in Heavy Armor OR Greatshields (needs a dropdown).
-- [ ] Armorsmith Core Crafting: key Benefit 4 says "Armorsmith Core Crafting" but the granted
-      ability on the page is named "Armorsmith Basics". Stored as "Armorsmith Basics (crafting abilities)".
-- [ ] Thermal Quench cost line shows "1 Crafting Dice" with an extra "Other" label. Confirm.
-- [ ] Modification A / Frame details are on Universal Armor + armor pages (not captured).
+- [ ] **GM question.** Level 3: expertise trade wording names Athletics, Riding, Common Knowledge only - unclear
+      if the fixed Armorsmithing points can be traded too. Confirm. → Level 3 trade wording "these skills": can the fixed crafting points be traded for expertise too?
+- [x] Heart step also grants proficiency in Heavy Armor OR Greatshields (needs a dropdown). → **Done:** Proficiency choice handled (alsoGrants).
+- [x] Armorsmith Core Crafting: key Benefit 4 says "Armorsmith Core Crafting" but the granted
+      ability on the page is named "Armorsmith Basics". Stored as "Armorsmith Basics (crafting abilities)". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Thermal Quench cost line shows "1 Crafting Dice" with an extra "Other" label. Confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Modification A / Frame details are on Universal Armor + armor pages (not captured). → **Done:** Universal armor mods and Frame mods are in the Mods window (data/mods.js).
 
 ## Artificer
 
-- [ ] Level 3 lists both "Artificing" (fixed +5) and "Artifice" (in the choice list). These may
-      be two different skills or a site typo. Confirm.
-- [ ] Artifice Modification C: text says it modifies a "weapon" despite the name. Possible site typo.
-- [ ] Blackbird cost: "1 AP" plus "1 Small Shell" (tagged "Other"). Recorded "1 AP, 1 Small Shell".
-- [ ] Overclock: +1d10 crafting points - needs rulebook.
-- [ ] "clim" currency and material unit values - need rulebook/items pages.
+- [x] Level 3 lists both "Artificing" (fixed +5) and "Artifice" (in the choice list). These may
+      be two different skills or a site typo. Confirm. → **Rulebook:** they're two different skills: Artifice (a Reason skill) and Artificing (Artificer crafting). Official page 2026-10-24 lists both.
+- [x] Artifice Modification C: text says it modifies a "weapon" despite the name. Possible site typo. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Blackbird cost: "1 AP" plus "1 Small Shell" (tagged "Other"). Recorded "1 AP, 1 Small Shell". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Overclock: +1d10 crafting points - needs rulebook. → *Noted, no action needed.* Crafting dice/points are rulebook crafting rules; not needed for planning.
+- [x] "clim" currency and material unit values - need rulebook/items pages. → **Done:** Clim and units are in the planner (units added 2026-10-24).
 
 ## Assassin
 
-- [ ] Devastating Strike III: "guaranteed maximum damage" - confirm wording and damage math.
-- [ ] Death Mark: no listed cost (Encounter Start ability).
+- [x] Devastating Strike III: "guaranteed maximum damage" - confirm wording and damage math. → **Done:** Official page 2026-10-24 has NO maximum-damage clause - just a Light (1 AP) or Heavy (2 AP) attack. Summary corrected.
+- [x] Death Mark: no listed cost (Encounter Start ability). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Aurora Blade Style
 
-- [ ] Ultimate name is spelled "Permafrost Guilotine" on the class index (one 'l'). One page read
-      spelled it "Guillotine". Recorded the index spelling. Confirm.
-- [ ] Rimestep has no Requirements heading; its trigger (target Slowed by a Frost attack) is in the
-      rules text. Recorded requires: null.
-- [ ] Rimestep has an Overcharge in its text but "Overcharge" isn't in its keyword list.
+- [x] Ultimate name is spelled "Permafrost Guilotine" on the class index (one 'l'). One page read
+      spelled it "Guillotine". Recorded the index spelling. Confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Rimestep has no Requirements heading; its trigger (target Slowed by a Frost attack) is in the
+      rules text. Recorded requires: null. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Rimestep has an Overcharge in its text but "Overcharge" isn't in its keyword list. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Bajiquan Style
 
-- [ ] Zhen Jiao: no cost, range, keywords or requirements on the page.
-- [ ] Elbow Uppercut and Tetsuzanko show a "Combo" heading in the rules - recorded inside summary.
-- [ ] Rushing Knee Drop is mentioned (from Martial Artist?) - not on this page.
+- [x] Zhen Jiao: no cost, range, keywords or requirements on the page. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Elbow Uppercut and Tetsuzanko show a "Combo" heading in the rules - recorded inside summary. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Rushing Knee Drop is mentioned (from Martial Artist?) - not on this page. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## General (added during Bard - Botanist batch)
 
@@ -250,71 +250,71 @@ When the site version changes, recheck classes already entered.
 ## Bard
 
 - [ ] Role read as "Main" + "Support" - recorded Support only (matches class index).
-- [ ] Toss a coin: cost recorded as "Errand" (page says it's an Errand action, no cost line).
-- [ ] Inspiring Song +1d4 / Dirge -1d4 - dice, needs rulebook.
-- [ ] Entry requirement includes Art expertise in Singing/Idol/an instrument - planner needs
-      Art expertise sub-types for this check.
+- [x] Toss a coin: cost recorded as "Errand" (page says it's an Errand action, no cost line). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Inspiring Song +1d4 / Dirge -1d4 - dice, needs rulebook. → *Noted, no action needed.* Dice described in the ability text.
+- [x] Entry requirement includes Art expertise in Singing/Idol/an instrument - planner needs
+      Art expertise sub-types for this check. → **Done:** Requirements check named Art expertise.
 
 ## Battle Mage
 
-- [ ] Battle Cast (Level 4) shows refund possible; also granted by Archsage. Amount MISSING.
-- [ ] Shooting Form range shows "-". Recorded null.
-- [ ] Circle Swing has no Keywords line on the page. Recorded [].
-- [ ] Mage Armor add-ons (Barrier, Fortress, Manaweave, Protective Coating, Spidersilk) are on
-      armor pages - not captured.
+- [x] Battle Cast (Level 4) shows refund possible; also granted by Archsage. Amount MISSING. → **Rulebook:** an ability you already have is a full EXP refund (Refunds rule); the planner refunds exact duplicates automatically, so no page amount is needed.
+- [x] Shooting Form range shows "-". Recorded null. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Circle Swing has no Keywords line on the page. Recorded []. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Mage Armor add-ons (Barrier, Fortress, Manaweave, Protective Coating, Spidersilk) are on
+      armor pages - not captured. → **Done:** Armor mods are in the Mods window (data/mods.js).
 
 ## Battlemaster
 
-- [ ] Ability name spelled "Skillfull Blow" (two l's) on the site. Recorded as shown.
-- [ ] Arms Mastery proficiency doesn't count for class requirements - planner should respect this.
+- [x] Ability name spelled "Skillfull Blow" (two l's) on the site. Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Arms Mastery proficiency doesn't count for class requirements - planner should respect this. → **Done:** proficiencies.js marks Arms Mastery as not counting for class requirements.
 
 ## Berserker
 
-- [ ] Fallen Friend triggers on a "Heroic-tier ally" - needs rulebook.
-- [ ] Soul options listed as "Power or Focus" (that order). Recorded as shown.
+- [x] Fallen Friend triggers on a "Heroic-tier ally" - needs rulebook. → **Rulebook:** Heroic/Elite vs Grunt types are in the rulebook (RULES_REFERENCE.md section 7).
+- [x] Soul options listed as "Power or Focus" (that order). Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Biochemist
 
 - [ ] Role read as "Main" + "Specialist" - recorded Specialist only (matches class index).
-- [ ] Chimera subraces and their genes/abilities - need races pages (races.js later).
-- [ ] Alchemy Elixirs (Rabbit, Reaper, Shark, Tunnel, Bull, Bear) - need items pages.
+- [x] Chimera subraces and their genes/abilities - need races pages (races.js later). → **Done:** Chimera sub-races are in races.js.
+- [x] Alchemy Elixirs (Rabbit, Reaper, Shark, Tunnel, Bull, Bear) - need items pages. → **Done:** Those elixirs are in items.js.
 
 ## Black Oath Style
 
-- [ ] Eclipse Breaker: tactical guidance says no mana cost, can start with 1 AP and cancel if no
-      one's in the area - not in the ability block. Recorded the ability block only.
-- [ ] "Setup" keyword (charging abilities) - needs rulebook.
+- [x] Eclipse Breaker: tactical guidance says no mana cost, can start with 1 AP and cancel if no
+      one's in the area - not in the ability block. Recorded the ability block only. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] "Setup" keyword (charging abilities) - needs rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
 
 ## Blacksmith
 
-- [ ] Weapon Maintenance has no listed cost, range or duration.
-- [ ] Crit ranges (19-20, katana 18-20) - needs rulebook/weapons pages.
+- [x] Weapon Maintenance has no listed cost, range or duration. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Crit ranges (19-20, katana 18-20) - needs rulebook/weapons pages. → **Rulebook:** Katana's Keen (crit 19-20) and other weapon-group rules are in RULES_REFERENCE.md section 10.
 
 ## Bloodbinder
 
-- [ ] Entry requirement "At least 1 class mastered" (worded differently from "Any class mastered"
-      on other pages - likely the same). Recorded as shown.
-- [ ] Crimson Enmity: no cost, range or keywords on the page.
+- [x] Entry requirement "At least 1 class mastered" (worded differently from "Any class mastered"
+      on other pages - likely the same). Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Crimson Enmity: no cost, range or keywords on the page. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Bodyguard
 
-- [ ] Cost lines show run together on the page ("0 AP3 MP", "0 RP2 MP"). Recorded as
-      "0 AP, 3 MP" and "0 RP, 2 MP".
-- [ ] Vengeance range is "Weapon Range" (not "Melee Weapon Range"). Recorded as shown.
+- [x] Cost lines show run together on the page ("0 AP3 MP", "0 RP2 MP"). Recorded as
+      "0 AP, 3 MP" and "0 RP, 2 MP". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Vengeance range is "Weapon Range" (not "Melee Weapon Range"). Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Botanist
 
-- [ ] **Level 8 Ultimate is BLANK on the site** (the class index also shows an empty 5th ability).
-      Recorded as MISSING. Recheck when the site updates.
-- [ ] **Forager's Eye** is listed under Abilities unlocked but isn't in any progression step.
+- [x] **Level 8 Ultimate is BLANK on the site** (the class index also shows an empty 5th ability).
+      Recorded as MISSING. Recheck when the site updates. → **Done:** Filled from the official site 2026-10-24 (Forager's Eye).
+- [x] **Forager's Eye** is listed under Abilities unlocked but isn't in any progression step.
       Stored as kind "unlisted". Its Combo text is confusing (mentions Lifebeat Sense with an
-      unstated bonus). Confirm with a screenshot.
-- [ ] Felling Strike and Craft Pemmican are mentioned in the tactical guidance but have no entries.
-- [ ] Level 3: +5 Foraging only; expertise trading not mentioned.
-- [ ] Trail Mix cost "Rest Action" (plus an "Other" tag); Stalks of Comparison cost "1 Strike Dice"
-      (plus "Other"). Recorded without the "Other" tag.
-- [ ] Node Points, Lucky Points, Strike Dice, Outcrop tiers - gathering rules, need rulebook.
-- [ ] Trail Mix mentions "Mirane" getting 0 Mana - probably a race or character. Confirm.
+      unstated bonus). Confirm with a screenshot. → **Done:** Forager's Eye is now the Level 8 step (official site 2026-10-24).
+- [x] Felling Strike and Craft Pemmican are mentioned in the tactical guidance but have no entries. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Level 3: +5 Foraging only; expertise trading not mentioned. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Trail Mix cost "Rest Action" (plus an "Other" tag); Stalks of Comparison cost "1 Strike Dice"
+      (plus "Other"). Recorded without the "Other" tag. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Node Points, Lucky Points, Strike Dice, Outcrop tiers - gathering rules, need rulebook. → *Noted, no action needed.* Gathering rules are in the rulebook; not needed for planning.
+- [x] Trail Mix mentions "Mirane" getting 0 Mana - probably a race or character. Confirm. → *Noted, no action needed.* Mirane is the canon campaign's town (Mirane Expedition) - a campaign-specific line.
 
 ## General (added during Brawler - Cultivator batch)
 
@@ -327,67 +327,67 @@ When the site version changes, recheck classes already entered.
 
 ## Brawler
 
-- [ ] Vital Drive II cost shows "0 RP Variable MP" run together. Recorded "0 RP, Variable MP".
-- [ ] Counter Stance: ability says cancel for 0 AP or 1 RP; tactical guidance says it can't end
-      until your next turn. Recorded the ability block.
-- [ ] Suckerpunch: tactical guidance says only usable when already in melee range at encounter
-      start - not in the ability block.
+- [x] Vital Drive II cost shows "0 RP Variable MP" run together. Recorded "0 RP, Variable MP". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Counter Stance: ability says cancel for 0 AP or 1 RP; tactical guidance says it can't end
+      until your next turn. Recorded the ability block. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Suckerpunch: tactical guidance says only usable when already in melee range at encounter
+      start - not in the ability block. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Cannoneer
 
-- [ ] Cannons' "1 attack limitation" and splash mods - need weapons/items pages.
-- [ ] Sunder 2 - needs rulebook.
-- [ ] Quantum Bomb lists only "heavy attack" with Setup - seems light on detail. Confirm.
+- [x] Cannons' "1 attack limitation" and splash mods - need weapons/items pages. → **Done:** Cannon items and mods are in items.js.
+- [x] Sunder 2 - needs rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
+- [x] Quantum Bomb lists only "heavy attack" with Setup - seems light on detail. Confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Carpenter
 
-- [ ] Level 3 expertise trade: "these skills" is ambiguous (Carpentry too, or only the 3 choices?).
-- [ ] Felling Strike: no keywords listed on the page.
-- [ ] Hammer and Nail has the Rage keyword (unusual for a crafter). Recorded as shown.
+- [ ] **GM question.** Level 3 expertise trade: "these skills" is ambiguous (Carpentry too, or only the 3 choices?). → Level 3 trade wording "these skills": can the fixed crafting points be traded for expertise too?
+- [x] Felling Strike: no keywords listed on the page. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Hammer and Nail has the Rage keyword (unusual for a crafter). Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Cavalier
 
 - [ ] Role read as "Main" + "Utility" - recorded Utility only (matches class index).
-- [ ] Spirit Jump: same unclear "For 0 AP, the fall doesn't provoke..." wording as Adventurer's
-      Power Jump. Recorded as always true.
-- [ ] Mounts and mount stats - need rulebook/monsters pages.
+- [x] Spirit Jump: same unclear "For 0 AP, the fall doesn't provoke..." wording as Adventurer's
+      Power Jump. Recorded as always true. → **Done:** Same wording as Power Jump; the recorded reading matches the official page.
+- [x] Mounts and mount stats - need rulebook/monsters pages. → **Done:** Mounts are in items.js (category Mount).
 
 ## Chronofighter
 
-- [ ] Past Self (granted) has no Requirements section. Recorded null.
-- [ ] Accelerating Strike: "Initiative rises by up to 2" - confirm exact wording.
-- [ ] "Opener" keyword and the Delay encounter start action - need rulebook.
+- [x] Past Self (granted) has no Requirements section. Recorded null. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Accelerating Strike: "Initiative rises by up to 2" - confirm exact wording. → **Done:** Official page: "increases your Initiative by up to 2".
+- [x] "Opener" keyword and the Delay encounter start action - need rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
 
 ## Chronomancer
 
-- [ ] No abilities on this page show a Requirements line at all. Recorded null.
-- [ ] Galaxy Stop: "non-heroic units" - needs rulebook.
+- [x] No abilities on this page show a Requirements line at all. Recorded null. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Galaxy Stop: "non-heroic units" - needs rulebook. → **Rulebook:** Grunt/Heroic types are in RULES_REFERENCE.md section 7.
 
 ## Colossus
 
-- [ ] Mighty Leap: save vs Unbalanced - no save type given on the page.
-- [ ] Level 3 skill list is only 4 skills (no Common Knowledge). Recorded as shown.
+- [x] Mighty Leap: save vs Unbalanced - no save type given on the page. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Level 3 skill list is only 4 skills (no Common Knowledge). Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Cryomancer
 
-- [ ] Glacial Wall: "4 x X" cubes - X isn't defined on the page (probably Mana spent, given the
-      "Variable MP" cost). Confirm.
-- [ ] Sheet Ice "20x20 area" - no unit on the page (probably ft).
-- [ ] Frost Coffin cubes have HP 15 + Focus (Glacial Wall cubes are 20 + Focus). Recorded as shown.
+- [x] Glacial Wall: "4 x X" cubes - X isn't defined on the page (probably Mana spent, given the
+      "Variable MP" cost). Confirm. → **Done:** Official page: cost "X MP", so X = Mana spent.
+- [x] Sheet Ice "20x20 area" - no unit on the page (probably ft). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Frost Coffin cubes have HP 15 + Focus (Glacial Wall cubes are 20 + Focus). Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Culinarian
 
-- [ ] Craft Pemmican listed with the "Errand" keyword and no cost line.
-- [ ] Pepper Spray keyword shown as "Blinded" (a condition, not a usual keyword). Recorded as shown.
-- [ ] Oil Slick "15x15 area" - no unit (probably ft). No keywords listed.
-- [ ] Food bonuses (+1 Focus etc.) - planner could track as temporary buffs later.
+- [x] Craft Pemmican listed with the "Errand" keyword and no cost line. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Pepper Spray keyword shown as "Blinded" (a condition, not a usual keyword). Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Oil Slick "15x15 area" - no unit (probably ft). No keywords listed. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Food bonuses (+1 Focus etc.) - planner could track as temporary buffs later. → *Noted, no action needed.* Idea for later: food buffs as toggles.
 
 ## Cultivator
 
 - [ ] Role read as "Main" + "Utility" - recorded Utility only (matches class index).
-- [ ] Cultivator's Journey Benefit 3 gives +5 skill points from the SAME list as Level 3 - a page
-      read called it a duplicate. Recorded both. Confirm it's really two separate +5s.
-- [ ] Index lore talks about philosophies/paths, but the page has no path choices. Nothing to record.
+- [x] Cultivator's Journey Benefit 3 gives +5 skill points from the SAME list as Level 3 - a page
+      read called it a duplicate. Recorded both. Confirm it's really two separate +5s. → **Done:** Official page 2026-10-24: yes, two separate +5s (Level 3 and the key's benefit).
+- [x] Index lore talks about philosophies/paths, but the page has no path choices. Nothing to record. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## General (added during Curse Knight - Electromancer batch)
 
@@ -400,67 +400,67 @@ When the site version changes, recheck classes already entered.
 
 ## Curse Knight
 
-- [ ] Role read as "Main" + "Striker" - recorded Striker only (matches class index).
-- [ ] "Lockstep" keyword on Backlash and "Climax Arts" in Devil's Curse - need rulebook.
-- [ ] Devil's Blow: page lists Full Pierce as a keyword but the text says the attack does NOT have
-      Full Pierce (the self-damage on a roll of 1 does). Recorded keyword as shown. Confirm.
+- [x] Role read as "Main" + "Striker" - recorded Striker only (matches class index). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] "Lockstep" keyword on Backlash and "Climax Arts" in Devil's Curse - need rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
+- [x] Devil's Blow: page lists Full Pierce as a keyword but the text says the attack does NOT have
+      Full Pierce (the self-damage on a roll of 1 does). Recorded keyword as shown. Confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Cutthroat
 
-- [ ] Exposing Stab says "Devastating Strike" (no number) - assumed it means Devastating Strike II
-      on this class. Confirm.
-- [ ] Artery Cut: critical hit rules - need rulebook.
+- [x] Exposing Stab says "Devastating Strike" (no number) - assumed it means Devastating Strike II
+      on this class. Confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Artery Cut: critical hit rules - need rulebook. → **Rulebook:** Critical hits are in the rulebook (natural 20; Keen 19-20).
 
 ## Daionmyoji
 
 - [ ] Role read as "Main" + "Specialist" - recorded Specialist only (matches class index).
-- [ ] Level 3 list shows "Magic Perception" with no comma. Recorded as two skills (Magic,
-      Perception). Possible site typo - confirm.
-- [ ] Prepared Talisman: cost "No listed cost" and requirement "Special". Recorded as shown.
-- [ ] Talismans, Create Talisman, Sealing/Secret Talismans, calligraphy units - come from Onmyoji
-      (the required class). Need Onmyoji page.
-- [ ] Spirit Core values and "non-heroic" - need rulebook.
+- [x] Level 3 list shows "Magic Perception" with no comma. Recorded as two skills (Magic,
+      Perception). Possible site typo - confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Prepared Talisman: cost "No listed cost" and requirement "Special". Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Talismans, Create Talisman, Sealing/Secret Talismans, calligraphy units - come from Onmyoji
+      (the required class). Need Onmyoji page. → **Done:** Onmyoji is in classes.js and was rechecked 2026-10-24.
+- [x] Spirit Core values and "non-heroic" - need rulebook. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Dark Priest
 
-- [ ] Soul Absorption key grants Elemental Mastery: Dark (stored as `grants: { mastery: "Dark" }`).
-- [ ] Gloom Infusion: "Type" keyword and creature type "Dark II" - need rulebook.
-- [ ] Stygian Screen: Concentration but no stated duration.
+- [x] Soul Absorption key grants Elemental Mastery: Dark (stored as `grants: { mastery: "Dark" }`). → **Done:** Dark Mastery tracked.
+- [x] Gloom Infusion: "Type" keyword and creature type "Dark II" - need rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
+- [x] Stygian Screen: Concentration but no stated duration. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Deadeye
 
-- [ ] Aimed Shot (Level 6) shows refund possible; also granted by Sniper. Amount MISSING.
-- [ ] Countershot has no keywords listed.
-- [ ] Status Assessment III also shows RP % (Archer's II shows HP % only).
+- [x] Aimed Shot (Level 6) shows refund possible; also granted by Sniper. Amount MISSING. → **Rulebook:** an ability you already have is a full EXP refund (Refunds rule); the planner refunds exact duplicates automatically, so no page amount is needed.
+- [x] Countershot has no keywords listed. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Status Assessment III also shows RP % (Archer's II shows HP % only). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Death Knight
 
-- [ ] Unholy Strength grants +2 Power and +2 Focus while active (temporary buff).
-- [ ] Call of the Grave: page read gave no damage dice for the Heavy Attack (normal - uses weapon).
+- [x] Unholy Strength grants +2 Power and +2 Focus while active (temporary buff). → **Done:** Shown as a toggle bonus.
+- [x] Call of the Grave: page read gave no damage dice for the Heavy Attack (normal - uses weapon). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Dragoon
 
-- [ ] Level 3 includes "a relevant Expert Knowledge skill (DM approval)". Recorded as an option label.
-- [ ] Jump (granted) range shows "-". Recorded null.
-- [ ] Entry: "Lancer mastered" + (10 Athletics (Jumping) expertise OR Jiangshi race).
+- [x] Level 3 includes "a relevant Expert Knowledge skill (DM approval)". Recorded as an option label. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Jump (granted) range shows "-". Recorded null. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Entry: "Lancer mastered" + (10 Athletics (Jumping) expertise OR Jiangshi race). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Duelist
 
-- [ ] Parry comes from Fencer (the required class). Need Fencer page to link.
-- [ ] Endless Waltz wording ("two Light Attacks, then one more on damage") - confirm exact sequence.
+- [x] Parry comes from Fencer (the required class). Need Fencer page to link. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Endless Waltz wording ("two Light Attacks, then one more on damage") - confirm exact sequence. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Earthcleaving Style
 
-- [ ] "Half Pierce" keyword and "Offstep" - need rulebook.
-- [ ] Measured Collapse always counts as rolling a 2 for accuracy - confirm (seems unusual; maybe
-      it's a bonus of 2?). Recorded as the page read stated.
+- [x] "Half Pierce" keyword and "Offstep" - need rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
+- [x] Measured Collapse always counts as rolling a 2 for accuracy - confirm (seems unusual; maybe
+      it's a bonus of 2?). Recorded as the page read stated. → **Done:** Official page 2026-10-24: "always considered to have rolled a 2 for accuracy" (+2 vs large, +4 vs huge). Recorded correctly.
 
 ## Electromancer
 
-- [ ] Superconductor key grants Elemental Mastery: Lightning (stored as `grants: { mastery: "Lightning" }`).
-- [ ] Cost lines show run together ("1 AP1 MP"). Recorded with comma.
-- [ ] Static (Focus x 3 etc.) - Static rules need rulebook.
-- [ ] Bolting: tactical guidance says it can't be used indoors - not in the ability block.
+- [x] Superconductor key grants Elemental Mastery: Lightning (stored as `grants: { mastery: "Lightning" }`). → **Done:** Lightning Mastery tracked.
+- [x] Cost lines show run together ("1 AP1 MP"). Recorded with comma. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Static (Focus x 3 etc.) - Static rules need rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
+- [x] Bolting: tactical guidance says it can't be used indoors - not in the ability block. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## General (added during the overnight run)
 
@@ -479,141 +479,141 @@ When the site version changes, recheck classes already entered.
 
 ## Armiger
 
-- [ ] Not on the class list page (see General). Role read as "Main" + "Utility" - recorded Utility.
-- [ ] Fast Dimensional Equip requirement says "Dimension Armory" (not "Dimensional") - site typo.
-- [ ] Send To Armory has an Overcharge in its text, but Overcharge isn't in its keywords.
+- [x] Not on the class list page (see General). Role read as "Main" + "Utility" - recorded Utility. → **Done:** Armiger is on the official class list.
+- [x] Fast Dimensional Equip requirement says "Dimension Armory" (not "Dimensional") - site typo. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Send To Armory has an Overcharge in its text, but Overcharge isn't in its keywords. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Electromaster
 
-- [ ] Static Overload: no damage stated on a successful save. Daze keyword - needs rulebook.
-- [ ] Thunderstorm: "cover is figured from above the target" - needs rulebook (cover rules).
+- [x] Static Overload: no damage stated on a successful save. Daze keyword - needs rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
+- [x] Thunderstorm: "cover is figured from above the target" - needs rulebook (cover rules). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Elementalist
 
-- [ ] Elemental Convergence lets you count as having mastered an element for the encounter -
-      planner should NOT treat this as a permanent mastery for class entry.
-- [ ] Elemental Bolt lists condition names (Burning, Soaked, Illumination, etc.) as keywords.
-      Recorded as shown.
-- [ ] Elemental Burst: 2d4 + Focus - dice, needs rulebook.
+- [x] Elemental Convergence lets you count as having mastered an element for the encounter -
+      planner should NOT treat this as a permanent mastery for class entry. → **Done:** Elemental Convergence doesn't grant a permanent mastery in the data.
+- [x] Elemental Bolt lists condition names (Burning, Soaked, Illumination, etc.) as keywords.
+      Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Elemental Burst: 2d4 + Focus - dice, needs rulebook. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Eremancer
 
-- [ ] Role read as "Main" only - recorded Striker (matches class index).
-- [ ] Dark Bolt lists both Half Pierce and Full Pierce as keywords. Recorded as shown.
-- [ ] Energy Drain: "universal" damage resistance types - needs rulebook.
-- [ ] "Playing Eremancer" guidance has only an image (no text).
+- [x] Role read as "Main" only - recorded Striker (matches class index). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Dark Bolt lists both Half Pierce and Full Pierce as keywords. Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Energy Drain: "universal" damage resistance types - needs rulebook. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] "Playing Eremancer" guidance has only an image (no text). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Evil Eye
 
-- [ ] Entry needs "at least 1 mystic eye slot open" - planner needs to track Mystic Eye slots.
-- [ ] Key ability shares the class name; stored as "Evil Eye (key)".
-- [ ] Evil Eye of Death: page lists no save. Recorded as shown.
-- [ ] "Playing Evil Eye" guidance says only "Soon".
+- [x] Entry needs "at least 1 mystic eye slot open" - planner needs to track Mystic Eye slots. → **Done:** Mystic Eye slots are tracked.
+- [x] Key ability shares the class name; stored as "Evil Eye (key)". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Evil Eye of Death: page lists no save. Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] "Playing Evil Eye" guidance says only "Soon". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Exalted Blade
 
 - [ ] Role read as "Main" + "Striker" - recorded Striker only (matches class index).
-- [ ] Undying Justice (Level 2) shows refund possible; also granted by Exalted Shield. Amount MISSING.
-- [ ] Heavy Blade bonus damage and Anathema mentioned - from other classes/items.
+- [x] Undying Justice (Level 2) shows refund possible; also granted by Exalted Shield. Amount MISSING. → **Rulebook:** an ability you already have is a full EXP refund (Refunds rule); the planner refunds exact duplicates automatically, so no page amount is needed.
+- [x] Heavy Blade bonus damage and Anathema mentioned - from other classes/items. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Exalted Shield
 
 - [ ] Undying Justice (Level 2) shows refund possible; also granted by Exalted Blade. Amount MISSING.
-- [ ] Divine Shield: "must be first action of your turn" is in its text, not a Requirements line.
-- [ ] Holy Declaration has no listed trigger/requirement, but its text says Block "against the
-      attack" - it's probably a reaction. Confirm.
+- [x] Divine Shield: "must be first action of your turn" is in its text, not a Requirements line. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Holy Declaration has no listed trigger/requirement, but its text says Block "against the
+      attack" - it's probably a reaction. Confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Excavator
 
-- [ ] Level 3: +5 Mining only; expertise trading not mentioned.
-- [ ] Focused Detonation / Take it easy cost "1 Strike Dice" (plus an "Other" tag). Requirement
-      text on site says "Must in a gathering session" (missing "be"). Recorded corrected wording.
+- [x] Level 3: +5 Mining only; expertise trading not mentioned. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Focused Detonation / Take it easy cost "1 Strike Dice" (plus an "Other" tag). Requirement
+      text on site says "Must in a gathering session" (missing "be"). Recorded corrected wording. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Executor
 
-- [ ] Role read as "Main" + "Striker" - recorded Striker only.
-- [ ] Entry: "Any mastered class + Any points in Acolyte" - unclear if "points" means levels in
-      Acolyte. Confirm.
-- [ ] Ultimate name is "Ave María" (with accent); Deus Vult text writes "Ave Maria". Recorded as shown.
-- [ ] Eagle Hunt range "-". Recorded null.
+- [x] Role read as "Main" + "Striker" - recorded Striker only. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [ ] **GM question.** Entry: "Any mastered class + Any points in Acolyte" - unclear if "points" means levels in
+      Acolyte. Confirm. → Executor entry: "any points in Acolyte" - Acolyte unlocked, and can the mastered class be Acolyte?
+- [x] Ultimate name is "Ave María" (with accent); Deus Vult text writes "Ave Maria". Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Eagle Hunt range "-". Recorded null. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Fae Knight
 
-- [ ] Entry requires the Fae race ("Fae only") - needs races.js.
-- [ ] Fluttering Blade "Active" keyword and "Pass" keyword - need rulebook.
-- [ ] Petal Swirl Flash refreshes "Faerie Flash" - probably a Fae racial ability.
+- [x] Entry requires the Fae race ("Fae only") - needs races.js. → **Done:** Race requirements are checked.
+- [x] Fluttering Blade "Active" keyword and "Pass" keyword - need rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
+- [x] Petal Swirl Flash refreshes "Faerie Flash" - probably a Fae racial ability. → **Done:** Faerie Flash is the Fae racial ability.
 
 ## Fae Knight: Willow Style
 
-- [ ] URL slug has a double hyphen ("fae-knight--willow-style"); record id is "fae-knight-willow-style".
-- [ ] Level 3 wording read as "5 skill points in ONE of" the listed skills - unusual. Recorded as
-      the normal pick-among-list. Confirm.
-- [ ] Heavy Spin enhancement: ability text says 2 Mana; tactical guidance says 1 Mana. Recorded 2.
-- [ ] Ultimate is named "Secret Art ~ Faerie Light Eyes: Jade Shelterbelt" - links to the
-      Faerie Light Eyes class somehow. Confirm.
+- [x] URL slug has a double hyphen ("fae-knight--willow-style"); record id is "fae-knight-willow-style". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Level 3 wording read as "5 skill points in ONE of" the listed skills - unusual. Recorded as
+      the normal pick-among-list. Confirm. → *Noted, no action needed.* Same "+5 in either A, B, C..." wording the race pages use; read as spend among the list.
+- [x] Heavy Spin enhancement: ability text says 2 Mana; tactical guidance says 1 Mana. Recorded 2. → **Done:** Official page 2026-10-24: Willow Stance's Heavy Spin enhancement costs 2 mana.
+- [x] Ultimate is named "Secret Art ~ Faerie Light Eyes: Jade Shelterbelt" - links to the
+      Faerie Light Eyes class somehow. Confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Faerie Light Eyes
 
-- [ ] Role read as "Main" + "Controller" - recorded Controller only.
-- [ ] Entry needs the "Mystic Eyes of Faerie Light" breakthrough + an open mystic eye slot.
-- [ ] Time Dilation: Dodge bonus "2X" - X isn't defined (probably Mana spent, given "Variable MP").
-- [ ] Boss enemies, Esoteric Arts - need rulebook.
+- [x] Role read as "Main" + "Controller" - recorded Controller only. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Entry needs the "Mystic Eyes of Faerie Light" breakthrough + an open mystic eye slot. → **Done:** Requirement checked by the planner.
+- [x] Time Dilation: Dodge bonus "2X" - X isn't defined (probably Mana spent, given "Variable MP"). → **Done:** Official page: cost "X MP", Dodge bonus 2X - X = Mana spent.
+- [x] Boss enemies, Esoteric Arts - need rulebook. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Farmer
 
-- [ ] Level 3 recorded as fixed +5 Farming plus +5 choice (same pattern as other crafters). The
-      page read said "no fixed points" but also "5 points to spend on Farming". Confirm.
-- [ ] Farming plots, seeds, harvest difficulty - need rulebook (farming rules).
+- [x] Level 3 recorded as fixed +5 Farming plus +5 choice (same pattern as other crafters). The
+      page read said "no fixed points" but also "5 points to spend on Farming". Confirm. → **Done:** Official page 2026-10-24: fixed +5 Farming plus 5 among Athletics, Survival, Animal Husbandry, Common Knowledge.
+- [x] Farming plots, seeds, harvest difficulty - need rulebook (farming rules). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Fencer
 
-- [ ] Lunge (Level 4) shows refund possible; also granted by Lancer. Amount MISSING.
-- [ ] Parry range "-". Recorded null. Parry's "regain 1 RP" is a rules effect, not a refund note.
-- [ ] Nimble (light blades ability) - need weapons page.
+- [x] Lunge (Level 4) shows refund possible; also granted by Lancer. Amount MISSING. → **Rulebook:** an ability you already have is a full EXP refund (Refunds rule); the planner refunds exact duplicates automatically, so no page amount is needed.
+- [x] Parry range "-". Recorded null. Parry's "regain 1 RP" is a rules effect, not a refund note. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Nimble (light blades ability) - need weapons page. → **Rulebook:** Nimble (Light Swords) is in RULES_REFERENCE.md section 10.
 
 ## Fighter
 
-- [ ] Fighter's Journey grants +5 HP (stored as `grants: { hp: 5 }`). Planner should add to HP.
-- [ ] Power Strike keyword "Crushing" - needs rulebook.
+- [x] Fighter's Journey grants +5 HP (stored as `grants: { hp: 5 }`). Planner should add to HP. → **Done:** +5 HP is added.
+- [x] Power Strike keyword "Crushing" - needs rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
 
 ## Five Harmonies Style
 
-- [ ] Ultimate name spelled "Dharani: Blooming Conciousness" on the site (missing 's'). Recorded as shown.
-- [ ] Luminous Form Stance mentions "Gravitional Ki" (site spelling) - another class's ability.
-- [ ] The ultimate is a Secret Art (keyword) - recorded as shown.
+- [x] Ultimate name spelled "Dharani: Blooming Conciousness" on the site (missing 's'). Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Luminous Form Stance mentions "Gravitional Ki" (site spelling) - another class's ability. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] The ultimate is a Secret Art (keyword) - recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Flame Sentinel
 
-- [ ] Controlled Blaze key grants Fire Mastery; refund possible (also granted by Pyromancer). Amount MISSING.
-- [ ] Flame Infusion cost shows "1 AP, 0 MP". Recorded as shown.
+- [x] Controlled Blaze key grants Fire Mastery; refund possible (also granted by Pyromancer). Amount MISSING. → **Rulebook:** an ability you already have is a full EXP refund (Refunds rule); the planner refunds exact duplicates automatically, so no page amount is needed.
+- [x] Flame Infusion cost shows "1 AP, 0 MP". Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Flash Star Blade Style
 
 - [ ] Role read as "Main" + "Striker" - recorded Striker only.
-- [ ] URL slug ends with a hyphen ("flash-star-blade-style-"); record id has no trailing hyphen.
+- [x] URL slug ends with a hyphen ("flash-star-blade-style-"); record id has no trailing hyphen. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Flowing Wind Style
 
-- [ ] Plume-Treading Art: no cost or range on the page (passive). "Stacking" keyword - needs rulebook.
+- [x] Plume-Treading Art: no cost or range on the page (passive). "Stacking" keyword - needs rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
 
 ## Forager
 
-- [ ] Level 3: fixed +5 Foraging plus +5 choice; trade wording "these skills" is ambiguous.
-- [ ] Verdant Instinct / Divining Petalfall cost "1 Strike Dice" (plus "Other" tag).
-- [ ] Expose condition - needs rulebook.
-- [ ] Forager's Eye (seen on the Botanist page) is NOT on the Forager page either. Still unknown.
+- [ ] **GM question.** Level 3: fixed +5 Foraging plus +5 choice; trade wording "these skills" is ambiguous. → Level 3 trade wording "these skills": can the fixed crafting points be traded for expertise too?
+- [x] Verdant Instinct / Divining Petalfall cost "1 Strike Dice" (plus "Other" tag). → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Expose condition - needs rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
+- [x] Forager's Eye (seen on the Botanist page) is NOT on the Forager page either. Still unknown. → **Done:** Forager's Eye is Botanist's Level 8 ability.
 
 ## Forgemaster
 
-- [ ] Level 3: +5 Blacksmithing only; expertise trading not mentioned.
-- [ ] Level 6 "Expertise Study (Blacksmithing)" grants expertise points + a weapon proficiency
-      (stored in `grants`). Planner should add these.
-- [ ] Secret Art: Shatter - "non-divine arms weapon" and crafted enhancements - need items rules.
+- [x] Level 3: +5 Blacksmithing only; expertise trading not mentioned. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Level 6 "Expertise Study (Blacksmithing)" grants expertise points + a weapon proficiency
+      (stored in `grants`). Planner should add these. → *Noted, no action needed.* Proficiency is handled; the expertise points are the open "track craft expertise grants" item in Bonuses.
+- [x] Secret Art: Shatter - "non-divine arms weapon" and crafted enhancements - need items rules. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Fusilier
 
-- [ ] Salvo keyword and Dual Wield - need rulebook.
-- [ ] "Playing Fusilier" guidance is effectively empty.
+- [x] Salvo keyword and Dual Wield - need rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
+- [x] "Playing Fusilier" guidance is effectively empty. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Geomancer
 
@@ -1272,57 +1272,57 @@ When the site version changes, recheck classes already entered.
 
 ## Chimera
 
-- [ ] Kanolith/zoalith are lore categories, not choices - confirm.
-- [ ] Page doesn't link its sub-races; list built from the hybrid page and sub-race pages.
+- [x] Kanolith/zoalith are lore categories, not choices - confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Page doesn't link its sub-races; list built from the hybrid page and sub-race pages. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Demon
 
-- [ ] Proficiency choice: one common weapon OR +5 skill points "in a skill tied to your demon clan" - which skill belongs to each clan isn't stated.
-- [ ] Mana Burst: "you may use AP for this attack instead" - unclear which cost is replaced.
-- [ ] Mixed House breakthrough (100 EXP) gives a second clan.
-- [ ] No size listed; no sub-races.
+- [ ] **GM question.** Proficiency choice: one common weapon OR +5 skill points "in a skill tied to your demon clan" - which skill belongs to each clan isn't stated. → Demon: which skill belongs to each clan for the "+5 in a skill tied to your clan" option?
+- [x] Mana Burst: "you may use AP for this attack instead" - unclear which cost is replaced. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Mixed House breakthrough (100 EXP) gives a second clan. → **Done:** Mixed House works in the planner.
+- [x] No size listed; no sub-races. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Fae
 
-- [ ] Faerie Flash has the Rage keyword but its text doesn't mention Rage.
-- [ ] Speed for Faerie Flash ("twice your Speed") isn't on the page.
+- [x] Faerie Flash has the Rage keyword but its text doesn't mention Rage. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
+- [x] Speed for Faerie Flash ("twice your Speed") isn't on the page. → **Rulebook:** base Speed is 20ft, so Faerie Flash = up to 40ft.
 
 ## Youkai
 
 - [ ] Spiritual Sync "8X" - X assumed to be mana paid.
 
 ## Ancient Marionette
-- [ ] "Adaptive Defense (Type)" - the Type keyword needs the rulebook.
+- [x] "Adaptive Defense (Type)" - the Type keyword needs the rulebook. → **Done:** The keyword(s) are defined in data/keywords.js (tap the tag for the rule).
 
 ## Anubis
-- [ ] Speak with Dead requirement is just "Special".
+- [x] Speak with Dead requirement is just "Special". → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Bearfolk
-- [ ] Hibernate's extra night-rest HP "Toughness HP" amount isn't clear.
+- [x] Hibernate's extra night-rest HP "Toughness HP" amount isn't clear. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Bullfolk
-- [ ] Restriction: "Male only." Goring Charge: X and the AP cost aren't defined.
+- [x] Restriction: "Male only." Goring Charge: X and the AP cost aren't defined. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Cait Sith
-- [ ] Soul Strike "once on that target" usage - confirm.
+- [x] Soul Strike "once on that target" usage - confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Catfolk
-- [ ] Fast Runner sets base speed 25ft (stored in `grants`).
+- [x] Fast Runner sets base speed 25ft (stored in `grants`). → **Done:** 25ft base speed applied.
 
 ## Centaur
-- [ ] Charge cost line "2 AP" but text allows 2 or 4 AP. Same mechanic as Spearmaster's Spear Charge.
+- [x] Charge cost line "2 AP" but text allows 2 or 4 AP. Same mechanic as Spearmaster's Spear Charge. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Cowfolk
-- [ ] Restriction: "Female only." Provide Milk cost line says no cost but text says 1 EP.
+- [x] Restriction: "Female only." Provide Milk cost line says no cost but text says 1 EP. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Cu Sith
-- [ ] Haunting Bark: Light Lightning damage on 3rd use has no number.
+- [x] Haunting Bark: Light Lightning damage on 3rd use has no number. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Dogfolk
-- [ ] Nothing extra.
+- [x] Nothing extra. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Dryad
-- [ ] Nature's Grasp: "costs 0 Mana vs Grunts" though the cost line already shows 1 MP - fine, but confirm.
+- [x] Nature's Grasp: "costs 0 Mana vs Grunts" though the cost line already shows 1 MP - fine, but confirm. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 
 ## Dullahan
 - [ ] Nothing extra.
