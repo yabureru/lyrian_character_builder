@@ -646,6 +646,8 @@ function calc(){
   var freeKit = 0;
   if (B.canon && B.items.some(function(e){ return e.id === MIRANE.freeKit; })) freeKit = itemCost(ITEMS[MIRANE.freeKit]) || 0;
   climSpent -= freeKit;
+  var meyes = mysticEyes(); C.mysticEyes = meyes;
+  if (meyes.used > meyes.slots) C.warn.push("Mystic Eyes: you have " + meyes.used + " but only " + meyes.slots + " eye slots (each Mystic Eye replaces one of your eyes; the Third Eye breakthrough (3) or 8 Eyes (8) raise the limit).");
   B.bts.forEach(function(b){ var r = BTS[b.id]; if (!r) return;
     if (B.canon && MIRANE.bannedBts.indexOf(b.id) >= 0) C.warn.push(r.name + ": " + MIRANE.bannedNote + ".");
     else if (r.restricted && !B.canon && !B.gmRestricted) C.warn.push(r.name + " is restricted: needs GM approval (tick \"GM allows restricted\" in Identity).");
@@ -948,7 +950,14 @@ function condCheck(c, C){
 function mysticEyes(){
   var cfg = LC.mysticEyes || { baseSlots: 2, classes: [] }, slots = cfg.baseSlots;
   btGrants("mysticEyeSlots").forEach(function(x){ slots = Math.max(slots, x.g.mysticEyeSlots); });
-  var used = B.classes.filter(function(c){ return cfg.classes.indexOf(c.id) >= 0 && c.owned[0]; }).length;
+  // Each Mystic Eye (one per eye class) replaces one of your real eyes and uses a slot (user/GM ruling 2026-10-24):
+  // a class counts once you have its eye key, or any ability with the Mystic Eye keyword.
+  var used = B.classes.filter(function(c){
+    var rec = CLASSES[c.id]; if (!rec) return false;
+    if (cfg.classes.indexOf(c.id) >= 0 && c.owned[0]) return true;
+    return rec.steps.some(function(st, i){ var a = st.ability && rec.abilities[st.ability];
+      return c.owned[i] && a && (a.keywords || []).some(function(k){ return /^mystic eye$/i.test(k); }); });
+  }).length;
   return { slots: slots, used: used };
 }
 function earlyAscension(){ return hasBt("early-ascension") ? 1 : 0; }
@@ -1723,6 +1732,7 @@ function renderLive(){
   h += '<div class="kv"><span>Breakthrough EXP left</span><b class="' + (e.btLeft ? "warn" : "") + '">' + e.btLeft + " / 300</b></div>";
   h += '<div class="kv"><span>Unspent EXP</span><b class="' + (e.unspent < 0 ? "bad" : "") + '">' + e.unspent.toLocaleString() + "</b></div>";
   h += '<div class="kv"><span>Spirit Core</span><b>' + e.spiritCore.toLocaleString() + "</b></div>";
+  if (C.mysticEyes && C.mysticEyes.used) h += '<div class="kv" title="Each Mystic Eye replaces one of your eyes."><span>Mystic Eye slots</span><b class="' + (C.mysticEyes.used > C.mysticEyes.slots ? "bad" : "") + '">' + C.mysticEyes.used + " / " + C.mysticEyes.slots + "</b></div>";
   if (B.canon) h += '<div class="kv" title="Mirane: Spirit Core / 500, rounded down. Staying in a zone with a higher astra level than this risks astra poisoning."><span>Astra resistance</span><b>' + Math.floor(e.spiritCore / 500) + "</b></div>";
   h += '<div class="kv"><span>EXP earned since creation</span><input type="number" id="inExp" min="0" step="25" value="' + num(B.expEarned) + '"></div>';
   if (e.human) h += '<div class="note">Includes Human Ambition +100 EXP.</div>';

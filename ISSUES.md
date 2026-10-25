@@ -14,7 +14,7 @@ Everything else in this file is either done, checked against the official site (
 3. **Stat training breakthroughs:** is there a maximum for a stat? *(Planner: no cap.)*
 4. **"Any tier 2 class mastered":** does a mastered tier 3 class count? *(Planner: yes.)*
 5. **Executor** ("any mastered class + any points in Acolyte"): does that mean Acolyte unlocked, and can the mastered class be Acolyte itself? *(Planner: Acolyte unlocked + one mastered class, which may be Acolyte.)*
-6. **Mystic Eye slots:** which abilities/classes use up a slot (Evil Eye, Wave Palm's Life Perception Eye, Shinigami Eyes, Faerie Light Eyes...)? *(Planner: each Mystic Eye class uses one.)*
+6. ~~**Mystic Eye slots**~~ **Answered (user, 2026-10-24):** anything with the Mystic Eye keyword is a Mystic Eye; each eye replaces one of your real eyes and takes a slot - 2 normally, 3 with Third Eye, 8 with 8 Eyes. The planner counts one per eye class (its key, or any owned ability with the keyword), shows "Mystic Eye slots used / max" in Pools and warns when over.
 7. **Blocking:** Block sets Guard to 2 x Toughness + armor Block value. Do armor Guard and Guard bonuses from abilities (Stoneskin, stances) also add while Blocking? *(Planner: no, kept separate.)*
 8. **Unholy Strength** (+2 Power / +2 Focus): does it also raise max Mana, or only attacks? *(Planner: full stat bonus while on.)*
 9. **High Fae:** does Faerie Flash II replace the Fae race's Faerie Flash, or do you have both? *(Planner: both listed.)*
@@ -1471,7 +1471,7 @@ Everything else in this file is either done, checked against the official site (
 - [x] **Mark of Conflict** needs "an Unknown Paladin that follows Eisen" + Mark of Justice (Sword Paladin). → *Noted, no action needed.* Data note.
 - [x] **Slow Starter:** -200 starting EXP, then doubled EXP until 500 received. Planner needs to handle this in the EXP budget. → **Done:** Slow Starter is handled in the EXP budget.
 - [x] **Tengu Defensive Aura:** Astra corruption rules aren't in the rulebook copy I read. → *Noted, no action needed.* Astra levels and poisoning are campaign rules (Mirane guide: astra resistance = Spirit Core / 500); corruption effects are GM-side.
-- [ ] **GM question.** **Third Eye / 8 Eyes:** "regular 2" Mystic Eyes - mystic eye slot rules aren't in the rulebook copy (Wave Palm Style and Shinigami Eyes need an open slot). → Which abilities use up a Mystic Eye slot isn't written anywhere (the planner counts the eye classes).
+- [x] **Third Eye / 8 Eyes:** "regular 2" Mystic Eyes - mystic eye slot rules aren't in the rulebook copy (Wave Palm Style and Shinigami Eyes need an open slot). → Which abilities use up a Mystic Eye slot isn't written anywhere (the planner counts the eye classes). → **Answered (user 2026-10-24):** each Mystic Eye (anything with the Mystic Eye keyword) takes a slot; 2 normally, 3 with Third Eye, 8 with 8 Eyes.
 - [x] **Touched by Death:** also gives a 1 AP "see HP% and weak spots for 1 turn" effect (separate from the Shinigami Eyes class). → *Noted, no action needed.* Data note.
 
 ---
@@ -1483,7 +1483,7 @@ Everything else in this file is either done, checked against the official site (
 - [x] Built from the 185 page-checked "Requirements" lines in classes.js (text copied exactly into each record, so a site change shows up as a mismatch). Not re-fetched from the site. → *Noted, no action needed.* Data note.
 - [x] **Generic routes** (any class mastered, element masteries, "have a spell", weapon proficiency, skill points) are checked live by the planner, not listed in the reverse index. The site's "Helps unlock" lists include those (e.g. Sorcerer lists 26 classes; 9 name Sorcerer directly, the rest come through Arcane/element mastery, spells, etc.). That matches. → *Noted, no action needed.* Data note.
 - [x] **Proficiency categories** used: "ANY_MELEE", "ANY_TWO_HANDED_MELEE", "ANY_WEAPON", and group names (Light Swords, Longsword, Katana, Dueling Weapons, Polearms, Lance, Scythe, Heavy Blades, Small Weapons, Thrown, Shields, Medium/Heavy Armor). Needs a weapon-group list (items data) for the planner to check "ANY_MELEE". → **Done:** Weapon groups are in proficiencies.js and items.js.
-- [ ] **GM question.** **Mystic eye slots** ("at least 1 open"): base 2 slots (Third Eye -> 3, 8 Eyes -> 8). What uses up a slot (Evil Eye, Wave Palm's Life Perception Eye, Shinigami Eye, Faerie Light Eyes...) isn't spelled out anywhere I read. → Same as the Mystic Eye slot question above.
+- [x] **Mystic eye slots** ("at least 1 open"): base 2 slots (Third Eye -> 3, 8 Eyes -> 8). What uses up a slot (Evil Eye, Wave Palm's Life Perception Eye, Shinigami Eye, Faerie Light Eyes...) isn't spelled out anywhere I read. → Same as the Mystic Eye slot question above. → **Answered (user 2026-10-24):** each Mystic Eye (anything with the Mystic Eye keyword) takes a slot; 2 normally, 3 with Third Eye, 8 with 8 Eyes.
 - [ ] **GM question.** **"Any class mastered"** - does a Tier 1 count? Assumed yes (any class). "Any tier 2 class mastered" assumed to also accept tier 3 - confirm. → "Any tier 2 class mastered" - does a tier 3 mastery count? (The planner counts it.)
 
 ## Requirements - ambiguous lines

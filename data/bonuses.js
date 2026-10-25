@@ -99,8 +99,9 @@ LC.bonuses = [
 ];
 
 // ---------------- Mystic Eyes ----------------
-// You normally have 2 Mystic Eye slots (the 8 Eyes breakthrough raises it to 8). Each of these classes'
-// key ability turns one of your eyes into a Mystic Eye ("One of your eyes becomes ..."), using a slot.
+// You normally have 2 Mystic Eye slots (the 8 Eyes breakthrough raises it to 8). Each Mystic Eye replaces one
+// of your real eyes and uses a slot. These classes' key ability is the eye; any other class counts once you
+// own an ability with the "Mystic Eye" keyword (ruling from the user, 2026-10-24).
 LC.mysticEyes = {
   baseSlots: 2,
   classes: ["evil-eye", "faerie-light-eyes", "mystic-eyes-of-destruction", "mystic-eyes-of-domination",
