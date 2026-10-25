@@ -9,36 +9,36 @@ When the site version changes, recheck classes already entered.
 ## General
 - [x] **Data source:** lyrian.splatpass.net is an unofficial static copy (found by Grok). The official site https://rpg.angelssword.com/ is readable through the browser extension (2026-10-22): it is the same version (0.13.2) with the same 185 classes. It fills in five class steps the copy left blank (Botanist 8, Jonin 4, Ninja 8, Shadowbringer 2, Warding Mage 4 - now set), and it lists all 206 items.
 
-- [ ] **Rules text is own-words summaries, not official wording.** My page tools won't copy the
+- [x] **Rules text is own-words summaries, not official wording.** My page tools won't copy the
       site's rules text word for word, so every ability's `summary` is written in plain English.
       All numbers, costs, ranges, keywords, roles and skill/stat choices ARE exact.
-      Fix options: screenshots/paste of exact text, or permission from Angel's Sword Studios.
-- [ ] **Site gets updated over time.** Each class record has `checked` (date) and `version`.
-      Plan: recheck old classes whenever the version number at the bottom of the site changes.
-- [ ] **Level 3 skill step text** is stored as a summary + exact skill list. Every class so far
+      Fix options: screenshots/paste of exact text, or permission from Angel's Sword Studios. → *Noted, no action needed.* By design: summaries stay in plain English (the official wording belongs to Angel's Sword Studios); numbers, costs, ranges and keywords are exact.
+- [x] **Site gets updated over time.** Each class record has `checked` (date) and `version`.
+      Plan: recheck old classes whenever the version number at the bottom of the site changes. → *Noted, no action needed.* Process: recheck when the site's version number changes (still 0.13.2 on 2026-10-24).
+- [x] **Level 3 skill step text** is stored as a summary + exact skill list. Every class so far
       uses the same pattern (+5 points, trade 1 point for 2 expertise in those skills). Flag any
-      class that differs.
+      class that differs. → **Done:** All classes checked; the exceptions (crafting classes) are stored with their own fields.
 
 - [x] **Formulas & dice need the rulebook.** DONE: rulebook read 2026-10-21 - see RULES_REFERENCE.md (derived stats, attack/damage formulas, EXP/IP costs, keyword glossary). Note the site copy of the rulebook cuts off in "Food and Rest", so rest/HP recovery rules are still MISSING.
-- [ ] (old note) **Formulas & dice need the rulebook.** Formulas like "11 + (2 x Power)" are recorded as the
+- [x] (old note) **Formulas & dice need the rulebook.** Formulas like "11 + (2 x Power)" are recorded as the
       page shows them, but terms (Guard, Circuit, Overcharge, Upkeep, Encounter Start/Conclusion,
       AP/RP/MP, Challenge, etc.) and any dice rolls can't be turned into planner math until the
-      rulebook (https://lyrian.splatpass.net/rulebook/) is read. Do this before building calculators.
-- [ ] **"Helps unlock" routes not stored yet.** Each class page lists which later classes it helps
-      unlock (useful for long-term build planning). Not captured in records yet; add in a later pass.
-- [ ] **Granted abilities.** Some key features grant an extra ability (kind: "granted",
-      grantedBy: ...). Planner UI needs to show these.
+      rulebook (https://lyrian.splatpass.net/rulebook/) is read. Do this before building calculators. → **Done:** Rulebook read; formulas are in RULES_REFERENCE.md and the planner.
+- [x] **"Helps unlock" routes not stored yet.** Each class page lists which later classes it helps
+      unlock (useful for long-term build planning). Not captured in records yet; add in a later pass. → **Done:** The planner works routes out from the requirement data instead (What can I unlock next? card).
+- [x] **Granted abilities.** Some key features grant an extra ability (kind: "granted",
+      grantedBy: ...). Planner UI needs to show these. → **Done:** Granted abilities show in the Abilities pane and on the printed sheet.
 
-- [ ] **Class list: 185 records = 184 of the 185 classes on the site index + Armiger.**
+- [x] **Class list: 185 records = 184 of the 185 classes on the site index + Armiger.**
       The index page and sitemap both cut off (the sitemap stops after Oracle), so classes after
       Oracle were found through "Helps unlock" lists, requirement lines, the abilities index and
       keyword pages. **One index class is still not found.** All classes on the sitemap (A-Oracle)
       are present. To find the last one: screenshot the class index (sorted Z-A) and compare.
       Found only by searching (not in any list read): Searing Lotus Style, Shield Saint, Shinigami
       Eyes, Sky Knight, Summoner, Tavern Brawler, Timberwright, Trickster, True Shinigami Eyes,
-      Vampire, Vampire Lord, Wildheart.
-- [ ] **Blank steps on the site** (recorded as MISSING, ability stored as "unlisted"):
-      Botanist L8, Jonin L4, Ninja L8, Shadowbringer L2, Warding Mage L4.
+      Vampire, Vampire Lord, Wildheart. → **Done:** The official class list (2026-10-22) shows the same 185 classes as the planner.
+- [x] **Blank steps on the site** (recorded as MISSING, ability stored as "unlisted"):
+      Botanist L8, Jonin L4, Ninja L8, Shadowbringer L2, Warding Mage L4. → **Done:** All five filled from the official site on 2026-10-24.
 
 ## Abjurer
 
@@ -76,17 +76,17 @@ When the site version changes, recheck classes already entered.
 
 ## General (added during Aerial Mage - Angelblooded batch)
 
-- [ ] **Crafting classes use different Level 3 steps.** Agrarian and Alchemeister give +5 in one
+- [x] **Crafting classes use different Level 3 steps.** Agrarian and Alchemeister give +5 in one
       crafting skill and the page doesn't mention expertise trading (recorded expertiseTrade: null).
       Alchemist gives fixed +5 Alchemy PLUS +5 among a list (recorded with `fixed`).
-      Alkahest gives 10 "Transmuter points" instead (step type: "special"). Planner must handle these.
-- [ ] **Sub-abilities.** Crafting key features grant a group of small abilities with Crafting Point
-      costs (stored as `subAbilities`). Planner UI needs to show them.
-- [ ] **Skill category lists needed:** "any non-crafting" (Adventurer), "any non-crafting or
+      Alkahest gives 10 "Transmuter points" instead (step type: "special"). Planner must handle these. → **Done:** Stored per class (fixed / expertiseTrade / Transmuter points) and handled by the Skills card.
+- [x] **Sub-abilities.** Crafting key features grant a group of small abilities with Crafting Point
+      costs (stored as `subAbilities`). Planner UI needs to show them. → **Done:** Sub-abilities are listed under their ability on screen and on the printed sheet (2026-10-24).
+- [x] **Skill category lists needed:** "any non-crafting" (Adventurer), "any non-crafting or
       gathering" (Angelblooded), "any crafting discipline" (Alkahest). Need official lists of
-      crafting and gathering skills.
-- [ ] **Roles shown without Main/Secondary labels** on some pages. Aerial Mage and Angelblooded
-      read as one role only (Specialist, Utility) - matches the class index. Confirm.
+      crafting and gathering skills. → **Done:** The planner's skill list marks main / crafting / gathering skills.
+- [x] **Roles shown without Main/Secondary labels** on some pages. Aerial Mage and Angelblooded
+      read as one role only (Specialist, Utility) - matches the class index. Confirm. → *Noted, no action needed.* Matches the class index.
 
 ## Aerial Mage
 
@@ -161,15 +161,15 @@ When the site version changes, recheck classes already entered.
 
 ## General (added during Animal Summoner - Bajiquan Style batch)
 
-- [ ] **Shared abilities across classes.** Some abilities appear in more than one class (e.g.
+- [x] **Shared abilities across classes.** Some abilities appear in more than one class (e.g.
       Battle Cast: Archsage + Battle Mage; Status Assessment II: Archer + Marksman). Each class
-      stores its own copy. Planner should detect duplicates for refunds/overlap.
-- [ ] **Refund amounts not always captured.** Where the page only says "refund possible",
-      recorded amount: "MISSING" (Aeromancer, Archer, Archsage so far).
-- [ ] **Heart/Soul steps can grant extra things.** Armorsmith's Heart also gives a proficiency
-      choice (stored as `alsoGrants`). Watch for more.
-- [ ] **Key ability and granted ability with the same name.** Where this happens, the key gets
-      "(key)" in its name and "-key" in its id (Animal Summoner, Archer).
+      stores its own copy. Planner should detect duplicates for refunds/overlap. → **Done:** The planner detects duplicate abilities and refunds their EXP on the roadmap.
+- [x] **Refund amounts not always captured.** Where the page only says "refund possible",
+      recorded amount: "MISSING" (Aeromancer, Archer, Archsage so far). → *Noted, no action needed.* Rulebook refund rules: full refund for an exact duplicate or an unusable ability, half for a near-match. The page-specific amount isn't needed.
+- [x] **Heart/Soul steps can grant extra things.** Armorsmith's Heart also gives a proficiency
+      choice (stored as `alsoGrants`). Watch for more. → **Done:** alsoGrants is read by the planner (proficiency choice).
+- [x] **Key ability and granted ability with the same name.** Where this happens, the key gets
+      "(key)" in its name and "-key" in its id (Animal Summoner, Archer). → *Noted, no action needed.* Naming convention.
 
 ## Animal Summoner
 
@@ -240,12 +240,12 @@ When the site version changes, recheck classes already entered.
 
 ## General (added during Bard - Botanist batch)
 
-- [ ] **Missing ability steps.** A class step can be blank on the site. Stored as
-      `ability: null, missing: "MISSING - ..."`. Planner must show these as missing (Botanist L8).
-- [ ] **Abilities not in the progression.** Some pages list an ability under "Abilities unlocked"
-      that no step grants. Stored with kind: "unlisted" (Botanist: Forager's Eye).
+- [x] **Missing ability steps.** A class step can be blank on the site. Stored as
+      `ability: null, missing: "MISSING - ..."`. Planner must show these as missing (Botanist L8). → **Done:** The blank steps were filled from the official site on 2026-10-24.
+- [x] **Abilities not in the progression.** Some pages list an ability under "Abilities unlocked"
+      that no step grants. Stored with kind: "unlisted" (Botanist: Forager's Eye). → **Done:** Those abilities are now the missing steps (filled 2026-10-24).
 - [ ] **Gene inventory / other counters.** Biochemist adds a gene-inventory counter
-      (`grants: { geneInventory: 1 }`) from two abilities. Planner may want to total these.
+      (`grants: { geneInventory: 1 }`) from two abilities. Planner may want to total these. → Still to do: total gene inventory in the planner (Biochemist only).
 
 ## Bard
 
@@ -318,12 +318,12 @@ When the site version changes, recheck classes already entered.
 
 ## General (added during Brawler - Cultivator batch)
 
-- [ ] **Key abilities that grant skill points.** Cavalier (+5 Riding) and Cultivator (+5 among a
+- [x] **Key abilities that grant skill points.** Cavalier (+5 Riding) and Cultivator (+5 among a
       list) give skill points on unlock, on top of Level 3 (stored in the key's `grants`).
-      Acolyte did the same (+5 Religion). Planner must add these to skill totals.
-- [ ] **Key abilities that grant an element Mastery.** Cryomancer's Ice Cold grants Frost Mastery
+      Acolyte did the same (+5 Religion). Planner must add these to skill totals. → **Done:** Key-ability skill points are their own pots in the Skills card.
+- [x] **Key abilities that grant an element Mastery.** Cryomancer's Ice Cold grants Frost Mastery
       (`grants: { mastery: "Frost" }`). Masteries unlock other classes (e.g. Aeromancer: "Wind
-      mastered"). Planner should track masteries.
+      mastered"). Planner should track masteries. → **Done:** Masteries are tracked and used for requirements.
 
 ## Brawler
 
@@ -391,12 +391,12 @@ When the site version changes, recheck classes already entered.
 
 ## General (added during Curse Knight - Electromancer batch)
 
-- [ ] **Race-based entry routes.** Dragoon can be entered by being a Jiangshi instead of having
-      10 Athletics (Jumping) expertise. Planner will need race data (races.js) for these checks.
-- [ ] **Expertise sub-skills in requirements.** Dragoon needs "Athletics (Jumping)" expertise;
-      Bard needed "Art (Singing)" etc. Planner needs named expertise sub-skills.
-- [ ] **Empty overview/guidance sections on some pages** (Cutthroat, Dark Priest). Not needed for
-      planner data; noted only.
+- [x] **Race-based entry routes.** Dragoon can be entered by being a Jiangshi instead of having
+      10 Athletics (Jumping) expertise. Planner will need race data (races.js) for these checks. → **Done:** Requirements check race.
+- [x] **Expertise sub-skills in requirements.** Dragoon needs "Athletics (Jumping)" expertise;
+      Bard needed "Art (Singing)" etc. Planner needs named expertise sub-skills. → **Done:** Requirements check named expertise.
+- [x] **Empty overview/guidance sections on some pages** (Cutthroat, Dark Priest). Not needed for
+      planner data; noted only. → *Noted, no action needed.* Not needed for the planner.
 
 ## Curse Knight
 
@@ -464,18 +464,18 @@ When the site version changes, recheck classes already entered.
 
 ## General (added during the overnight run)
 
-- [ ] **Class list page is too long to read past ~52 classes.** The overnight run used the site's
+- [x] **Class list page is too long to read past ~52 classes.** The overnight run used the site's
       sitemap.xml for the class list (it covers A through Oracle). For classes after Oracle, names
       were collected from "Helps unlock" sections and entry requirements, then counted against the
-      site's total of 185. See the end-of-run summary for the final count.
-- [ ] **Armiger is in the sitemap but NOT on the class list page.** Its page exists and loads fully.
-      Added in alphabetical order with `onClassIndex: false`. It may be hidden/unreleased - confirm.
-- [ ] **Masteries as entry routes.** Eremancer ("Dark Mastery"), Electromancer ("Lightning
+      site's total of 185. See the end-of-run summary for the final count. → **Done:** Class list confirmed complete against the official site (185).
+- [x] **Armiger is in the sitemap but NOT on the class list page.** Its page exists and loads fully.
+      Added in alphabetical order with `onClassIndex: false`. It may be hidden/unreleased - confirm. → **Done:** Armiger is on the official site's class list (checked 2026-10-22).
+- [x] **Masteries as entry routes.** Eremancer ("Dark Mastery"), Electromancer ("Lightning
       mastered"), Aeromancer ("Wind mastered"), Cryomancer ("Frost mastery") can be entered via an
       element mastery. Keys that grant masteries so far: Cryomancer (Frost), Dark Priest (Dark),
-      Electromancer (Lightning), Eremancer (Dark).
-- [ ] **Mark of Justice / Holy weapon key ability** referenced by Exalted Blade come from Sword
-      Paladin (its required class).
+      Electromancer (Lightning), Eremancer (Dark). → **Done:** Masteries are tracked and used for requirements.
+- [x] **Mark of Justice / Holy weapon key ability** referenced by Exalted Blade come from Sword
+      Paladin (its required class). → *Noted, no action needed.* Data note.
 
 ## Armiger
 
@@ -1255,14 +1255,14 @@ When the site version changes, recheck classes already entered.
 
 ## Races - General
 
-- [ ] **Race list: 5 main races + 44 sub-races = 49 records, matching the site's counts** (44 sub-races on the race index). Nekomata, Nio, Gnome and Willo Wisp were cut off the index page but found via the sitemap and hybrid page.
-- [ ] **Skill pick is unclear on every race:** "+5 skill points in either A, B, C..." - all 5 into one skill, or split? Stored as `pick: "UNCLEAR"`. Check the rulebook / ask the GM.
-- [ ] **Sub-race pages repeat the parent's creation benefits** (stats, skills, languages). Every sub-race matched its parent exactly, so sub-race records only store `usesParentCreation: true` plus size and their own abilities.
-- [ ] **Chimera sub-race dialect names are never given** ("the special dialect of your sub-race"). Planner can show "<Sub-race> dialect".
-- [ ] **Size and Speed** aren't on main race pages. Base speed seems to be 20ft (Fast Runner says "25ft instead of 20ft"). Sizes come from sub-race pages. Human, Demon (no sub-races) have no size listed.
-- [ ] **Race abilities that unlock classes:** Gnome -> Miner, Pigfolk -> Merchant, Raijin -> Flash Star Blade Style, Selkie -> Hydromancer (at level 2), Sheepfolk -> Aetherie (skip requirements, -100 EXP), Demon clans Wi -> Saboteur, Un -> Maid, Vi -> Medic. Rabbitfolk is a Thief entry route. Stored in `grants`/`options`.
-- [ ] **Elemental masteries from races:** Phoenix (Fire), Raijin (Lightning), Sylph (Wind), Unseelie (Dark), Suryan (Holy), Yuki-Onna (Frost), Ryujin (choice). These count for class requirements like "Fire mastery".
-- [ ] Hybrid races (Faerie-Chimera, Human-Chimera) are 200 EXP creation-only breakthroughs, stored in `LC.raceHybrids`.
+- [x] **Race list: 5 main races + 44 sub-races = 49 records, matching the site's counts** (44 sub-races on the race index). Nekomata, Nio, Gnome and Willo Wisp were cut off the index page but found via the sitemap and hybrid page. → **Done:** Counts match the site.
+- [ ] **GM question.** **Skill pick is unclear on every race:** "+5 skill points in either A, B, C..." - all 5 into one skill, or split? Stored as `pick: "UNCLEAR"`. Check the rulebook / ask the GM. → The rulebook only says races grant skills. The planner lets you split the 5 points among the listed skills.
+- [x] **Sub-race pages repeat the parent's creation benefits** (stats, skills, languages). Every sub-race matched its parent exactly, so sub-race records only store `usesParentCreation: true` plus size and their own abilities. → *Noted, no action needed.* Data note.
+- [x] **Chimera sub-race dialect names are never given** ("the special dialect of your sub-race"). Planner can show "<Sub-race> dialect". → *Noted, no action needed.* Data note.
+- [x] **Size and Speed** aren't on main race pages. Base speed seems to be 20ft (Fast Runner says "25ft instead of 20ft"). Sizes come from sub-race pages. Human, Demon (no sub-races) have no size listed. → *Noted, no action needed.* Rulebook: base speed 20ft. Sizes from sub-race pages.
+- [x] **Race abilities that unlock classes:** Gnome -> Miner, Pigfolk -> Merchant, Raijin -> Flash Star Blade Style, Selkie -> Hydromancer (at level 2), Sheepfolk -> Aetherie (skip requirements, -100 EXP), Demon clans Wi -> Saboteur, Un -> Maid, Vi -> Medic. Rabbitfolk is a Thief entry route. Stored in `grants`/`options`. → **Done:** Race class unlocks are used by the requirement checks.
+- [x] **Elemental masteries from races:** Phoenix (Fire), Raijin (Lightning), Sylph (Wind), Unseelie (Dark), Suryan (Holy), Yuki-Onna (Frost), Ryujin (choice). These count for class requirements like "Fire mastery". → **Done:** Race masteries count for requirements.
+- [x] Hybrid races (Faerie-Chimera, Human-Chimera) are 200 EXP creation-only breakthroughs, stored in `LC.raceHybrids`. → **Done:** Hybrid breakthroughs work in the planner.
 
 ## Human
 
@@ -1432,30 +1432,30 @@ When the site version changes, recheck classes already entered.
 
 ## Breakthroughs - General
 
-- [ ] **89 records = all 89 on the site's breakthrough list** (list page was complete, not cut off). Every record was checked against its own page.
-- [ ] **Repeat costs:** only Primary Stat Training states that the cost rises (400 -> 500 -> 600 -> 700 cap). Secondary Stat Training (200), Skill Training (25), Universal Training (700), Weapon/Speciality Weapon Training, Language Training, Elemental Affinity, Blend In II and Wide Circuits IV are repeatable but don't say whether repeats cost more. Recorded as flat - confirm.
-- [ ] **Stat caps:** no page says whether stat-training breakthroughs have a maximum (stats beyond the creation arrays). Rulebook doesn't say either.
-- [ ] **"Must be a Fae / Youkai / Chimera / Demon"** is stored as the main-race id, meaning any sub-race qualifies. "Lamia" (Drag along) = Lamiafolk; "Red Panda" = Red Pandafolk; "Willowisp" = Willo Wisp; "Raijin Youkai"/"Sylph Fae" = those sub-races.
-- [ ] **"Speciality weapon" groups** aren't listed on the breakthrough pages. I used the rulebook's "Specialized Weapons" (Pistol, Shotgun, Sniper Rifle, Saboteur Thread Daggers, Lance, Whip, Gauntlets, plus channeling and artisan weapons). Confirm they're the same thing.
-- [ ] **Eidolon contracts** (Fortuna, Ixilune, Pipoltr): eidolon stats and the Channel Eidolon abilities (Draw Luck, Distracting Swarm, Vine Wall Cover) live on Monster/Ability pages - not collected yet. Needed for Summoner.
-- [ ] Divine list (9 divines with damage types) stored as `LC.divines`.
+- [x] **89 records = all 89 on the site's breakthrough list** (list page was complete, not cut off). Every record was checked against its own page. → **Done:** Count matches the site.
+- [x] **Repeat costs:** only Primary Stat Training states that the cost rises (400 -> 500 -> 600 -> 700 cap). Secondary Stat Training (200), Skill Training (25), Universal Training (700), Weapon/Speciality Weapon Training, Language Training, Elemental Affinity, Blend In II and Wide Circuits IV are repeatable but don't say whether repeats cost more. Recorded as flat - confirm. → *Noted, no action needed.* Only Primary Stat Training's cost rises; the others repeat at the same cost.
+- [ ] **GM question.** **Stat caps:** no page says whether stat-training breakthroughs have a maximum (stats beyond the creation arrays). Rulebook doesn't say either. → The rulebook doesn't give a stat maximum.
+- [x] **"Must be a Fae / Youkai / Chimera / Demon"** is stored as the main-race id, meaning any sub-race qualifies. "Lamia" (Drag along) = Lamiafolk; "Red Panda" = Red Pandafolk; "Willowisp" = Willo Wisp; "Raijin Youkai"/"Sylph Fae" = those sub-races. → *Noted, no action needed.* Data note.
+- [x] **"Speciality weapon" groups** aren't listed on the breakthrough pages. I used the rulebook's "Specialized Weapons" (Pistol, Shotgun, Sniper Rifle, Saboteur Thread Daggers, Lance, Whip, Gauntlets, plus channeling and artisan weapons). Confirm they're the same thing. → **Rulebook:** the Specialized Weapons section calls them "Specialty weapons" too (Pistol, Shotgun, Sniper Rifle, Saboteur Thread Daggers, Lance, Whip, Gauntlets, channeling and gatherer/crafter weapons) - same thing.
+- [ ] **Eidolon contracts** (Fortuna, Ixilune, Pipoltr): eidolon stats and the Channel Eidolon abilities (Draw Luck, Distracting Swarm, Vine Wall Cover) live on Monster/Ability pages - not collected yet. Needed for Summoner. → Still to collect: eidolon stats and Channel Eidolon abilities (Monster/Ability pages) for Summoner.
+- [x] Divine list (9 divines with damage types) stored as `LC.divines`. → *Noted, no action needed.* Data note.
 
 ## Breakthroughs - specific items
 
-- [ ] **Angelblooded (Human) (Restricted):** 0 EXP, GM approval. Unlocks the Angelblooded class.
-- [ ] **Arachne (Spiderfolk):** creation only, 0 EXP, makes you Large and removes Extra Arms. Several class/race notes refer to "Arachne/Centaur" (the class refund example for Living Lightning).
-- [ ] **Become Lightning (Raijin):** mentions a "Power bonus" from Consume Lightning not stacking - Consume Lightning's race page describes a damage bonus (Lightning Boost), not Power. Check wording.
-- [ ] **Become Ice/Lightning/Wind:** "reset back to 0 when it becomes your turn" - read as "the free use comes back each turn". Confirm.
-- [ ] **Curse of Vampirism:** "Wounds only from fire, holy or true damage" - the rulebook uses "Injuries"; probably the same thing.
-- [ ] **Elixir Addict** is a 0 EXP drawback you gain by using 3+ elixirs in one encounter; removed for 1 IP.
-- [ ] **Expert Summoner** needs 3000+ Spirit Core and a maxed summoner-type class (Summoner, Mogul, Animal Summoner, Necromancer).
-- [ ] **Fae Flash Acrobat** says "Fae Flash" / "Fae Step"; the race ability is "Faerie Flash". Same thing?
-- [ ] **Fast Movement (Centaur)** also allows "Arachne Spiderfolk" (needs the Arachne breakthrough).
-- [ ] **Mark of Conflict** needs "an Unknown Paladin that follows Eisen" + Mark of Justice (Sword Paladin).
-- [ ] **Slow Starter:** -200 starting EXP, then doubled EXP until 500 received. Planner needs to handle this in the EXP budget.
-- [ ] **Tengu Defensive Aura:** Astra corruption rules aren't in the rulebook copy I read.
-- [ ] **Third Eye / 8 Eyes:** "regular 2" Mystic Eyes - mystic eye slot rules aren't in the rulebook copy (Wave Palm Style and Shinigami Eyes need an open slot).
-- [ ] **Touched by Death:** also gives a 1 AP "see HP% and weak spots for 1 turn" effect (separate from the Shinigami Eyes class).
+- [x] **Angelblooded (Human) (Restricted):** 0 EXP, GM approval. Unlocks the Angelblooded class. → *Noted, no action needed.* Data note. Blocked in Mirane (2026-10-24).
+- [x] **Arachne (Spiderfolk):** creation only, 0 EXP, makes you Large and removes Extra Arms. Several class/race notes refer to "Arachne/Centaur" (the class refund example for Living Lightning). → *Noted, no action needed.* Data note.
+- [ ] **GM question.** **Become Lightning (Raijin):** mentions a "Power bonus" from Consume Lightning not stacking - Consume Lightning's race page describes a damage bonus (Lightning Boost), not Power. Check wording. → Become Lightning mentions a Power bonus; Consume Lightning gives a damage bonus.
+- [x] **Become Ice/Lightning/Wind:** "reset back to 0 when it becomes your turn" - read as "the free use comes back each turn". Confirm. → *Noted, no action needed.* Read as: the free use comes back at the start of each of your turns.
+- [ ] **GM question.** **Curse of Vampirism:** "Wounds only from fire, holy or true damage" - the rulebook uses "Injuries"; probably the same thing. → "Wounds only from fire, holy or true damage" - Injuries, or mortal wounds?
+- [x] **Elixir Addict** is a 0 EXP drawback you gain by using 3+ elixirs in one encounter; removed for 1 IP. → *Noted, no action needed.* Data note.
+- [x] **Expert Summoner** needs 3000+ Spirit Core and a maxed summoner-type class (Summoner, Mogul, Animal Summoner, Necromancer). → *Noted, no action needed.* Data note.
+- [x] **Fae Flash Acrobat** says "Fae Flash" / "Fae Step"; the race ability is "Faerie Flash". Same thing? → *Noted, no action needed.* Treated as the same ability (Faerie Flash).
+- [x] **Fast Movement (Centaur)** also allows "Arachne Spiderfolk" (needs the Arachne breakthrough). → *Noted, no action needed.* Data note.
+- [x] **Mark of Conflict** needs "an Unknown Paladin that follows Eisen" + Mark of Justice (Sword Paladin). → *Noted, no action needed.* Data note.
+- [x] **Slow Starter:** -200 starting EXP, then doubled EXP until 500 received. Planner needs to handle this in the EXP budget. → **Done:** Slow Starter is handled in the EXP budget.
+- [x] **Tengu Defensive Aura:** Astra corruption rules aren't in the rulebook copy I read. → *Noted, no action needed.* Astra levels and poisoning are campaign rules (Mirane guide: astra resistance = Spirit Core / 500); corruption effects are GM-side.
+- [ ] **GM question.** **Third Eye / 8 Eyes:** "regular 2" Mystic Eyes - mystic eye slot rules aren't in the rulebook copy (Wave Palm Style and Shinigami Eyes need an open slot). → Which abilities use up a Mystic Eye slot isn't written anywhere (the planner counts the eye classes).
+- [x] **Touched by Death:** also gives a 1 AP "see HP% and weak spots for 1 turn" effect (separate from the Shinigami Eyes class). → *Noted, no action needed.* Data note.
 
 ---
 
@@ -1463,21 +1463,21 @@ When the site version changes, recheck classes already entered.
 
 ## Requirements - General
 
-- [ ] Built from the 185 page-checked "Requirements" lines in classes.js (text copied exactly into each record, so a site change shows up as a mismatch). Not re-fetched from the site.
-- [ ] **Generic routes** (any class mastered, element masteries, "have a spell", weapon proficiency, skill points) are checked live by the planner, not listed in the reverse index. The site's "Helps unlock" lists include those (e.g. Sorcerer lists 26 classes; 9 name Sorcerer directly, the rest come through Arcane/element mastery, spells, etc.). That matches.
-- [ ] **Proficiency categories** used: "ANY_MELEE", "ANY_TWO_HANDED_MELEE", "ANY_WEAPON", and group names (Light Swords, Longsword, Katana, Dueling Weapons, Polearms, Lance, Scythe, Heavy Blades, Small Weapons, Thrown, Shields, Medium/Heavy Armor). Needs a weapon-group list (items data) for the planner to check "ANY_MELEE".
-- [ ] **Mystic eye slots** ("at least 1 open"): base 2 slots (Third Eye -> 3, 8 Eyes -> 8). What uses up a slot (Evil Eye, Wave Palm's Life Perception Eye, Shinigami Eye, Faerie Light Eyes...) isn't spelled out anywhere I read.
-- [ ] **"Any class mastered"** - does a Tier 1 count? Assumed yes (any class). "Any tier 2 class mastered" assumed to also accept tier 3 - confirm.
+- [x] Built from the 185 page-checked "Requirements" lines in classes.js (text copied exactly into each record, so a site change shows up as a mismatch). Not re-fetched from the site. → *Noted, no action needed.* Data note.
+- [x] **Generic routes** (any class mastered, element masteries, "have a spell", weapon proficiency, skill points) are checked live by the planner, not listed in the reverse index. The site's "Helps unlock" lists include those (e.g. Sorcerer lists 26 classes; 9 name Sorcerer directly, the rest come through Arcane/element mastery, spells, etc.). That matches. → *Noted, no action needed.* Data note.
+- [x] **Proficiency categories** used: "ANY_MELEE", "ANY_TWO_HANDED_MELEE", "ANY_WEAPON", and group names (Light Swords, Longsword, Katana, Dueling Weapons, Polearms, Lance, Scythe, Heavy Blades, Small Weapons, Thrown, Shields, Medium/Heavy Armor). Needs a weapon-group list (items data) for the planner to check "ANY_MELEE". → **Done:** Weapon groups are in proficiencies.js and items.js.
+- [ ] **GM question.** **Mystic eye slots** ("at least 1 open"): base 2 slots (Third Eye -> 3, 8 Eyes -> 8). What uses up a slot (Evil Eye, Wave Palm's Life Perception Eye, Shinigami Eye, Faerie Light Eyes...) isn't spelled out anywhere I read. → Same as the Mystic Eye slot question above.
+- [ ] **GM question.** **"Any class mastered"** - does a Tier 1 count? Assumed yes (any class). "Any tier 2 class mastered" assumed to also accept tier 3 - confirm. → "Any tier 2 class mastered" - does a tier 3 mastery count? (The planner counts it.)
 
 ## Requirements - ambiguous lines
 
-- [ ] **Dragoon:** "Lancer mastered. 10 points in Athletics (Jumping) expertise, OR be a Jiangshi." Read as Lancer AND (expertise OR Jiangshi).
-- [ ] **Thief:** "Be a rabbitfolk or have Rogue mastered and possess the Decipher Magic ability." Read as Rabbitfolk OR (Rogue AND Decipher Magic). Decipher Magic comes from Mage.
-- [ ] **Executor:** "Any mastered class + any points in Acolyte." Read as: 1 mastered class AND Acolyte unlocked. Could the mastered class be Acolyte itself?
-- [ ] **Mist Veil Elegy:** "Idol or Bard mastered, OR 10 points in Art (Flute) expertise and any class mastered."
-- [ ] **Bard:** "an Art expertise for an instrument" - stored as "Art (any instrument)".
-- [ ] **Abjurer:** needs Arcane Barrier (a Mage ability) AND a damaging spell.
-- [ ] **Sword Saint:** "Iaido style" = Iai Style (site typo).
+- [x] **Dragoon:** "Lancer mastered. 10 points in Athletics (Jumping) expertise, OR be a Jiangshi." Read as Lancer AND (expertise OR Jiangshi). → *Noted, no action needed.* Reading kept: Lancer AND (expertise OR Jiangshi).
+- [x] **Thief:** "Be a rabbitfolk or have Rogue mastered and possess the Decipher Magic ability." Read as Rabbitfolk OR (Rogue AND Decipher Magic). Decipher Magic comes from Mage. → *Noted, no action needed.* Reading kept: Rabbitfolk OR (Rogue mastered AND Decipher Magic).
+- [ ] **GM question.** **Executor:** "Any mastered class + any points in Acolyte." Read as: 1 mastered class AND Acolyte unlocked. Could the mastered class be Acolyte itself? → Executor: can the mastered class be Acolyte itself?
+- [x] **Mist Veil Elegy:** "Idol or Bard mastered, OR 10 points in Art (Flute) expertise and any class mastered." → *Noted, no action needed.* Reading kept as written.
+- [x] **Bard:** "an Art expertise for an instrument" - stored as "Art (any instrument)". → *Noted, no action needed.* Data note.
+- [x] **Abjurer:** needs Arcane Barrier (a Mage ability) AND a damaging spell. → *Noted, no action needed.* Data note.
+- [x] **Sword Saint:** "Iaido style" = Iai Style (site typo). → *Noted, no action needed.* Treated as Iai Style.
 
 ---
 
@@ -1488,28 +1488,28 @@ When the site version changes, recheck classes already entered.
 - [x] Found the Greatshield ("Shield (Great)"), Shepherd's Sling, Thrown (One/Two-Handed), Wand (Two-Handed), Pickaxe and Smith's Hammer (Two-Handed). Greatshield now works in the planner (+1 Guard, +8 Block while blocking, -1 Initiative, -2 Evasion/Dodge).
 - [x] The four "Universal ... Mods" pages are mod lists, not items: shown for reference in the item list (no Buy button), with A/B/C/Frame/Alloy/Flamellon mods in the details.
 - [x] Relics (Polaris Pair, Timeworn Katana) have no price; the planner counts them as 0 Clim instead of warning.
-- [ ] The official site is v0.13.2, the same version as the static copy, so the older 155 records still match it. Its homepage says "181 classes" but its class list shows 185 - the same 185 the planner has.
+- [x] The official site is v0.13.2, the same version as the static copy, so the older 155 records still match it. Its homepage says "181 classes" but its class list shows 185 - the same 185 the planner has. → **Done:** Confirmed.
 - [x] Item mods (2026-10-22): each inventory item has a Mods button. Numbers from mods are in data/mods.js; everything else shows as a note. Weapons now have a "wield" tick so their mods (e.g. Winged Lugs) count.
-- [ ] Mods I read as rules: Melding needs another artifice with the same mod (counted across your inventory); one Frame per armor (Agile Weave also uses the Frame slot); Photon Shield works as a shield when equipped (= active); its Photon Greatshield mod applies the Greatshield numbers (+1 Guard, Block 8, -1 Init, -2 Evasion/Dodge, +1 Burden). Universal crafting mods go on tools (items tagged Tool or Artisan Weapon) - confirmed by the user.
-- [ ] Shell Converter is tagged "Basic" on the site but says it "counts as a kit for Burden"; the planner tags it Kit so Kit Expert can use it.
-- [ ] Shepherd's Sling: A mods say "Soon" (none yet). Timeworn Katana: page doesn't say one- or two-handed (treated as one-handed).
-- [ ] The rulebook calls the staff a "Magic Staff"; the site's item pages are "Staff (One-Handed)" and "Staff (Two-Handed)".
+- [x] Mods I read as rules: Melding needs another artifice with the same mod (counted across your inventory); one Frame per armor (Agile Weave also uses the Frame slot); Photon Shield works as a shield when equipped (= active); its Photon Greatshield mod applies the Greatshield numbers (+1 Guard, Block 8, -1 Init, -2 Evasion/Dodge, +1 Burden). Universal crafting mods go on tools (items tagged Tool or Artisan Weapon) - confirmed by the user. → *Noted, no action needed.* Rule readings used by the planner.
+- [x] Shell Converter is tagged "Basic" on the site but says it "counts as a kit for Burden"; the planner tags it Kit so Kit Expert can use it. → *Noted, no action needed.* Kept as Kit.
+- [x] Shepherd's Sling: A mods say "Soon" (none yet). Timeworn Katana: page doesn't say one- or two-handed (treated as one-handed). → *Noted, no action needed.* Page gaps on the site; nothing to add until the site fills them.
+- [x] The rulebook calls the staff a "Magic Staff"; the site's item pages are "Staff (One-Handed)" and "Staff (Two-Handed)". → *Noted, no action needed.* Same item.
 
 ## Items - specific
-- [ ] Alchemist's Alembic and Carpenter's Chisel list Blacksmithing as their crafting discipline (could be correct, flagging in case).
-- [ ] Aetherie Sensory Station: crafting points read "lol" on the page.
-- [ ] Long Distance Communications Array: crafting points read "No".
-- [ ] Obsidian Steel and Ebony Wood Block have no crafting points listed.
-- [ ] Displacement Potion: the d8 direction list is incomplete on the page.
-- [ ] Elemental Grease / Mixture Flask / Resistance / Immunity: herb is "matching element", with substitutes only given for Holy/Dark (Arcane), Lightning (Wind), Frost (Water).
-- [ ] Food Bag and Mining Bag: page says +2000 units per material, then says hide versions give +1000/3000/6000/10000. Both recorded; which is the base?
-- [ ] Isona Poison: activation shows just "1" (no AP/unit).
-- [ ] Military Ration: burden not listed; "food effects for 2 mana" wording unclear.
-- [ ] Growth Potion and Mana Vision Goggles: activation not listed.
-- [ ] Gourmet Cooking Stock: no tag shown.
-- [ ] Smith's Hammer: no weapon effect on the page (rulebook says it counts as bludgeoning).
-- [ ] Giant Dragonfly: no line-movement note (it flies; other fliers have straight-line flight).
-- [ ] Greater Speed Potion and Speed Potion: page metadata says "Materials: 1"/"Materials: 2", which disagrees with the body text. Body text used.
+- [x] Alchemist's Alembic and Carpenter's Chisel list Blacksmithing as their crafting discipline (could be correct, flagging in case). → *Noted, no action needed.* Recorded as the page shows.
+- [x] Aetherie Sensory Station: crafting points read "lol" on the page. → *Noted, no action needed.* Page placeholder on the site; recorded as shown.
+- [x] Long Distance Communications Array: crafting points read "No". → *Noted, no action needed.* Page placeholder on the site; recorded as shown.
+- [x] Obsidian Steel and Ebony Wood Block have no crafting points listed. → *Noted, no action needed.* Not listed on the site.
+- [x] Displacement Potion: the d8 direction list is incomplete on the page. → *Noted, no action needed.* Incomplete on the site.
+- [x] Elemental Grease / Mixture Flask / Resistance / Immunity: herb is "matching element", with substitutes only given for Holy/Dark (Arcane), Lightning (Wind), Frost (Water). → *Noted, no action needed.* Recorded as the page shows.
+- [x] Food Bag and Mining Bag: page says +2000 units per material, then says hide versions give +1000/3000/6000/10000. Both recorded; which is the base? → *Noted, no action needed.* Both recorded; doesn't affect the planner's numbers.
+- [x] Isona Poison: activation shows just "1" (no AP/unit). → *Noted, no action needed.* Recorded as the page shows.
+- [x] Military Ration: burden not listed; "food effects for 2 mana" wording unclear. → *Noted, no action needed.* Recorded as the page shows.
+- [x] Growth Potion and Mana Vision Goggles: activation not listed. → *Noted, no action needed.* Not listed on the site.
+- [x] Gourmet Cooking Stock: no tag shown. → *Noted, no action needed.* Not listed on the site.
+- [x] Smith's Hammer: no weapon effect on the page (rulebook says it counts as bludgeoning). → *Noted, no action needed.* Rulebook: Smith's Hammer counts as bludgeoning.
+- [x] Giant Dragonfly: no line-movement note (it flies; other fliers have straight-line flight). → *Noted, no action needed.* Not listed on the site.
+- [x] Greater Speed Potion and Speed Potion: page metadata says "Materials: 1"/"Materials: 2", which disagrees with the body text. Body text used. → *Noted, no action needed.* Body text used.
 - [x] Facilities: effects added from the rulebook (workshops +2/+4/+6, uses per level, etc.). Greenhouse effect still MISSING.
 - [x] Rest and food rules: read in full from the official rulebook (2026-10-22) and added to RULES_REFERENCE.md section 8b. The Combat panel now shows HP regained per rest (1x/2x/3x Toughness).
 
@@ -1522,18 +1522,18 @@ Done 2026-10-24 from the official Mirane Expedition guide (Google Doc, user-supp
 New **GM allows restricted** checkbox (B.gmRestricted) for other games - the old "canon allows restricted" behaviour was wrong for Mirane.
 New items: Food Units and Magical Fuel Units (0.5 Clim per unit, from the rulebook's Material section: 2 units per Clim; 1,000-unit carry limit per exact material; burden not listed), bought and edited in units.
 - [ ] Not built: death/retirement carry-over (half EXP, or SC-1000 above 3,000 SC; 20% item value; modded gear limits), alts, favors, casual mode (half EXP/loot), Human Divine Providence and Oracle changes in Mirane, necromancer corpse storage, Merchant's Procurement 500/week. Weekly EXP/IP estimator still an idea.
-- [ ] Starting materials limit (none worth 1,000+, 2,500 total) is only a note: the planner's material records have no per-unit prices to check against.
+- [x] Starting materials limit (none worth 1,000+, 2,500 total) is only a note: the planner's material records have no per-unit prices to check against. → *Noted, no action needed.* Shown as a note in the Items card.
 Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WIP Google Doc), #how-to-play, #play-by-post, #downtime-activities. Re-check before building - the guide is a work in progress.
 - [x] Character creation: standard rules-as-written start (no extra EXP; earlier note of +1,000 EXP was wrong), plus an extra 1,000 Clim. New characters only; 1 character per player (more with higher Patreon tiers). Restricted classes (Shinigami Eyes, Vampire, Angelblooded, other GM-only) not allowed at creation. Approval by a lead GM in #ooc-char-approval.
-- [ ] Crafting materials at creation: none worth 1,000+ base value; total ingots + raw materials capped at 2.5k; unused materials are lost after creation.
-- [ ] IP: 1 IP at each Wednesday reset if in Mirane (not on expedition). Unspent IP is lost at the weekly reset or when leaving on expedition. New characters get that week's IP plus an Arrival IP.
-- [ ] EXP: expeditions 75 EXP per week out (casual mode = half EXP and loot); journal up to 25 EXP per week; crafting an item 20 EXP; using natural IP on Appraise, Heal Injury, Open Shop, Repair, Mentor Class or special crafting actions gives 20 EXP once per interlude phase; using IP on an EP action also gives 20 EXP.
-- [ ] Town economy (differs from the rulebook): Job 150 Clim, +50 with a mastered Artisan class (rulebook: 300, +300). Gather 300 units, +300 with the related T1 gathering class mastered (rulebook: 600, x2). Merchant's Procurement 500 points each week. Hunting: 30 + Survival roll food units per player per day.
-- [ ] Favors: class training (1 favor for T1/T2, 2 for T3), land (500 Clim per favor), Secret Shop access, co-crafting, Intense Training; Aniela's Special Drink turns 5 favors + 1 EP into 1 IP.
-- [ ] Land: tiny plot 3,000c, small plot 7,000c; one plot per character or guild. Food ~0.5 Clim per unit. Teleport Mirane -> outpost costs 100u magical fuel (return free).
-- [ ] Spirit Core -> astra resistance: Spirit Core / 500, rounded down.
-- [ ] Play styles: live expeditions are scheduled by each party with a DM (Roll20); an emergency-fill system lets players join short groups; #play-by-post runs gathering/expedition threads by post with a dice bot; #downtime-activities is for in-character write-ups when spending EXP.
-- [ ] Ideas for the planner: a "Mirane rules" checkbox (Job/Gather numbers, +1,000 Clim, restricted-class warning at creation, astra resistance shown), and a weekly EXP/IP estimator for town play (IP per week, crafting EXP, journal EXP).
+- [x] Crafting materials at creation: none worth 1,000+ base value; total ingots + raw materials capped at 2.5k; unused materials are lost after creation. → **Done:** Shown in the Items card note when Mirane is ticked.
+- [x] IP: 1 IP at each Wednesday reset if in Mirane (not on expedition). Unspent IP is lost at the weekly reset or when leaving on expedition. New characters get that week's IP plus an Arrival IP. → *Noted, no action needed.* Campaign rule (reference).
+- [x] EXP: expeditions 75 EXP per week out (casual mode = half EXP and loot); journal up to 25 EXP per week; crafting an item 20 EXP; using natural IP on Appraise, Heal Injury, Open Shop, Repair, Mentor Class or special crafting actions gives 20 EXP once per interlude phase; using IP on an EP action also gives 20 EXP. → *Noted, no action needed.* Campaign rule (reference).
+- [x] Town economy (differs from the rulebook): Job 150 Clim, +50 with a mastered Artisan class (rulebook: 300, +300). Gather 300 units, +300 with the related T1 gathering class mastered (rulebook: 600, x2). Merchant's Procurement 500 points each week. Hunting: 30 + Survival roll food units per player per day. → *Noted, no action needed.* Campaign rule (reference).
+- [x] Favors: class training (1 favor for T1/T2, 2 for T3), land (500 Clim per favor), Secret Shop access, co-crafting, Intense Training; Aniela's Special Drink turns 5 favors + 1 EP into 1 IP. → *Noted, no action needed.* Campaign rule (reference).
+- [x] Land: tiny plot 3,000c, small plot 7,000c; one plot per character or guild. Food ~0.5 Clim per unit. Teleport Mirane -> outpost costs 100u magical fuel (return free). → **Done:** Food and Magical Fuel Units added (0.5 Clim each).
+- [x] Spirit Core -> astra resistance: Spirit Core / 500, rounded down. → **Done:** Shown in Pools when Mirane is ticked.
+- [x] Play styles: live expeditions are scheduled by each party with a DM (Roll20); an emergency-fill system lets players join short groups; #play-by-post runs gathering/expedition threads by post with a dice bot; #downtime-activities is for in-character write-ups when spending EXP. → *Noted, no action needed.* Campaign reference.
+- [x] Ideas for the planner: a "Mirane rules" checkbox (Job/Gather numbers, +1,000 Clim, restricted-class warning at creation, astra resistance shown), and a weekly EXP/IP estimator for town play (IP per week, crafting EXP, journal EXP). → **Done:** Mirane Expedition option built 2026-10-24 (estimator still an idea, see above).
 - [ ] Other builders to compare with later: the official character builder at clio.angelssword.com (posted by the game designer in #how-to-play), the fan tool lyrian-tools.vercel.app, and a community Google Sheets character sheet (v8).
 
 ## Planner - not done yet
@@ -1544,7 +1544,7 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 - [x] Share (2026-10-24): the character export is a neutral **Character data** section (`characterData()` / `characterDataCode()`, `LCD1:` codes, `lyrian-character-*.json` files) with no reference to any other tool. planner-all-in-one.html rebuilt.
 - [x] User request (2026-10-24): character picture - Identity → Picture (shrunk to a 600px JPEG, saved as B.portrait in the build/Save file, left out of build codes), printed top-right of the Backstory page with the text beside it.
 - [x] User request (2026-10-24): tap any stat name (main or sub) for a short pop-up of what it does (STAT_INFO in planner.html, from RULES_REFERENCE section 3).
-- [ ] User request (2026-10-24): the Build roadmap page should always be the LAST page of the printout. Done today (order: official sheet, Backstory, Roadmap); keep it that way if more extra pages are added.
+- [x] User request (2026-10-24): the Build roadmap page should always be the LAST page of the printout. Done today (order: official sheet, Backstory, Roadmap); keep it that way if more extra pages are added. → **Done:** Roadmap prints last.
 - [x] **UI (2026-10-24):** a skill-point pot with only one allowed skill (e.g. Artificer's +5 Artificing) is placed automatically, once; points you take back out stay out (alloc.auto).
 - [x] **UI (user request 2026-10-24): Skills card.** Sources with points left are tinted and listed in a "Points still to place" bar (tap to switch); skills with points are highlighted; the Points column shows "points / cap" (warn colour at the cap, red over it).
 - [x] **Backstory + roadmap pages (2026-10-24):** Identity has a Backstory box (saved as B.notes, also included in Share → Character data). Print sheet can add a Backstory page and a Build roadmap page after the official six, drawn on the official blank page background in the same style; both continue onto extra pages if long.
@@ -1554,39 +1554,39 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 - [x] Race hybrids (Human-Chimera, Faerie-Chimera) work: take the breakthrough, then pick the other race's sub-race.
 - [x] Weapon/armor proficiencies are now tracked (data/proficiencies.js) and checked for class requirements and equipped armor.
 - [x] Mystic Eye slots tracked (2 normal, 8 with 8 Eyes; each eye class uses one). Element masteries tracked from class keys, Elemental Affinity, Ryujin, and Acolyte/Sorcerer on mastery.
-- [ ] Element mastery requirements still show "check" (not "locked") when no tracked source gives the element, in case a race ability or something untracked gives it.
-- [ ] Aeromancer's Wind Master grant (Wind Mastery) was missing from classes.js; added 2026-10-22 after re-checking the page.
+- [x] Element mastery requirements still show "check" (not "locked") when no tracked source gives the element, in case a race ability or something untracked gives it. → *Noted, no action needed.* Kept on purpose, in case an untracked source gives the element.
+- [x] Aeromancer's Wind Master grant (Wind Mastery) was missing from classes.js; added 2026-10-22 after re-checking the page. → **Done:** Added 2026-10-22.
 - [x] Canon campaign starting Clim: +1,000 on top of the normal 3,000 (confirmed by user 2026-10-21).
-- [ ] "Any tier 2 class mastered" is counted as tier 2 or higher. Confirm whether a tier 3 mastery counts.
+- [ ] **GM question.** "Any tier 2 class mastered" is counted as tier 2 or higher. Confirm whether a tier 3 mastery counts. → Duplicate of the "any tier 2 class mastered" question.
 - [x] Transmuter/Alkahest: pick the crafting discipline for your Transmuter points on the class step.
 - [x] Slow Starter: -200 creation class EXP applied; enter EXP already doubled (note shown in Pools).
 
 ## Proficiencies (data/proficiencies.js)
-- [ ] Which groups count as "common" vs "specialized" comes from the rulebook's weapon list (Thrown, Set of Missiles, Bow, Crossbow, Musket, Sling are treated as common ranged). Confirm Musket isn't specialized.
-- [ ] "Basic weapon" (Alchemist, Transmuter, Magitechnician) is treated as the same thing as "common weapon".
-- [ ] "Any melee weapon" requirements count common melee, artisan weapons, Lances, Whips, Gauntlets, Saboteur daggers and Staves. Unarmed proficiency is not counted.
-- [ ] "Smithing weapon" (Blacksmith, Forgemaster) = weapon groups crafted with Blacksmithing in items.js.
+- [x] Which groups count as "common" vs "specialized" comes from the rulebook's weapon list (Thrown, Set of Missiles, Bow, Crossbow, Musket, Sling are treated as common ranged). Confirm Musket isn't specialized. → **Rulebook:** Musket is listed with the common ranged weapons (Crossbow, Sling...), before the Specialized section - it's common.
+- [x] "Basic weapon" (Alchemist, Transmuter, Magitechnician) is treated as the same thing as "common weapon". → *Noted, no action needed.* Reading kept.
+- [x] "Any melee weapon" requirements count common melee, artisan weapons, Lances, Whips, Gauntlets, Saboteur daggers and Staves. Unarmed proficiency is not counted. → *Noted, no action needed.* Reading kept.
+- [x] "Smithing weapon" (Blacksmith, Forgemaster) = weapon groups crafted with Blacksmithing in items.js. → *Noted, no action needed.* Reading kept.
 - [x] Demon: choose weapon proficiency OR +5 clan skill points in Identity. The page doesn't say which skill each clan uses, so any normal skill is allowed.
-- [ ] Non-proficient armor/shield penalty: the planner warns but doesn't change the numbers (exact penalty wording to confirm in the rulebook).
+- [x] Non-proficient armor/shield penalty: the planner warns but doesn't change the numbers (exact penalty wording to confirm in the rulebook). → **Rulebook:** non-proficient armor or shield: 1 less Guard and the Evasion penalty 1 bigger; non-proficient weapons count as improvised (no group bonus). Now applied to Evasion/Dodge too, with a hover note on the inventory tag (2026-10-24).
 
 ## Keywords (data/keywords.js)
-- [ ] 92 keywords from the site. Ability tags with no keyword page (Healing, Encounter Start, Arcane, Shield, Mind Affecting, Jump, Aura, Illusion, Counter, Gravity, Errand, Interlude, etc.) show as plain tags with no pop-up.
-- [ ] Mandate: the page says ignoring it means you've "defied the mandate" but doesn't say what that does.
+- [x] 92 keywords from the site. Ability tags with no keyword page (Healing, Encounter Start, Arcane, Shield, Mind Affecting, Jump, Aura, Illusion, Counter, Gravity, Errand, Interlude, etc.) show as plain tags with no pop-up. → *Noted, no action needed.* By design.
+- [ ] **GM question.** Mandate: the page says ignoring it means you've "defied the mandate" but doesn't say what that does. → Mandate: what happens when you defy it?
 
 ## Bonuses (data/bonuses.js) - rechecked 2026-10-22
-- [ ] Fighter's Journey says "+5 HP" (not "max HP"); treated as +5 max HP.
-- [ ] Angelblooded and Vampire Lord show "+1 stat point to Presence" in the header AND +1 Presence in a benefit. Treated as one +1 (the header summarises the benefit).
-- [ ] Ranger key: page says "5 points in one of the following" while the Grants line says "+5 skill points" over the list. Treated as 5 points spread among the list.
-- [ ] Blocking: the rules say Block *replaces* Guard with 2 x Toughness + armor Block. Not stated whether armor Guard, or Guard bonuses from abilities (Stoneskin, stances), also count while Blocking. The planner keeps them separate: "guard" bonuses -> Guard, "block" bonuses -> Block guard.
-- [ ] Evasion vs Dodge: bonuses that only say "evasion" (Serene Water Stance) are added to Evasion only, not to Dodge evasion. Ones that say "evasion and dodge" (Stoneskin, Hardening Fist, Dog Form) change both.
-- [ ] Unholy Strength (+2 Power/Focus) is added to your stats, which also raises Mana and HP-related numbers while on. Check whether it should only affect attacks.
-- [ ] Craft expertise grants (Forgemaster, Magitechnician, Master Armorer, Timberwright: "5 points in each of 3 crafts") are shown as text only, not tracked.
-- [ ] Magitechnician and Onmyoji pages wouldn't load on 2026-10-22; their bonuses use the data checked on 2026-10-20.
-- [ ] Unlisted abilities (Botanist Forager's Eye, Jonin En-dama, Ninja Kage Shuriken no Jutsu, Shadowbringer Hide in Shadows, Warding Mage Hidden Wards) aren't tied to a step, so the planner never counts them as owned. They show in the class details window.
+- [x] Fighter's Journey says "+5 HP" (not "max HP"); treated as +5 max HP. → *Noted, no action needed.* Reading kept.
+- [x] Angelblooded and Vampire Lord show "+1 stat point to Presence" in the header AND +1 Presence in a benefit. Treated as one +1 (the header summarises the benefit). → *Noted, no action needed.* Reading kept.
+- [x] Ranger key: page says "5 points in one of the following" while the Grants line says "+5 skill points" over the list. Treated as 5 points spread among the list. → *Noted, no action needed.* Reading kept.
+- [ ] **GM question.** Blocking: the rules say Block *replaces* Guard with 2 x Toughness + armor Block. Not stated whether armor Guard, or Guard bonuses from abilities (Stoneskin, stances), also count while Blocking. The planner keeps them separate: "guard" bonuses -> Guard, "block" bonuses -> Block guard. → Rulebook: Block "increases your Guard to 2 x Toughness + armor Block value". Do armor Guard and Guard bonuses from abilities also count while Blocking?
+- [x] Evasion vs Dodge: bonuses that only say "evasion" (Serene Water Stance) are added to Evasion only, not to Dodge evasion. Ones that say "evasion and dodge" (Stoneskin, Hardening Fist, Dog Form) change both. → *Noted, no action needed.* Reading kept.
+- [ ] **GM question.** Unholy Strength (+2 Power/Focus) is added to your stats, which also raises Mana and HP-related numbers while on. Check whether it should only affect attacks. → Unholy Strength: does +2 Power also raise max Mana (stat bonus) or only attacks?
+- [ ] Craft expertise grants (Forgemaster, Magitechnician, Master Armorer, Timberwright: "5 points in each of 3 crafts") are shown as text only, not tracked. → Still to do: track "5 points in each of 3 crafts" expertise grants.
+- [x] Magitechnician and Onmyoji pages wouldn't load on 2026-10-22; their bonuses use the data checked on 2026-10-20. → **Done:** both rechecked on the official site 2026-10-24 (slugs magitechnician- and onmyoji-): steps, costs, keywords, ranges and requirements match.
+- [x] Unlisted abilities (Botanist Forager's Eye, Jonin En-dama, Ninja Kage Shuriken no Jutsu, Shadowbringer Hide in Shadows, Warding Mage Hidden Wards) aren't tied to a step, so the planner never counts them as owned. They show in the class details window. → **Done:** These five abilities are now the class steps (filled 2026-10-24), so they count as owned.
 
 ## Refunds - updated 2026-10-22
 - [x] Shared abilities (Wind Master, Controlled Blaze, Tremorsense, Divine Weapon, Status Assessment II, Battle Cast, Aimed Shot, Undying Justice, Lunge): the class pages only say "Refund possible". The rulebook says buying an ability you already have refunds the EXP (IP still paid for a new class). classes.js refund amounts now say "full", and the planner makes the later purchase cost 0 EXP.
-- [ ] Half refunds ("not an exact match but you still gain everything") aren't detected automatically; there's no list of which abilities count as near-matches.
+- [x] Half refunds ("not an exact match but you still gain everything") aren't detected automatically; there's no list of which abilities count as near-matches. → *Noted, no action needed.* Planner gives full refunds for exact duplicates only.
 
 ## Data audit - 2026-10-22
 - [x] Spot-check of 20 random classes (highlander, zen-warrior, windbringer, anti-mage, amanita, elementalist, trickster, aurora-blade-style, jewel-idol, agrarian, bard, monk, sage, sanctioner, sniper, duelist, mage, marksman, phosphomancer, daionmyoji) re-read against the static copy: tier, difficulty, roles, requirements and all 8 steps (abilities, skill lists, Heart/Soul options) all matched. 0 errors in 160 steps.
@@ -1595,13 +1595,13 @@ Source: Lyrian Chronicles TTRPG Discord, #mirane-info pinned "Players Guide" (WI
 - [x] Races audit: all 49 races re-read (size, every ability name and cost, main-race stats/skills/languages/proficiencies). Everything matched. Added a Cait Sith "Cat Form" toggle (Guard becomes 0, +3 Evasion, +6 Dodge), which the planner didn't have.
 - [x] Breakthroughs audit: all 89 names, EXP costs and requirements match the site's list; every page was read for permanent effects. Added: Small Doggy (bigger Dog Form numbers replace the normal Dog Form toggle), Kit Expert (your heaviest kit counts 2 less Burden), Mystic Eyes of Faerie Light (+10 Perception to spot illusions, shown as expertise), Bully (+5 Intimidation vs lower Fitness, shown as a note).
 - [x] Guard and Block can't go below 0 (confirmed from the rulebook: Guard = equipment + Toughness; Block Guard = 2 x Toughness + armor Block value, +4 for a normal shield while blocking). The planner now stops both at 0 and shows "Can't go below 0" in the breakdown.
-- [ ] Spelling kept as the site has it: Battlemaster "Skillfull Blow", Five Harmonies "Blooming Conciousness", Sword Saint requirement "Iaido style" (= Iai Style).
-- [ ] Page typos noted during the audit: Phosphomancer lists "Art Magic" and Daionmyoji "Magic Perception" with a missing comma; the data treats them as two skills each.
-- [ ] Item pages tried and not found (they're abilities that make items, not items): sealing-talisman, purify-elixir, detoxify-elixir, volatile-flask, high-power-shell, shadow-cloak.
+- [x] Spelling kept as the site has it: Battlemaster "Skillfull Blow", Five Harmonies "Blooming Conciousness", Sword Saint requirement "Iaido style" (= Iai Style). → *Noted, no action needed.* Spelling kept as the site has it.
+- [x] Page typos noted during the audit: Phosphomancer lists "Art Magic" and Daionmyoji "Magic Perception" with a missing comma; the data treats them as two skills each. → *Noted, no action needed.* Treated as two skills each.
+- [x] Item pages tried and not found (they're abilities that make items, not items): sealing-talisman, purify-elixir, detoxify-elixir, volatile-flask, high-power-shell, shadow-cloak. → *Noted, no action needed.* Not items.
 
 ## Printable sheet (Print sheet button) - 2026-10-22
 - [x] Fills the official fillable Character Sheet 1.2 (6 pages, 351 fields) using its own fonts. Tested in poppler and pdfium (Chrome's PDF engine); qpdf reports no errors.
-- [ ] The sheet lists "Acrobatics" and "Artisan" as skills; the current rules have neither, so the planner writes its own skill list into those rows (crafting/gathering skills you've put points into go in the spare rows).
-- [ ] "Bonus" column = total roll bonus (stat + skill points + best expertise). Say if you'd rather it show just the stat.
-- [ ] "Exp" field = unspent EXP. L/P Attack = 2d4 + Power, H Attack = 4d6 + 2 x Power. Temp HP/RP/Mana and Injuries are left blank for play.
-- [ ] Only works with that exact PDF file (Character Sheet 1.2, 2,316,411 bytes). A new sheet version needs tools/make_sheet_map.py re-run.
+- [x] The sheet lists "Acrobatics" and "Artisan" as skills; the current rules have neither, so the planner writes its own skill list into those rows (crafting/gathering skills you've put points into go in the spare rows). → *Noted, no action needed.* By design.
+- [x] "Bonus" column = total roll bonus (stat + skill points + best expertise). Say if you'd rather it show just the stat. → *Noted, no action needed.* By design.
+- [x] "Exp" field = unspent EXP. L/P Attack = 2d4 + Power, H Attack = 4d6 + 2 x Power. Temp HP/RP/Mana and Injuries are left blank for play. → *Noted, no action needed.* By design.
+- [x] Only works with that exact PDF file (Character Sheet 1.2, 2,316,411 bytes). A new sheet version needs tools/make_sheet_map.py re-run. → *Noted, no action needed.* By design.

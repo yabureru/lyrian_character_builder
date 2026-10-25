@@ -718,6 +718,8 @@ function calcDerived(C){
       }
       if (num(a.evasion)) P("evasion", it.name, num(a.evasion));
       if (num(a.dodge)) P("dodge", it.name, num(a.dodge));
+      // rulebook (Items & Equipment, Proficiency): non-proficient armor/shield gives 1 less Guard and 1 more Evasion penalty
+      if (noProf) { P("evasion", it.name + " not proficient", -1); P("dodge", it.name + " not proficient", -1); }
       if (num(a.initiative)) P("init", it.name, num(a.initiative));
     }
     // flat numbers from mods (while equipped / wielded)
@@ -1782,7 +1784,8 @@ function renderLive(){
     var ms = chosenMods(e), canMod = modSources(it).length > 0;
     if (canMod) eq += ' <button class="small" data-mods="' + i + '" title="Pick this item\'s mods">Mods' + (ms.length ? " (" + ms.length + ")" : "") + "</button>";
     var need = itemProf(it);
-    if (need && !C.profs[need]) eq += ' <span class="tag bad" title="You are not proficient with ' + esc(need) + '">not proficient</span>';
+    if (need && !C.profs[need]) eq += ' <span class="tag bad" title="You are not proficient with ' + esc(need) + (it.weapon ?
+      ": it counts as an improvised weapon (no weapon group bonus; Light 2d4, Heavy 2d6 + Power)" : ": 1 less Guard and 1 more Evasion penalty (already in your numbers)") + '">not proficient</span>';
     if (it.units) h += '<div class="kv"><span>' + esc(it.name) + '</span><span class="pm"><input type="number" class="small" data-uq="' + i + '" min="0" step="' + (it.unitStep || 10) + '" value="' + e.qty + '" style="width:76px">u</span></div>';
     else h += '<div class="kv"><span>' + esc(it.name) + " " + eq + '</span><span class="pm"><button class="small" data-q="' + i + '" data-d="-1">−</button><b>' + e.qty + '</b><button class="small" data-q="' + i + '" data-d="1">+</button></span></div>';
     if (ms.length) h += '<div class="small dim" style="margin:-4px 0 6px 8px">' + ms.map(function(x){ return esc(x.m.name); }).join(", ") +
