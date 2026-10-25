@@ -1706,7 +1706,7 @@ function renderItems(){
   h += '<div class="note">Buy items to track Clim and burden. Tick "equip" on armor and shields in the side panel to apply their stats.</div>';
   if (B.canon) h += '<div class="note"><b>Mirane:</b> your Adventurer\'s Kit is free (added for you when you tick Mirane Expedition). Starting crafting materials: none worth 1,000+ base value (no Mithril or Silver Ingots, Ash Blocks...), ' +
     "2,500 Clim of ingots/raw materials at most, only what you could gather or use yourself (food is fine). Every party needs a Camping Kit and a Culinary Kit; " +
-    "a Medical Kit and a Cartographer's Kit are strongly recommended. Plan food for 2 weeks (Food Units: about 600u = 300 Clim; a day is 40u = 20 Clim, cheaper than a 40 Clim ration) and 100-200 Magical Fuel Units for the teleporter; buy both below (search for Food Units or Magical Fuel). ' +
+    "a Medical Kit and a Cartographer's Kit are strongly recommended. Plan food for 2 weeks (Food Units: about 600u = 300 Clim; a day is 40u = 20 Clim, cheaper than a 40 Clim ration) and 100-200 Magical Fuel Units for the teleporter; buy both below (search for Food Units or Magical Fuel). " +
     "Light build? The guide suggests Armor Plates over Light Armor (no armor penalties, more Burden); regular clothing is free.</div>";
   h += '<div class="toolbar"><input type="search" id="itSearch" placeholder="Search items..." value="' + esc(ui.itemSearch) + '">' +
     '<select id="itCat"><option value="">All types</option>' + Object.keys(cats).sort().map(function(c){ return "<option>" + esc(c) + "</option>"; }).join("") + "</select></div>";
