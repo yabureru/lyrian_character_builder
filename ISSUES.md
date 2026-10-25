@@ -13,7 +13,7 @@ Everything else in this file is either done, checked against the official site (
 2. **Crafting classes' Level 3** (Alchemist, Armorsmith, Carpenter, Forager): "exchange any skill point for 2 expertise points... in these skills" - does that include the fixed +5 in the crafting skill? *(Planner: allows it.)*
 3. **Stat training breakthroughs:** is there a maximum for a stat? *(Planner: no cap.)*
 4. ~~**"Any tier 2 class mastered"**~~ **Answered (user, 2026-10-24): doesn't matter.** Checked the data: every tier 3 class's entry needs a tier 2 mastered (Sword Saint needs Iai Style, which is tier 2), so anyone with a tier 3 mastered already has a tier 2 mastered.
-5. **Executor** ("any mastered class + any points in Acolyte"): does that mean Acolyte unlocked, and can the mastered class be Acolyte itself? *(Planner: Acolyte unlocked + one mastered class, which may be Acolyte.)*
+5. ~~**Executor**~~ **Answered (user, 2026-10-24):** "any points in Acolyte" means you've taken Acolyte, plus any class mastered - a mastered Acolyte counts. The planner already works this way.
 6. ~~**Mystic Eye slots**~~ **Answered (user, 2026-10-24):** anything with the Mystic Eye keyword is a Mystic Eye; each eye replaces one of your real eyes and takes a slot - 2 normally, 3 with Third Eye, 8 with 8 Eyes. The planner counts one per eye class (its key, or any owned ability with the keyword), shows "Mystic Eye slots used / max" in Pools and warns when over.
 7. **Blocking:** Block sets Guard to 2 x Toughness + armor Block value. Do armor Guard and Guard bonuses from abilities (Stoneskin, stances) also add while Blocking? *(Planner: no, kept separate.)*
 8. **Unholy Strength** (+2 Power / +2 Focus): does it also raise max Mana, or only attacks? *(Planner: full stat bonus while on.)*
@@ -549,7 +549,7 @@ Everything else in this file is either done, checked against the official site (
 ## Executor
 
 - [x] Role read as "Main" + "Striker" - recorded Striker only. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
-- [ ] **GM question.** Entry: "Any mastered class + Any points in Acolyte" - unclear if "points" means levels in
+- [x] Entry: "Any mastered class + Any points in Acolyte" - unclear if "points" means levels in → **Answered (user 2026-10-24):** Acolyte taken + any class mastered; a mastered Acolyte counts.
       Acolyte. Confirm. → Executor entry: "any points in Acolyte" - Acolyte unlocked, and can the mastered class be Acolyte?
 - [x] Ultimate name is "Ave María" (with accent); Deus Vult text writes "Ave Maria". Recorded as shown. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
 - [x] Eagle Hunt range "-". Recorded null. → *Noted, no action needed.* Recorded as the page shows; no planner impact.
@@ -1490,7 +1490,7 @@ Everything else in this file is either done, checked against the official site (
 
 - [x] **Dragoon:** "Lancer mastered. 10 points in Athletics (Jumping) expertise, OR be a Jiangshi." Read as Lancer AND (expertise OR Jiangshi). → *Noted, no action needed.* Reading kept: Lancer AND (expertise OR Jiangshi).
 - [x] **Thief:** "Be a rabbitfolk or have Rogue mastered and possess the Decipher Magic ability." Read as Rabbitfolk OR (Rogue AND Decipher Magic). Decipher Magic comes from Mage. → *Noted, no action needed.* Reading kept: Rabbitfolk OR (Rogue mastered AND Decipher Magic).
-- [ ] **GM question.** **Executor:** "Any mastered class + any points in Acolyte." Read as: 1 mastered class AND Acolyte unlocked. Could the mastered class be Acolyte itself? → Executor: can the mastered class be Acolyte itself?
+- [x] **Executor:** "Any mastered class + any points in Acolyte." Read as: 1 mastered class AND Acolyte unlocked. Could the mastered class be Acolyte itself? → Executor: can the mastered class be Acolyte itself? → **Answered (user 2026-10-24):** Acolyte taken + any class mastered; a mastered Acolyte counts.
 - [x] **Mist Veil Elegy:** "Idol or Bard mastered, OR 10 points in Art (Flute) expertise and any class mastered." → *Noted, no action needed.* Reading kept as written.
 - [x] **Bard:** "an Art expertise for an instrument" - stored as "Art (any instrument)". → *Noted, no action needed.* Data note.
 - [x] **Abjurer:** needs Arcane Barrier (a Mage ability) AND a damaging spell. → *Noted, no action needed.* Data note.

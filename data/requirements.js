@@ -131,7 +131,7 @@ REQ("exalted-shield", { text: "Shield Paladin mastered.", routes: [ [ { mastered
 REQ("excavator", { text: "Miner mastered.", routes: [ [ { mastered: "miner" } ] ] });
 REQ("executor", { text: "Any mastered class + any points in Acolyte.",
   routes: [ [ { masteredAny: 1 }, { classLearned: "acolyte" } ] ],
-  unclear: "'Any points in Acolyte' read as: you have unlocked the Acolyte class. Could mean Acolyte must be a DIFFERENT class from the mastered one." });
+  note: "'Any points in Acolyte' = you have taken Acolyte; a mastered Acolyte also counts as the mastered class (user ruling 2026-10-24)." });
 REQ("fae-knight", { text: "Fae only. Any class mastered.",
   routes: [ [ { race: "fae" }, { masteredAny: 1 } ] ] });
 REQ("fae-knight-willow-style", { text: "Fae Knight mastered.", routes: [ [ { mastered: "fae-knight" } ] ] });
