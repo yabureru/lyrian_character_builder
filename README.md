@@ -10,6 +10,10 @@ Community tool. No monetization.
 
 ## Quick start
 
+**Use it online:** https://yabureru.github.io/lyrian_character_builder/planner-all-in-one.html (nothing to download; your builds save in your browser).
+
+Or keep your own copy:
+
 1. Download **[planner-all-in-one.html](planner-all-in-one.html)** (open it, then the **download** button at the top right).
    That one file is the whole planner. It works offline on a PC or a phone, with nothing to install.
 2. Double-click it to open it in your browser (Chrome, Edge or Firefox).
