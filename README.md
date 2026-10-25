@@ -26,7 +26,8 @@ and use **Load** to open your saved character.
 ## Questions, mistakes and ideas
 
 This is a community tool, and the game updates often. If a number looks wrong, a class is missing something, or you'd like a feature,
-say so in the Lyrian Chronicles Discord or open an issue on GitHub. Rules questions that still need a GM's answer are listed at the top of [ISSUES.md](ISSUES.md).
+**reply to the planner's announcement post in the Lyrian Chronicles Discord** (please don't DM), or open an issue here on GitHub.
+Feedback is checked every week or two and fixes come out in batches. Rules questions that still need a GM's answer are listed at the top of [ISSUES.md](ISSUES.md).
 
 ## What it does
 
