@@ -29,6 +29,7 @@ Rules questions only a GM or the designers can answer. The planner's current rea
 
 ## Ideas for later
 
+- Quick reference (quick-reference.html, added 2026-10-26): once settled, move pieces into the planner itself (e.g. a Rules tab or more pop-ups).
 - Weekly EXP/IP estimator for town play in Mirane (IP per week, crafting EXP, journal EXP).
 - Food buffs as toggles (Culinarian dishes).
 - Day/night toggle (Shadow Thief's night cost reductions, Shadow Buoyancy armor mod).

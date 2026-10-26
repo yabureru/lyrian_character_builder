@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lyrian Quick Reference</title>
+<!--
+  Lyrian Chronicles - quick reference for play (unofficial fan tool, game version 0.13.2).
+  Plain-English summaries of the official rulebook (https://rpg.angelssword.com/game/latest/rulebook),
+  not the official wording. Edit in Notepad like any other page.
+  The Keywords section is filled from data/keywords.js: after changing keywords.js run
+      python tools/build_quick_reference.py
+-->
+<style>
+:root{
+  --bg:#1b1d22; --panel:#252830; --panel2:#2d3039; --line:#3a3e49; --text:#e6e3db; --dim:#9da1ab;
+  --gold:#c9a24a; --gold2:#e2c072; --good:#6fbf73; --bad:#e06c5e; --blue:#79a8d8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--blue)}
+header{position:sticky;top:0;z-index:5;background:#16181c;border-bottom:1px solid var(--line);padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+header h1{font-size:18px;margin:0;color:var(--gold2);letter-spacing:.5px}
+header .dim{font-size:12px}
+#q{flex:1;min-width:180px;max-width:360px;background:#1f2128;border:1px solid var(--line);border-radius:6px;padding:6px 9px;color:var(--text);font-size:14px}
+#q:focus{outline:1px solid var(--gold)}
+nav{display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px;border-bottom:1px solid var(--line);background:#191b20}
+nav a{font-size:12px;text-decoration:none;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:3px 10px}
+nav a:hover{border-color:var(--gold)}
+main{max-width:1100px;margin:0 auto;padding:14px 16px 40px;columns:2 480px;column-gap:14px}
+section{break-inside:avoid;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 14px}
+section.wide{column-span:all}
+h2{font-size:14px;margin:0 0 8px;color:var(--gold2);text-transform:uppercase;letter-spacing:1px}
+h3{font-size:13px;margin:10px 0 4px;color:var(--gold)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:3px 6px;border-top:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--dim);font-weight:600;border-top:none}
+td:first-child{white-space:nowrap;font-weight:600}
+td.f{font-family:ui-monospace,Consolas,monospace;white-space:nowrap;color:var(--gold2)}
+ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
+.note{font-size:12px;color:var(--dim)}
+.box{border-left:3px solid var(--gold);padding:4px 10px;margin:8px 0;background:rgba(201,162,74,.07);font-size:13px}
+dl.kw{margin:0;columns:2 260px;column-gap:18px;font-size:13px}
+dl.kw div{break-inside:avoid;margin:0 0 6px}
+dl.kw dt{font-weight:600;color:var(--gold2);display:inline}
+dl.kw dd{display:inline;margin:0}
+.hide{display:none !important}
+mark{background:rgba(226,192,114,.35);color:inherit;padding:0 1px;border-radius:2px}
+footer{max-width:1100px;margin:0 auto;padding:0 16px 30px;font-size:12px;color:var(--dim)}
+@media (max-width:600px){ td:first-child{white-space:normal} td.f{white-space:normal} th,td{padding:3px 4px} main{padding:10px 8px 30px} section{padding:10px} }
+@media print{
+  :root{--bg:#fff;--panel:#fff;--panel2:#fff;--line:#bbb;--text:#000;--dim:#444;--gold:#000;--gold2:#000}
+  header{position:static;background:#fff;border-bottom:2px solid #000;padding:0 0 4px} header a,#q,nav{display:none}
+  main{columns:auto;max-width:none;padding:6px 0 0}
+  section{break-inside:auto;border:1px solid #999;border-radius:4px;padding:6px 8px;margin:0 0 8px}
+  tr,dl.kw div,li{break-inside:avoid} h2{break-after:avoid}
+  body{font-size:10.5px} table{font-size:10px} dl.kw{font-size:10px;columns:3}
+  td.f{color:#000}
+  footer{padding:0}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Lyrian Quick Reference</h1>
+  <span class="dim">Rules at a glance for play · game version 0.13.2 · unofficial</span>
+  <input id="q" type="search" placeholder="Search (e.g. Dodge, Prone, Stealth)..." autocomplete="off">
+  <a href="planner-all-in-one.html" class="dim">Open the planner</a>
+</header>
+<nav id="nav">
+  <a href="#rolls">Rolls</a><a href="#stats">Stats &amp; skills</a><a href="#checks">Skill checks</a><a href="#turn">Your turn</a>
+  <a href="#actions">Basic actions</a><a href="#attack">Attacking</a><a href="#defend">Defending</a><a href="#conditions">Conditions</a>
+  <a href="#downed">Downed &amp; after the fight</a><a href="#rest">Rest &amp; food</a><a href="#interlude">Interlude</a>
+  <a href="#weapons">Weapons &amp; armor</a><a href="#damage">Damage types</a><a href="#keywords">Keywords</a>
+</nav>
+<main id="main">
+
+<section id="rolls" class="wide">
+<h2>Rolls at a glance</h2>
+<table>
+<tr><th>Roll</th><th>Formula</th><th>Notes</th></tr>
+<tr><td>Accuracy (attack)</td><td class="f">1d20 + Focus</td><td>Hits if it equals or beats the target's Evasion (Dodge evasion if they Dodge).</td></tr>
+<tr><td>Precise attack accuracy</td><td class="f">1d20 + 2 × Focus</td><td>Precise attacks cost 2 AP.</td></tr>
+<tr><td>Light attack damage</td><td class="f">2d4 + Power</td><td>1 AP.</td></tr>
+<tr><td>Heavy attack damage</td><td class="f">4d6 + 2 × Power</td><td>2 AP. Two-handed melee weapon: <b>5d6 + 2 × Power</b>.</td></tr>
+<tr><td>Precise attack damage</td><td class="f">2d4 + Power</td><td>Has Pinpoint (ignores Guard up to your Focus).</td></tr>
+<tr><td>Improvised weapon</td><td class="f">Light 2d4 · Heavy 2d6 + Power</td><td>Also what a weapon you're not proficient with counts as. Unarmed without proficiency: 1 damage.</td></tr>
+<tr><td>Skill check</td><td class="f">1d20 + stat + skill points + best expertise</td><td>Only your single best expertise counts. See Skill checks.</td></tr>
+<tr><td>Save</td><td class="f">2d10 + Toughness</td><td>Against the Potency of the effect.</td></tr>
+<tr><td>Potency (your effects' DC)</td><td class="f">11 + Focus</td><td>What enemies must save against.</td></tr>
+<tr><td>Initiative</td><td class="f">1d4 + Agility</td><td>Plus bonuses; minimum 0. Ties: players go before enemies.</td></tr>
+<tr><td>Crafting check</td><td class="f">1d10 + crafting skill (+ expertise)</td><td>Each roll spends a Crafting Die (5 per craft).</td></tr>
+<tr><td>Gathering check</td><td class="f">1d10 + gathering skill</td><td>Each roll spends a Strike Die (5 per session).</td></tr>
+<tr><td>Fall damage</td><td class="f">1d6 true per 10ft</td><td>Prone if you fall 30ft or more.</td></tr>
+</table>
+<h3>Your numbers</h3>
+<table>
+<tr><td>HP</td><td class="f">20 + 10 × Toughness</td><td>AP</td><td class="f">4 per turn</td></tr>
+<tr><td>Max Mana</td><td class="f">6 + Power</td><td>Max RP</td><td class="f">2 + Agility</td></tr>
+<tr><td>Evasion</td><td class="f">7 + Agility</td><td>Dodge evasion</td><td class="f">20 + Agility</td></tr>
+<tr><td>Guard</td><td class="f">armor + Toughness</td><td>Block guard</td><td class="f">2 × Toughness + armor Block</td></tr>
+<tr><td>Speed</td><td class="f">20ft</td><td>Burden limit</td><td class="f">10</td></tr>
+</table>
+<p class="note">Round down unless stated. Add flat bonuses before doubling or halving. Effects with the same name don't stack: the highest one counts.</p>
+</section>
+
+<section id="stats">
+<h2>Stats and what they roll</h2>
+<h3>Main stats (combat)</h3>
+<table>
+<tr><td>Power</td><td>Damage of your attacks and your max Mana.</td></tr>
+<tr><td>Focus</td><td>Accuracy, and the Potency (DC) of your effects.</td></tr>
+<tr><td>Agility</td><td>Evasion, Dodge, max RP and Initiative.</td></tr>
+<tr><td>Toughness</td><td>HP, Guard, Block and saves. Resting heals a multiple of it.</td></tr>
+</table>
+<h3>Sub stats → skills</h3>
+<table>
+<tr><td>Fitness</td><td><b>Athletics</b> (strength: push, pull, lift, carry, climb, swim, jump) · <b>Riding</b> (mounts and vehicles in tough conditions)</td></tr>
+<tr><td>Cunning</td><td><b>Deception</b> (lying, distraction) · <b>Roguecraft</b> (locks, traps, sleight of hand) · <b>Stealth</b> (not being noticed)</td></tr>
+<tr><td>Reason</td><td><b>Appraise</b> (value, quality, forgeries) · <b>Artifice</b> (using and understanding artifices; not crafting them) · <b>Common Knowledge</b> (what most people know; its expertise is Expert Knowledge) · <b>Flight</b> (flying devices and airships) · <b>History</b> (the past, tactics, etiquette) · <b>Linguistics</b> (languages and ciphers) · <b>Magic</b> (understanding, identifying and disabling spells) · <b>Medicine</b> (first aid, biology) · <b>Religion</b> (faith spells and religions)</td></tr>
+<tr><td>Awareness</td><td><b>Animal Husbandry</b> (bonding with and calming animals) · <b>Insight</b> (reading a person or object closely) · <b>Perception</b> (noticing what's around you) · <b>Survival</b> (shelter, food, wayfinding in the wild)</td></tr>
+<tr><td>Presence</td><td><b>Art</b> (creating and performing, including Cartography) · <b>Intimidation</b> (using fear) · <b>Negotiation</b> (persuading, social graces)</td></tr>
+</table>
+<p class="note">Crafting skills (Alchemy, Armorsmithing, Artificing, Blacksmithing, Carpentry, Culinary, Farming...) and gathering skills (Foraging, Mining...) have no stat: just the skill points plus expertise.</p>
+</section>
+
+<section id="checks">
+<h2>Skill checks</h2>
+<table>
+<tr><th>DC</th><th>Difficulty</th></tr>
+<tr><td>10</td><td>Initiate: someone with basic training</td></tr>
+<tr><td>15</td><td>Professional: someone who does it for a living</td></tr>
+<tr><td>20</td><td>Expert: years of training</td></tr>
+<tr><td>25</td><td>Specialist: devoted to the field</td></tr>
+<tr><td>30</td><td>Master: a life's work</td></tr>
+</table>
+<ul>
+<li><b>Expertise</b> is a narrow specialty under a skill (Jumping under Athletics). Each skill point can become 2 expertise points. Only the best one applies to a roll.</li>
+<li><b>Caps:</b> 15 points per skill and per expertise; +5 at 5,000 Spirit Core; no cap at 10,000. Crafting skills cap at 10. Bonuses from items and abilities ignore caps.</li>
+<li><b>Skill encounters:</b> events have HP and a Hazard counter. A successful Skill Check deals 1 damage to the event, and that base skill is then used up against it. The event clears at 0 HP; it fails when the Hazard counter hits 0.</li>
+<li><b>Group Stealth</b> while travelling: average of the highest and lowest rolls. Stealthy travel is at half speed.</li>
+</ul>
+</section>
+
+<section id="turn">
+<h2>Your turn</h2>
+<ul>
+<li>A round is about 10 seconds. You get <b>4 AP</b> every turn.</li>
+<li><b>RP</b> (reactions) only refills at the <b>start of combat</b>, not every turn. Spend it carefully.</li>
+<li>Reactions resolve <b>last in, first out</b>. An action that gets cancelled is refunded.</li>
+<li>Each ability once per round, unless it's <b>Rapid</b> (upgrades like Fireball II count as the same ability).</li>
+<li>Only one <b>Secret Art</b> or <b>Esoteric Art</b> per encounter. One Encounter Start ability each.</li>
+<li><b>Moving</b> costs 1 AP per Speed's worth of distance. Difficult terrain costs double. You can't end in an occupied space.</li>
+<li>Leaving an enemy's reach <b>provokes an opportunity attack</b>; forced movement doesn't.</li>
+<li><b>Ranged attacks</b> (and Spells) provoke opportunity attacks from adjacent enemies unless they're <b>Safe</b>.</li>
+<li><b>Escaping:</b> start your turn on the map edge and spend all your AP.</li>
+<li>Getting a non-combat item out of a pack costs 4 AP in combat.</li>
+</ul>
+<div class="box"><b>Surprise:</b> the side that's unaware is surprised; everyone not surprised gets +1 Initiative, and whoever triggered the fight goes first.</div>
+</section>
+
+<section id="actions" class="wide">
+<h2>Basic actions</h2>
+<table>
+<tr><th>Action</th><th>Cost</th><th>What it does</th></tr>
+<tr><td>Light / Heavy / Precise attack</td><td>1 / 2 / 2 AP</td><td>See Rolls at a glance.</td></tr>
+<tr><td>Move</td><td>1 AP each</td><td>Move up to your Speed.</td></tr>
+<tr><td>Dodge</td><td>1 RP</td><td>Your Evasion becomes 20 + Agility against that attack.</td></tr>
+<tr><td>Block</td><td>1 RP</td><td>Guard becomes 2 × Toughness + armor Block value. The attack automatically hits, but can't crit. Shields add +4 while Blocking.</td></tr>
+<tr><td>Opportunity attack</td><td>0 RP Light / 1 RP Heavy or Precise</td><td>When an enemy leaves your reach. Deals at least your Power unless Blocked.</td></tr>
+<tr><td>Defend</td><td>3 AP</td><td>Your next Dodge or Block before your next turn costs 0 RP.</td></tr>
+<tr><td>Disengage</td><td>2 AP</td><td>Your movement doesn't provoke until your next turn.</td></tr>
+<tr><td>Hide</td><td>3 AP (2 with +10 Stealth)</td><td>Behind cover. Moving, attacking or non-Stealth abilities break it.</td></tr>
+<tr><td>Sneak</td><td>2 AP</td><td>Move up to your Speed and stay Hidden; you lose Hiding if you end without cover from an enemy.</td></tr>
+<tr><td>Search</td><td>2 AP</td><td>Reveal hidden enemies in a 20x20ft area within 30ft (+10ft range per +5 Perception).</td></tr>
+<tr><td>Hunker Down</td><td>2 AP</td><td>Low cover next to you counts as High cover until your next turn.</td></tr>
+<tr><td>Overwatch</td><td>2 AP</td><td>Watch a 90° cone out to 90ft until your next turn: you spot anything moving through it, and attacks from stealth there get no Trick Attack.</td></tr>
+<tr><td>Prepare</td><td>X AP</td><td>Name a trigger and a basic 1-2 AP action; your turn ends, and it happens if the trigger comes before your next turn.</td></tr>
+<tr><td>Push</td><td>2 AP</td><td>Push a target your size or smaller 5ft; it can spend 1 RP to resist.</td></tr>
+<tr><td>Grapple</td><td>4 AP</td><td>Escape power 8; upkeep 4 AP. Not on bosses.</td></tr>
+<tr><td>Stand / Crawl</td><td>1 AP / 2 AP</td><td>Get up from Prone / move 5ft while Prone (also while Downed).</td></tr>
+<tr><td>Grab Ally</td><td>1 AP</td><td>Drag a Downed ally (your speed is halved; needs a free hand).</td></tr>
+<tr><td>Interact / Drop</td><td>usually 1 AP / 0 AP</td><td>Use an object / drop what you're holding.</td></tr>
+<tr><td>Thrown attack</td><td>1 or 2 AP</td><td>Light or Heavy attack up to 15ft by throwing your weapon; weapon group abilities don't trigger.</td></tr>
+<tr><td>Aurasense</td><td>0 AP</td><td>Sense within 120ft whether something is a Boss, Heroic or Grunt.</td></tr>
+<tr><td>Encounter Start</td><td>-</td><td>Delay, Unsheathe.</td></tr>
+<tr><td>While Downed</td><td>-</td><td>Crawl (2 AP), Grit (2 AP, heal 4), Play Dead (4 AP), Throw Rock (2 AP, 2 damage, 40ft).</td></tr>
+</table>
+</section>
+
+<section id="attack">
+<h2>Attacking</h2>
+<ol style="margin:4px 0;padding-left:18px">
+<li>Check range and pay the cost.</li><li>Roll accuracy against Evasion.</li><li>Roll damage.</li>
+<li>Defender may Dodge (1 RP), Block (1 RP) or do nothing.</li><li>Guard reduces the damage (minimum 1, unless Blocking).</li>
+<li>Damage reduction, then temp HP, then HP.</li><li>Other effects.</li>
+</ol>
+<ul>
+<li><b>Critical hit:</b> a natural 20 that hits deals maximum damage and gains Half Pierce. Blocking targets can't be crit. Katanas crit on 19-20; Expose lowers the threshold.</li>
+<li><b>On hit</b> = the accuracy roll succeeded. <b>On damage</b> = it dealt more than 0 damage.</li>
+<li><b>True damage</b> ignores Guard, shields and temp HP. <b>Full Pierce</b> ignores Guard. <b>Half Pierce</b> ignores Guard unless the target Dodges or Blocks.</li>
+<li><b>Hidden attacker:</b> your first attack (2 AP or less) gets Trick Attack (the target pays double RP to react).</li>
+<li><b>Areas:</b> you're caught if at least half of one of your squares is covered.</li>
+<li><b>Dual wield</b> (two one-handed weapons): once per turn, after a basic Light attack, a free Light attack with the other weapon.</li>
+</ul>
+</section>
+
+<section id="defend">
+<h2>Defending and cover</h2>
+<table>
+<tr><td>Low cover</td><td>+4 Evasion (peeking out of cover counts as Low)</td></tr>
+<tr><td>High cover</td><td>+6 Evasion, +1 Guard</td></tr>
+<tr><td>Full cover</td><td>Can't be targeted</td></tr>
+</table>
+<ul>
+<li><b>Temp HP</b> is lost first and doesn't stack (the higher amount wins). It doesn't stop "on damage" effects.</li>
+<li><b>Guard</b> lowers each hit by its value, to a minimum of 1 damage (Blocking can reduce it further).</li>
+<li><b>Rooted</b> characters Dodge at 13 + Agility. Over your Burden limit, you're Rooted.</li>
+</ul>
+</section>
+
+<section id="conditions" class="wide">
+<h2>Conditions</h2>
+<table>
+<tr><td>Bleeding</td><td>1d6 true damage at the start of your turn.</td></tr>
+<tr><td>Blinded X</td><td>−X accuracy. At 3+: no ranged attacks unless you've located the target another way. At 5+: no Sure Hit.</td></tr>
+<tr><td>Burning X</td><td>X damage at the end of your turn. 1 AP removes it.</td></tr>
+<tr><td>Calcification</td><td>−1 Agility.</td></tr>
+<tr><td>Charm</td><td>You can't willingly attack whoever charmed you (unless only allies are left to target).</td></tr>
+<tr><td>Daze</td><td>Lose 1 AP right away (or 1 less next turn). Can't be Dazed again until the end of your next turn.</td></tr>
+<tr><td>Expose X</td><td>Attacks against you crit X lower. Removed when you're crit.</td></tr>
+<tr><td>Hiding</td><td>Can't be seen or targeted. Ends if you move, attack or use a non-Stealth ability.</td></tr>
+<tr><td>Illumination X</td><td>The next attack against you gets +X accuracy.</td></tr>
+<tr><td>Isolated</td><td>No allies within 10ft, and 2+ enemies (or 1 boss) within 10ft.</td></tr>
+<tr><td>Petrify</td><td>+10 Guard, but every attack hits you and you can't act. Only effects that name Petrify remove it.</td></tr>
+<tr><td>Prone</td><td>Attacks without the Prone keyword cost +1 AP and +1 RP. Stand costs 1 AP.</td></tr>
+<tr><td>Root</td><td>Can't move. Dodge evasion becomes 13 + Agility.</td></tr>
+<tr><td>Shaken</td><td>Max AP −1.</td></tr>
+<tr><td>Sickened</td><td>Rolls using Focus, Power, Agility or Toughness treat it as 1 lower.</td></tr>
+<tr><td>Slow</td><td>Speed halved.</td></tr>
+<tr><td>Soaked X</td><td>+X damage taken from Lightning.</td></tr>
+<tr><td>Stagger X</td><td>−X Evasion.</td></tr>
+<tr><td>Stun</td><td>AP, AP recovery and RP become 0 (unspent RP comes back after).</td></tr>
+<tr><td>Sunder X</td><td>−X Guard.</td></tr>
+<tr><td>Toxic</td><td>1d6 Full Pierce Poison damage at the start of your turn.</td></tr>
+<tr><td>Unbalanced</td><td>Your next attack that uses AP costs 1 more AP.</td></tr>
+<tr><td>Weakened</td><td>Max 2 AP and 1 RP (unspent RP comes back after).</td></tr>
+<tr><td>Broken (items)</td><td>Armor/shield gives no bonus or penalty; a weapon counts as improvised.</td></tr>
+</table>
+</section>
+
+<section id="downed">
+<h2>Downed, injuries and after the fight</h2>
+<ul>
+<li><b>0 HP: Downed.</b> You're Prone, every attack hits you, Guard is 0, and you can only use Downed actions.</li>
+<li><b>Below negative max HP: Mortal Wound.</b> You can't act; you die at the end of the encounter unless it's removed.</li>
+<li>Grunts die at 0 HP.</li>
+</ul>
+<h3>Encounter conclusion (in order)</h3>
+<ol style="margin:4px 0;padding-left:18px">
+<li><b>One conclusion action each:</b> Second Wind (heal 4d4) · Draw Mana (+1) · Gather Parts (Survival DC 15 grunt / 20 heroic / 25 boss) · Scavenge · Treat Conditions (with a kit).</li>
+<li><b>Deaths:</b> Mortal Wounds die; anyone else Downed comes back at 1 HP.</li>
+<li><b>Injuries:</b> if you were Downed, roll a d10 once on the injury table (hand, RP, mana, speed, AP, eye...).</li>
+<li>Loot, then EXP.</li>
+</ol>
+</section>
+
+<section id="rest">
+<h2>Resting and food</h2>
+<table>
+<tr><th>Rest (8 hours)</th><th>HP regained</th></tr>
+<tr><td>On the floor</td><td>1 × Toughness</td></tr>
+<tr><td>Camp or basic lodging</td><td>2 × Toughness</td></tr>
+<tr><td>Luxury lodging</td><td>3 × Toughness</td></tr>
+</table>
+<ul>
+<li><b>Mana comes from food:</b> eat once to regain Mana, then not again until you've rested. Snack 1 · basic meal or ration 2 · gourmet meal 3 · legendary food 4.</li>
+<li><b>One rest action</b> per person per rest; most need a kit (Medical Kit, a set-up Camping Kit...).</li>
+<li><b>Food:</b> 40 food units (or 1 ration) a day. Each day without enough: a starvation level (−5 Burden limit, −25% travel speed, all stats −1).</li>
+<li>During a rest you can spend EXP on skills and abilities, but <b>not new classes</b> (those need an Interlude).</li>
+</ul>
+<div class="box"><b>Mirane:</b> one tier lower. No camping kit: no HP. Camping kit: 1 × Toughness. Rations and a basic culinary kit restore only 1 Mana. Food units cost 0.5 Clim each.</div>
+</section>
+
+<section id="interlude">
+<h2>Interlude (downtime)</h2>
+<ul>
+<li><b>IP</b> from the GM: none / 1 (days) / 2 (weeks) / 3 (months). IP doesn't carry over. Each IP also gives 1 Errand Point (the first errand is free).</li>
+<li><b>Learn Class:</b> 1 IP + tier × 100 EXP. Each later step costs 100 EXP.</li>
+<li><b>Train:</b> +25 EXP · <b>Job:</b> 300 Clim (+300 with a mastered crafting class) · <b>Gather:</b> 600 units (double with the mastered tier 1 gathering class)</li>
+<li><b>Rest:</b> start the next adventure with +20% HP and Mana as temp pools · <b>Recover:</b> remove one injury · <b>Heal Injury</b> (someone else's)</li>
+<li>Crafting, Appraise Item, Open Shop, Mentor Class, Research, Investigate, and class actions that cost IP.</li>
+</ul>
+<div class="box"><b>Mirane:</b> 1 IP each Wednesday while in town (not on expedition); spend it before the next reset or before you leave. Job 150 Clim (+50 with a mastered artisan class). Gather 300 units (+300 with the tier 1 gathering class). Expeditions give 75 EXP a week, journals up to 25 more. Using natural IP on an IP action gives 20 EXP (once a week).</div>
+</section>
+
+<section id="weapons" class="wide">
+<h2>Weapons and armor</h2>
+<table>
+<tr><th>Group</th><th>What it does</th></tr>
+<tr><td>Small</td><td>Hidden weapon: draw for 0 AP; once per combat a Trick Attack.</td></tr>
+<tr><td>Polearm</td><td>+5ft reach; threatens 5-10ft.</td></tr>
+<tr><td>Light Swords</td><td>Nimble: move 5ft after a Light attack.</td></tr>
+<tr><td>Longsword</td><td>Versatile: one-handed alone +4 Block; two-handed +1d4 on crits.</td></tr>
+<tr><td>Dueling</td><td>After 3 attacks on one enemy, your next Dodge/Block against it costs 0 RP.</td></tr>
+<tr><td>Axes</td><td>Wild Swing: a miss still deals 4 (Light) / 8 (Heavy).</td></tr>
+<tr><td>Bludgeoning</td><td>Hollow Blow: +2 / +4 damage if the target Blocks.</td></tr>
+<tr><td>Katana</td><td>Keen: crits on 19-20.</td></tr>
+<tr><td>Heavy Blades</td><td>Two-handed. Overpower: +1d4 / +1d12 on crits.</td></tr>
+<tr><td>Twinblade</td><td>Two-handed, but makes dual-wield attacks.</td></tr>
+<tr><td>Bow / Crossbow</td><td>Bow: 240ft, can shoot from above. Crossbow: Guard 1 (one-handed) / 2 (two-handed) lower within 30ft.</td></tr>
+<tr><td>Musket / Sling</td><td>Musket: Guard 1 lower. Sling: Heavy attack +1 AP for +9 damage.</td></tr>
+<tr><td>Thrown / Missiles</td><td>Thrown weapons return. Sets of Missiles: 30ft, don't break stealth.</td></tr>
+<tr><td>Pistol</td><td>Draw for 0 AP once a turn; held two-handed: +1 accuracy (+2 Precise).</td></tr>
+<tr><td>Shotgun</td><td>15ft (one-handed) / 30ft (two-handed); fires in melee without provoking.</td></tr>
+<tr><td>Sniper Rifle</td><td>720ft; scoped +10 Perception beyond 60ft.</td></tr>
+<tr><td>Wand / Staff</td><td>Wand: swap damage to an element for 0 AP. Staff: 1 Mana to push 5ft on damage.</td></tr>
+</table>
+<p class="note">Ranged weapons: one-handed 60ft, two-handed 120ft unless stated. A weapon group proficiency covers one- and two-handed versions.</p>
+<table>
+<tr><th>Armor</th><th>Guard</th><th>Init</th><th>Eva / Dodge</th><th>Block</th><th>Burden</th></tr>
+<tr><td>Light</td><td>+1</td><td>−1</td><td>−2</td><td>4</td><td>1</td></tr>
+<tr><td>Medium</td><td>+2</td><td>−2</td><td>−4</td><td>8</td><td>2</td></tr>
+<tr><td>Heavy</td><td>+3</td><td>−3</td><td>−6</td><td>12</td><td>3</td></tr>
+<tr><td>Shield</td><td>-</td><td>-</td><td>-</td><td>+4 while Blocking</td><td>1</td></tr>
+<tr><td>Greatshield</td><td>+1</td><td>−1</td><td>−2</td><td>8</td><td>2</td></tr>
+</table>
+<p class="note">Not proficient with your armor or shield: 1 less Guard and 1 more Evasion penalty. Not proficient with a weapon: it counts as improvised. Burden: one-handed weapon 1, two-handed 2, potion/elixir/flask 1, tool 1.</p>
+</section>
+
+<section id="damage">
+<h2>Damage types</h2>
+<ul>
+<li><b>Physical:</b> slashing, piercing, bludgeoning</li>
+<li><b>Poison</b></li>
+<li><b>Magic:</b> Arcane, Fire, Water, Earth (Acid), Wind, Lightning, Frost</li>
+<li><b>Divine:</b> Holy, Dark (Necrotic)</li>
+<li><b>Astra:</b> rare, mostly from Fiends</li>
+</ul>
+<p class="note">Immunity to a main type covers its subtypes, but not the other way round.</p>
+</section>
+
+<section id="keywords" class="wide">
+<h2>Keywords</h2>
+<p class="note">Every keyword from the official keyword list, in plain words.</p>
+<dl class="kw" id="kwlist">
+<!-- KEYWORDS START (generated by tools/build_quick_reference.py - don't edit by hand) -->
+<div><dt>Active</dt> <dd>An ability with this keyword can&#x27;t be the target of a Prepare action.</dd></div>
+<div><dt>Aid</dt> <dd>Can only target allies, unless the ability says you can target yourself.</dd></div>
+<div><dt>Artillery</dt> <dd>Can hit units that aren&#x27;t hidden even behind cover (including full cover). Cover is judged from above the target, not from the attacker.</dd></div>
+<div><dt>Augment</dt> <dd>An attack already changed by an Augment effect can&#x27;t get a second Augment.</dd></div>
+<div><dt>Blanketing</dt> <dd>Against several targets you make one accuracy roll and one damage roll, and both apply to every target.</dd></div>
+<div><dt>Bleeding</dt> <dd>Take 1d6 true damage at the start of your turn.</dd></div>
+<div><dt>Blinded</dt> <dd>-X to accuracy rolls (X = Blinded value). At 3 or more: no ranged attacks unless you&#x27;ve found the target some way other than sight. At 5 or more: your attacks can&#x27;t get Sure Hit either.</dd></div>
+<div><dt>Block Crush</dt> <dd>Ignores the extra Guard a target gets from taking the Block action.</dd></div>
+<div><dt>Broken</dt> <dd>Only applies to equipment. Broken armor or shields give no bonus and no penalty. A broken weapon can only be used as an improvised weapon.</dd></div>
+<div><dt>Burning</dt> <dd>Take X damage at the end of your turn. Spend 1 AP to remove it.</dd></div>
+<div><dt>Calcification</dt> <dd>Your Agility is lowered by 1.</dd></div>
+<div><dt>Challenge</dt> <dd>If a challenged character attacks without including the challenger as a target, the challenger may make a melee attack of opportunity against it. No attack of opportunity if the challenged character is itself making an attack of opportunity, or if the challenger can&#x27;t be targeted (for example because of Charm).</dd></div>
+<div><dt>Charm</dt> <dd>You can&#x27;t willingly attack whoever charmed you, unless the only other valid targets are your allies. Area effects that hit allies also hit the charmer; area effects that skip allies also skip the charmer.</dd></div>
+<div><dt>Circuit</dt> <dd>The first time each combat you use a Circuit ability, it costs 1 less mana. After that, the discount is gone for all your Circuit abilities.</dd></div>
+<div><dt>Combo</dt> <dd>Gets an extra bonus when used right after a different ability. The bonus lasts until you spend AP on something that isn&#x27;t a Combo ability.</dd></div>
+<div><dt>Concentration</dt> <dd>Only one Concentration effect can be active at a time. You can end it on your own turn for 0 AP. You lose it if you&#x27;re Downed.</dd></div>
+<div><dt>Crushing</dt> <dd>If the attack hits and isn&#x27;t Blocked, it deals at least damage equal to your Power.</dd></div>
+<div><dt>Daze</dt> <dd>You lose 1 AP right away. If you have no AP left, you regain 1 less AP at the start of your next turn instead. A Dazed target can&#x27;t be Dazed again until the end of its next turn.</dd></div>
+<div><dt>Disarm</dt> <dd>You can&#x27;t make weapon attacks with the weapon you were holding when Disarmed. When the Disarm ends you must draw that weapon again to use it. Unarmed attacks aren&#x27;t affected.</dd></div>
+<div><dt>Divine</dt> <dd>If you have the Divine&#x27;s Chosen breakthrough, this deals your chosen divine&#x27;s damage type instead of Holy.</dd></div>
+<div><dt>Domain</dt> <dd>A spell that creates a domain area. Only one domain area can be active at a single location at a time.</dd></div>
+<div><dt>Dual Wield</dt> <dd>Using it uses up your dual wield attack for the round. Can&#x27;t be used if you&#x27;ve already made a dual wield attack this round. After using it you can&#x27;t make another dual wield attack that round.</dd></div>
+<div><dt>Enchantment</dt> <dd>Applied to a weapon; a weapon can hold only one enchantment at a time. On a channeling weapon, the enchantment also applies to spells you cast while holding it.</dd></div>
+<div><dt>Esoteric Art</dt> <dd>Only one Esoteric Art or Secret Art ability per encounter.</dd></div>
+<div><dt>Expose</dt> <dd>Lowers the target&#x27;s crit threshold by X (Expose 1: crits on 19-20). Stacks with katanas and other abilities that lower the attacker&#x27;s crit threshold. Removed once the target is critically hit, even if it defended.</dd></div>
+<div><dt>Fire</dt> <dd>Fire damage can set unattended, easily burned objects alight.</dd></div>
+<div><dt>Flashback</dt> <dd>Refers back to an earlier moment in the campaign: planning your character did in advance to set up the current situation.</dd></div>
+<div><dt>Full Pierce</dt> <dd>Damage can&#x27;t be reduced by Guard.</dd></div>
+<div><dt>Half Pierce</dt> <dd>Ignores Guard unless the target Blocks or Dodges.</dd></div>
+<div><dt>Half Rapid</dt> <dd>Can be used on each creature only once per round.</dd></div>
+<div><dt>Hellfire</dt> <dd>Like Burning: set damage at the end of the target&#x27;s turn. If it isn&#x27;t removed before the end of the target&#x27;s next turn, it can&#x27;t be removed the normal way any more. Abilities can still dispel it. Creatures immune to Burning can still get Hellfire, and for them it stays removable the normal way even after a turn. Ends automatically when the encounter ends.</dd></div>
+<div><dt>Hiding</dt> <dd>Enemies can&#x27;t see or target you, and can&#x27;t pinpoint where you are even if they know you&#x27;re near. Lost when you move, attack, or use an ability without the Stealth keyword, unless that action says otherwise.</dd></div>
+<div><dt>Illumination</dt> <dd>The next attack against you gets +X accuracy. Used up whether that attack hits or misses.</dd></div>
+<div><dt>Immovable</dt> <dd>While not flying, other creatures&#x27; knockdowns and forced movement (knockbacks, pulls, etc.) don&#x27;t affect you.</dd></div>
+<div><dt>Instant</dt> <dd>Can be used in the middle of another action, pausing it. Resolves right away, before the interrupted action finishes. If the interrupted action&#x27;s target becomes invalid, that action is cancelled and its cost refunded.</dd></div>
+<div><dt>Isolated</dt> <dd>You&#x27;re Isolated when no allies are within 10ft and 2+ enemies (or 1 boss) are within 10ft.</dd></div>
+<div><dt>Killing Blow</dt> <dd>Triggers when you bring an enemy to 0 HP or less. The same Killing Blow effect can only be gained once from a given target.</dd></div>
+<div><dt>Lock On</dt> <dd>Ignores the bonus a target gets from Dodging.</dd></div>
+<div><dt>Lockstep</dt> <dd>Always counts as meeting the target&#x27;s base Evasion (with its bonuses); the target can still Dodge normally.</dd></div>
+<div><dt>Mandate</dt> <dd>Your next single-target attack must target whoever gave you the Mandate; otherwise you&#x27;ve broken the mandate. Challenge doesn&#x27;t work on you while you have Mandate.</dd></div>
+<div><dt>Miracle</dt> <dd>Each character can use only one Miracle per encounter.</dd></div>
+<div><dt>Mystic Eye</dt> <dd>The ability is used through a Mystic Eye.</dd></div>
+<div><dt>Ninjutsu</dt> <dd>Needs both hands free. Holding a small weapon, Saboteur thread dagger, one-handed thrown weapon or set of missiles still counts as a free hand.</dd></div>
+<div><dt>Offstep</dt> <dd>Attacks against you always count as meeting your base Evasion (with its bonuses); you can still Dodge normally.</dd></div>
+<div><dt>Opener</dt> <dd>Can only be used as the first action of your turn. Paying upkeep isn&#x27;t an action, so it doesn&#x27;t count.</dd></div>
+<div><dt>Opportunistic</dt> <dd>Can be used instead of a normal attack of opportunity. It still counts as your attack of opportunity, so you give up the normal one.</dd></div>
+<div><dt>Overcharge</dt> <dd>Pay extra AP and/or Mana to make the ability stronger.</dd></div>
+<div><dt>Pass</dt> <dd>During this movement you can move through enemy spaces.</dd></div>
+<div><dt>Persist</dt> <dd>Removing it costs X extra mana; if the remover isn&#x27;t using mana, X extra AP (or RP) instead. The extra cost doesn&#x27;t apply to the effect&#x27;s normal removal method, if it has one (e.g. 1 AP to clear Burning).</dd></div>
+<div><dt>Petrify</dt> <dd>+10 Guard, but every attack against you hits automatically and you can&#x27;t take actions. Allies can use you as cover; if an attack would have missed them because of that cover, it hits you instead. Normal &quot;remove negative effects&quot; abilities don&#x27;t work; only effects that name Petrify remove it.</dd></div>
+<div><dt>Pinpoint</dt> <dd>Your attacks ignore an amount of the target&#x27;s Guard equal to your Focus. Guard can&#x27;t go below 0 from this.</dd></div>
+<div><dt>Presence Concealment</dt> <dd>Hides your mana output and aura: your Spirit Core counts as 0 for detection and aura abilities. +5 Stealth.</dd></div>
+<div><dt>Prone</dt> <dd>Abilities with this keyword can be used while Prone with no penalty. While Prone, attacks without this keyword cost +1 AP and +1 RP.</dd></div>
+<div><dt>Quick</dt> <dd>After you use a Quick ability, the next Quick ability you use that turn costs +1 AP.</dd></div>
+<div><dt>Rage</dt> <dd>Can be used while you&#x27;re in Rage Stance.</dd></div>
+<div><dt>Rapid</dt> <dd>Can be used more than once per turn.</dd></div>
+<div><dt>Regrowth</dt> <dd>At the start of your turn, heal 3 + the Focus of whoever applied it.</dd></div>
+<div><dt>Root</dt> <dd>You can&#x27;t move. When you Dodge, your Evasion is 13 + Agility (rounded down).</dd></div>
+<div><dt>Safe</dt> <dd>Doesn&#x27;t provoke attacks of opportunity just for being a spell or a ranged attack.</dd></div>
+<div><dt>Salvo</dt> <dd>All attacks in the Salvo resolve at the same time. One basic Dodge or Block against one of them covers the rest for no extra cost. Extra effects tied to that defense (like healing from a Block) happen only once. The Salvo provokes only one attack of opportunity.</dd></div>
+<div><dt>Sanctify</dt> <dd>When an attack hits the Sanctified creature, the attacker heals 3 + the applier&#x27;s Focus. Each trigger removes one stack. An attacker already at full HP can choose not to trigger it.</dd></div>
+<div><dt>Scatter</dt> <dd>Against several targets, roll accuracy and damage separately for each one.</dd></div>
+<div><dt>Secret Art</dt> <dd>Only one Secret Art or Esoteric Art ability per encounter.</dd></div>
+<div><dt>Setup</dt> <dd>Finished by spending AP on your next turn. While charging you can&#x27;t take other AP actions, and attacks against you gain Trick Attack. You can abandon it instead of finishing; the leftover AP stays unspent. You can cancel it any time for 0 RP. It can&#x27;t trigger until your next turn starts, and Setup abilities can&#x27;t be Prepared. Starting the charge costs at least 1 AP.</dd></div>
+<div><dt>Shaken</dt> <dd>Maximum AP lowered by 1.</dd></div>
+<div><dt>Shieldbreaker</dt> <dd>Double damage to Shield HP and Temporary HP. Damage that carries over past them isn&#x27;t doubled.</dd></div>
+<div><dt>Sickened</dt> <dd>Rolls that use Focus, Power, Agility or Toughness treat that stat as 1 lower.</dd></div>
+<div><dt>Sidestep</dt> <dd>This movement doesn&#x27;t provoke attacks of opportunity.</dd></div>
+<div><dt>Slow</dt> <dd>Your movement speed is halved.</dd></div>
+<div><dt>Soaked</dt> <dd>Take X extra damage from Lightning damage.</dd></div>
+<div><dt>Song</dt> <dd>Only one Song can be active at a time.</dd></div>
+<div><dt>Sound</dt> <dd>The effect is sound-based; anyone who can&#x27;t hear it is unaffected.</dd></div>
+<div><dt>Spell</dt> <dd>Counts as a spell and provokes attacks of opportunity unless something says otherwise.</dd></div>
+<div><dt>Stacking</dt> <dd>These abilities give stacks of something. You can only hold one kind of stack from them at a time; gaining a different kind removes all your old stacks.</dd></div>
+<div><dt>Stagger</dt> <dd>Evasion lowered by X.</dd></div>
+<div><dt>Stance</dt> <dd>Only one Stance can be active at a time.</dd></div>
+<div><dt>Static</dt> <dd>At the end of your next turn, you deal X lightning damage to each ally within 5ft of you.</dd></div>
+<div><dt>Stealth</dt> <dd>Doesn&#x27;t break Hiding. You still need to be in low cover or concealment afterward to stay hidden.</dd></div>
+<div><dt>Strafe</dt> <dd>You must move at least the Strafe distance toward the target before making this attack.</dd></div>
+<div><dt>Stun</dt> <dd>Your AP, AP recovery and RP all become 0. When it ends you get back the unspent RP it took.</dd></div>
+<div><dt>Summon</dt> <dd>Counts toward your summon limit: at most 2 summons at once. A summon can&#x27;t be the target of abilities that need a willing ally.</dd></div>
+<div><dt>Sunder</dt> <dd>Guard lowered by X.</dd></div>
+<div><dt>Sure Hit</dt> <dd>Always hits with no accuracy roll, but automatically misses a target in full cover.</dd></div>
+<div><dt>Teleport</dt> <dd>You move by teleporting instead of normal movement. Doesn&#x27;t provoke attacks of opportunity and gets past most roots and grapples. You must be able to see where you&#x27;re going; otherwise you ignore difficult terrain and solid obstacles. Unless stated, only you and your gear teleport; creatures you&#x27;re touching stay behind.</dd></div>
+<div><dt>Toxic</dt> <dd>Take 1d6 Full Pierce Poison damage at the start of your turn.</dd></div>
+<div><dt>Transformation</dt> <dd>Only one transformation effect can be active at a time.</dd></div>
+<div><dt>Trick Attack</dt> <dd>The target must pay double the normal RP to react to it.</dd></div>
+<div><dt>Type</dt> <dd>You can only be one &quot;type&quot; at a time.</dd></div>
+<div><dt>Unarmed Strike</dt> <dd>Must be made with an unarmed attack.</dd></div>
+<div><dt>Unbalanced</dt> <dd>Your next attack that uses AP (even a normally 0 AP one) costs 1 extra AP.</dd></div>
+<div><dt>Upkeep</dt> <dd>At the start of your turn you choose whether to pay; if you don&#x27;t, the effect ends. You can&#x27;t pay upkeep while Downed.</dd></div>
+<div><dt>Weakened</dt> <dd>Your max AP becomes 2 and max RP becomes 1. When it ends you get back the unspent RP it took.</dd></div>
+<!-- KEYWORDS END -->
+</dl>
+</section>
+
+</main>
+<footer>
+Unofficial fan tool, free, not affiliated with Angel's Sword Studios. Lyrian Chronicles and its rules belong to Angel's Sword Studios;
+these are plain-English summaries for quick reference. For exact wording, check the <a href="https://rpg.angelssword.com/game/latest/rulebook">official rulebook</a>.
+</footer>
+<script>
+// Search: hides sections and rows that don't match, and highlights the match.
+(function(){
+  var q = document.getElementById("q");
+  var blocks = document.querySelectorAll("main section");
+  function clearMarks(){ document.querySelectorAll("mark").forEach(function(m){ m.replaceWith(document.createTextNode(m.textContent)); }); document.querySelectorAll("main").forEach(function(m){ m.normalize(); }); }
+  function markIn(el, term){
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), nodes = [], n;
+    while ((n = walker.nextNode())) nodes.push(n);
+    nodes.forEach(function(t){
+      var i = t.nodeValue.toLowerCase().indexOf(term); if (i < 0) return;
+      var r = document.createRange(); r.setStart(t, i); r.setEnd(t, i + term.length);
+      var m = document.createElement("mark"); r.surroundContents(m);
+    });
+  }
+  q.addEventListener("input", function(){
+    var term = q.value.trim().toLowerCase(); clearMarks();
+    blocks.forEach(function(sec){
+      var rows = sec.querySelectorAll("tr, li, dl.kw > div"), any = false;
+      if (!term) { sec.classList.remove("hide"); rows.forEach(function(r){ r.classList.remove("hide"); }); return; }
+      var head = sec.querySelector("h2").textContent.toLowerCase().indexOf(term) >= 0;
+      rows.forEach(function(r){
+        var hit = head || r.textContent.toLowerCase().indexOf(term) >= 0 || (r.querySelector("th") !== null);
+        r.classList.toggle("hide", !hit); if (hit && !r.querySelector("th")) any = true;
+      });
+      sec.classList.toggle("hide", !(any || head));
+      if (any || head) markIn(sec, term);
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -25,6 +25,8 @@ Or keep your own copy:
 Your build also saves automatically in the browser. When a new version of the planner comes out, download the new file
 and use **Load** to open your saved character.
 
+**Quick reference for play:** [quick-reference.html](quick-reference.html) has the rules at a glance: what each stat rolls, basic actions, attacking and defending, conditions, resting, interlude and every keyword, with a search box. It also prints in black and white. ([Online](https://yabureru.github.io/lyrian_character_builder/quick-reference.html))
+
 (Prefer separate files? Download the whole repo with **Code → Download ZIP** and open `planner.html`; keep it next to the `data` folder.)
 
 ## Questions, mistakes and ideas
@@ -74,6 +76,7 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
 | `data/sheet.js` | Field map of the official Character Sheet 1.2 (positions only, no artwork) |
 | `data/bonuses.js` | Race bonuses, situational (stance/aura/transformation) bonuses and notes |
 | `RULES_REFERENCE.md` | Condensed rules used for the planner's formulas |
+| `quick-reference.html` | Rules at a glance for play (keywords filled from data/keywords.js by `tools/build_quick_reference.py`) |
 | `ISSUES.md` | What's still open: GM questions, to-dos, and the rule readings the planner uses |
 | `ISSUES_ARCHIVE.md` | Full history of the data check (every fix and page oddity, by class) |
 
