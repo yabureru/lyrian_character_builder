@@ -19264,11 +19264,11 @@ function softCap(s){
   if (s === "Agility") {
     var dg = d.dodge;
     r.lines.push("Your Dodge evasion is " + dg + " (20 + Agility, minus armor penalties).");
-    if (dg >= 28) { r.lvl = 2; r.lines.push("Soft cap reached: while you Dodge, no listed grunt, heroic or boss can hit you with a plain attack (best enemy accuracy +7)." + (dg > 28 ? " The extra " + (dg - 28) + " only adds RP and Initiative." : "")); }
+    if (dg >= 28) { r.lvl = 2; r.lines.push("Soft cap reached: while you Dodge, no listed grunt, heroic or boss can hit you with a plain attack (best enemy accuracy +7)." + (dg > 28 ? " The extra " + (dg - 28) + " only adds RP and Initiative (RP still matters against groups: it's how many Dodges you get per fight)." : "")); }
     else if (dg >= 26) { r.lvl = 1; r.lines.push("Breakpoint: no grunt can hit you while you Dodge" + (dg >= 27 ? ", and no heroic either" : "") + ". Soft cap at Dodge 28 (bosses)."); }
     else if (dg >= 24) { r.lvl = 1; r.lines.push("Breakpoint: typical grunts (+3) can't hit you while you Dodge. Next: Dodge 26 (every grunt), 27 (heroics), 28 (bosses)."); }
     else r.lines.push("Breakpoints: Dodge 24 (typical grunts can't hit you), 26 (every grunt), 27 (heroics), 28 (bosses).");
-    r.lines.push("Abilities with Sure Hit, Lock On or area attacks get past Dodge, and each Dodge costs 1 RP.");
+    r.lines.push("Abilities with Sure Hit, Lock On or area attacks get past Dodge, and each Dodge costs 1 RP (you have " + d.rp + "; RP only refills when a new fight starts).");
   } else if (s === "Focus") {
     var pr = 1 + 2 * v;
     if (v >= 6) { r.lvl = 2; r.lines.push("Soft cap reached: your Precise attacks (+" + 2 * v + ") hit any listed enemy that doesn't Dodge, even on a 1 (one slime with Evasion 15 aside)." + (v > 6 ? " Points past 6 mainly raise Potency and Light/Heavy accuracy." : "")); }
