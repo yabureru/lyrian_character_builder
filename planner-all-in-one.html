@@ -67,6 +67,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .statgrid td:first-child{width:90px}
 .statgrid select{width:58px}
 .final{font-weight:700;color:var(--gold2);font-size:15px}
+.sc1{color:var(--warn)!important} .sc2{color:var(--good)!important}
 
 .list{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:8px}
 .li{padding:7px 9px;border-bottom:1px solid #30333c}
@@ -18350,7 +18351,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-10-25";
+var PLANNER_VERSION = "2026-10-28";
 function newBuild(){
   return {
     v: 1,
@@ -19251,9 +19252,50 @@ var STAT_INFO = {
   Awareness: ["Senses skills: Animal Husbandry, Insight, Perception, Survival."],
   Presence:  ["Social skills: Art, Intimidation, Negotiation."]
 };
+// Soft caps: where more points in a stat stop paying off in the average fight.
+// Breakpoints come from the 84 official monster stat blocks (v0.13.2, checked 2026-10-28; see quick-reference.html "Monsters by rank"):
+//   enemy accuracy  - grunts +3 typical / +5 max, heroics +5 / +6, bosses +6 / +7
+//   enemy Evasion   - grunts 10 typical / 12 max, heroics 12 / 13, bosses 11 / 13 (one slime has 15)
+// A hit needs total >= Evasion, so a Dodge (20 + Agility, after armor) is safe from an enemy when Dodge >= 21 + their accuracy,
+// and a Precise attack (d20 + 2 x Focus) can't miss a non-dodging enemy when 1 + 2 x Focus >= their Evasion.
+// lvl: 0 = no breakpoint yet, 1 = a breakpoint reached, 2 = soft cap reached (more points mostly help elsewhere).
+function softCap(s){
+  var v = C.stat[s], d = C.d, r = { lvl: 0, lines: [] };
+  if (s === "Agility") {
+    var dg = d.dodge;
+    r.lines.push("Your Dodge evasion is " + dg + " (20 + Agility, minus armor penalties).");
+    if (dg >= 28) { r.lvl = 2; r.lines.push("Soft cap reached: while you Dodge, no listed grunt, heroic or boss can hit you with a plain attack (best enemy accuracy +7)." + (dg > 28 ? " The extra " + (dg - 28) + " only adds RP and Initiative." : "")); }
+    else if (dg >= 26) { r.lvl = 1; r.lines.push("Breakpoint: no grunt can hit you while you Dodge" + (dg >= 27 ? ", and no heroic either" : "") + ". Soft cap at Dodge 28 (bosses)."); }
+    else if (dg >= 24) { r.lvl = 1; r.lines.push("Breakpoint: typical grunts (+3) can't hit you while you Dodge. Next: Dodge 26 (every grunt), 27 (heroics), 28 (bosses)."); }
+    else r.lines.push("Breakpoints: Dodge 24 (typical grunts can't hit you), 26 (every grunt), 27 (heroics), 28 (bosses).");
+    r.lines.push("Abilities with Sure Hit, Lock On or area attacks get past Dodge, and each Dodge costs 1 RP.");
+  } else if (s === "Focus") {
+    var pr = 1 + 2 * v;
+    if (v >= 6) { r.lvl = 2; r.lines.push("Soft cap reached: your Precise attacks (+" + 2 * v + ") hit any listed enemy that doesn't Dodge, even on a 1 (one slime with Evasion 15 aside)." + (v > 6 ? " Points past 6 mainly raise Potency and Light/Heavy accuracy." : "")); }
+    else if (v >= 5) { r.lvl = 1; r.lines.push("Breakpoint: Precise attacks (+" + 2 * v + ") hit typical grunts and bosses even on a 1. Soft cap at Focus 6 (every enemy's normal Evasion)."); }
+    else r.lines.push("Breakpoints: Focus 5 (Precise attacks can't miss typical grunts and bosses), Focus 6 (can't miss any listed enemy that doesn't Dodge). Your lowest Precise roll now: " + pr + ".");
+    r.lines.push("Potency " + d.potency + ": a typical grunt (Toughness 3) saves on 2d10 >= " + (d.potency - 3) + ", a typical boss (Toughness 6) on >= " + (d.potency - 6) + ".");
+  } else if (s === "Power") {
+    r.lines.push("No soft cap: every point adds 1 to Light/Precise damage, 2 to Heavy damage and 1 Mana.");
+  } else if (s === "Toughness") {
+    r.lines.push("No soft cap: every point adds 10 HP, 1 Guard, 2 Block guard and 1 to saves.");
+  } else if (SUB.indexOf(s) >= 0) {
+    var best = null;
+    SKILLS.forEach(function(sk){ if (sk.stat !== s) return;
+      var t = v + (C.pts[sk.name] || 0) + (C.bestEx[sk.name] ? C.bestEx[sk.name].pts : 0);
+      if (!best || t > best.t) best = { n: sk.name, t: t }; });
+    if (best) {
+      if (best.t >= 29) { r.lvl = 2; r.lines.push("Soft cap reached for " + best.n + " (+" + best.t + "): it passes even master checks (DC 30) on a roll of 1. More here only helps your other " + s + " skills or opposed checks."); }
+      else if (best.t >= 19) { r.lvl = 1; r.lines.push("Breakpoint: " + best.n + " (+" + best.t + ") passes expert checks (DC 20) on a 1. Specialist (DC 25) at +24, master (DC 30) at +29."); }
+      else r.lines.push("Your best " + s + " skill is " + best.n + " at +" + best.t + ". Auto-pass breakpoints: +19 (DC 20), +24 (DC 25), +29 (DC 30).");
+    }
+  }
+  return r;
+}
 function showStatInfo(el){
   var k = el.dataset.statinfo, lines = (STAT_INFO[k] || []).slice(), pop = $("kwPop");
   if (SUB.indexOf(k) >= 0) lines.push("A skill check = d20 + this stat + skill points + your best expertise.");
+  var sc = softCap(k); if (sc.lines.length) lines = lines.concat(sc.lines);
   pop.innerHTML = "<b>" + esc(k) + " " + (C.stat[k] !== undefined ? C.stat[k] : "") + "</b>" + listHtml(lines);
   pop.style.display = "block";
   var r = el.getBoundingClientRect(), w = pop.offsetWidth, hgt = pop.offsetHeight;
@@ -19269,9 +19311,10 @@ function statTable(title, names, arr, grp){
     h += '<tr><td><span class="statname" data-statinfo="' + s + '" title="Tap: what ' + s + ' does">' + s + "</span></td><td><select data-grp=\"" + grp + "\" data-stat=\"" + s + "\">" +
       vals.map(function(v){ return "<option" + (B[grp][s] === v ? " selected" : "") + ">" + v + "</option>"; }).join("") + "</select></td>" +
       '<td title="' + esc(b.map(function(x){ return sign(x.n) + " " + x.why; }).join("\n")) + '">' + (bt ? '<span class="good">' + sign(bt) + "</span>" : '<span class="dim">—</span>') + "</td>" +
-      '<td class="num final">' + C.stat[s] + "</td></tr>";
+      '<td class="num final' + (softCap(s).lvl ? " sc" + softCap(s).lvl : "") + '" title="' + esc(softCap(s).lines.join("\n")) + '">' + C.stat[s] +
+      (softCap(s).lvl === 2 ? ' <span class="small">cap</span>' : "") + "</td></tr>";
   });
-  return h + "</table>";
+  return h + "</table>" + (grp === "subArr" ? '<div class="small dim">Totals turn <span class="sc1">amber</span> at a breakpoint and <span class="sc2">green</span> at a soft cap, where extra points start paying off less (based on the official monster stat blocks; tap a stat name for details).</div>' : "");
 }
 
 /* ---------- Classes ---------- */

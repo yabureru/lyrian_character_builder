@@ -71,7 +71,7 @@ footer{max-width:1100px;margin:0 auto;padding:0 16px 30px;font-size:12px;color:v
   <a href="#rolls">Rolls</a><a href="#stats">Stats &amp; skills</a><a href="#checks">Skill checks</a><a href="#turn">Your turn</a>
   <a href="#actions">Basic actions</a><a href="#attack">Attacking</a><a href="#defend">Defending</a><a href="#conditions">Conditions</a>
   <a href="#downed">Downed &amp; after the fight</a><a href="#rest">Rest &amp; food</a><a href="#interlude">Interlude</a>
-  <a href="#weapons">Weapons &amp; armor</a><a href="#damage">Damage types</a><a href="#keywords">Keywords</a>
+  <a href="#weapons">Weapons &amp; armor</a><a href="#damage">Damage types</a><a href="#monsters">Monsters</a><a href="#keywords">Keywords</a>
 </nav>
 <main id="main">
 
@@ -338,6 +338,114 @@ footer{max-width:1100px;margin:0 auto;padding:0 16px 30px;font-size:12px;color:v
 <li><b>Astra:</b> rare, mostly from Fiends</li>
 </ul>
 <p class="note">Immunity to a main type covers its subtypes, but not the other way round.</p>
+</section>
+
+<section id="monsters" class="wide">
+<h2>Monsters by rank</h2>
+<p class="small">From the 84 official monster stat blocks (v0.13.2, read 2026-10-28). Base numbers before any GM changes. "Typical" = the middle value.</p>
+<div style="overflow-x:auto"><table>
+<tr><th>Rank</th><th>Accuracy</th><th>Evasion</th><th>Evasion when Dodging</th><th>Toughness</th><th>Guard</th><th>Power</th><th>HP</th></tr>
+<tr><td>Grunt (38)</td><td>+3, max +5</td><td>10, max 12</td><td>23, max 25</td><td>3, max 7</td><td>3, max 7</td><td>3–4, max 5</td><td>~25</td></tr>
+<tr><td>Heroic (33)</td><td>+5, max +6</td><td>12, max 15</td><td>25, max 27</td><td>5, max 8</td><td>5, max 9</td><td>5, max 8</td><td>~70</td></tr>
+<tr><td>Boss (13)</td><td>+6, max +7</td><td>11, max 13</td><td>24, max 26</td><td>6, max 9</td><td>7, max 10</td><td>6–7, max 8</td><td>~300</td></tr>
+</table></div>
+<ul>
+<li><b>Can't be hit:</b> a hit needs total &ge; Evasion and the best roll is 20, so while you Dodge you're safe once your Dodge evasion &ge; 21 + their accuracy: <b>24</b> beats typical grunts, <b>26</b> every grunt, <b>27</b> heroics, <b>28</b> bosses. Armor lowers Dodge; Sure Hit, Lock On and area attacks get past it.</li>
+<li><b>Can't miss:</b> a Precise attack (d20 + 2 &times; Focus) hits a non-dodging enemy on a 1 once 1 + 2 &times; Focus &ge; its Evasion: <b>Focus 5</b> covers typical grunts and bosses, <b>Focus 6</b> every listed enemy except one slime (Evasion 15).</li>
+<li><b>Light attacks to 1 damage:</b> Guard 13 vs every grunt, Guard 16 vs every heroic and boss (Light attack = 2d4 + Power). Heavy attacks average 21 (grunts) to 27 (bosses).</li>
+<li><b>Saves (2d10 + Toughness vs your Potency 11 + Focus):</b> 2d10 rolls 11+ about 55% of the time, 14+ 28%, 17+ 10%, 20 only 1%.</li>
+<li><b>Initiative:</b> enemies are mostly +1 to +6 (outliers: Frost Maiden +10, Ice Queen +11 with Frosty Start). You always go first once your bonus is 3 more than theirs.</li>
+</ul>
+<details><summary>All 84 monsters</summary>
+<div style="overflow-x:auto"><table>
+<tr><th>Monster</th><th>Rank</th><th>Danger</th><th>HP</th><th>Acc</th><th>Evasion / Dodge</th><th>Guard</th><th>Tough</th><th>Power</th></tr>
+<tr><td>Acolyte</td><td>Grunt</td><td>F</td><td>30</td><td>+2</td><td>7 / 20</td><td>5</td><td>4</td><td>3</td></tr>
+<tr><td>Amanita Mushroom</td><td>Grunt</td><td>F</td><td>25</td><td>+3</td><td>10 / 23</td><td>3</td><td>3</td><td>5</td></tr>
+<tr><td>Apprentice</td><td>Grunt</td><td>F</td><td>15</td><td>+3</td><td>10 / 23</td><td>1</td><td>1</td><td>3</td></tr>
+<tr><td>Archer</td><td>Grunt</td><td>F</td><td>20</td><td>+4</td><td>10 / 23</td><td>2</td><td>2</td><td>3</td></tr>
+<tr><td>Armored Spider</td><td>Grunt</td><td>F</td><td>35</td><td>+3</td><td>5 / 18</td><td>6</td><td>4</td><td>4</td></tr>
+<tr><td>Astral Spider</td><td>Grunt</td><td>F</td><td>20</td><td>+4</td><td>11 / 24</td><td>2</td><td>2</td><td>4</td></tr>
+<tr><td>Astran Magpie</td><td>Grunt</td><td>F</td><td>25</td><td>+2</td><td>10 / 23</td><td>3</td><td>3</td><td>3</td></tr>
+<tr><td>Bear</td><td>Grunt</td><td>E</td><td>40</td><td>+3</td><td>7 / 20</td><td>6</td><td>5</td><td>5</td></tr>
+<tr><td>Boar</td><td>Grunt</td><td>F</td><td>25</td><td>+3</td><td>10 / 23</td><td>4</td><td>3</td><td>5</td></tr>
+<tr><td>Brute</td><td>Grunt</td><td>F</td><td>30</td><td>+3</td><td>7 / 20</td><td>4</td><td>3</td><td>4</td></tr>
+<tr><td>Burrowing Spider</td><td>Grunt</td><td>F</td><td>10</td><td>+1</td><td>10 / 23</td><td>0</td><td>0</td><td>1</td></tr>
+<tr><td>Cheetah</td><td>Grunt</td><td>F</td><td>25</td><td>+4</td><td>12 / 25</td><td>3</td><td>3</td><td>3</td></tr>
+<tr><td>Devouring Swarm</td><td>Grunt</td><td>F</td><td>20</td><td>+–</td><td>5 / 25</td><td>0</td><td>4</td><td>1</td></tr>
+<tr><td>Drake Wyrmling (Fire)</td><td>Grunt</td><td>F</td><td>25</td><td>+3</td><td>10 / 23</td><td>3</td><td>3</td><td>4</td></tr>
+<tr><td>Dredge Ooze</td><td>Grunt</td><td>E</td><td>31</td><td>+4</td><td>9 / 19</td><td>4</td><td>4</td><td>4</td></tr>
+<tr><td>Earth Slime</td><td>Grunt</td><td>F</td><td>50</td><td>+2</td><td>8 / –</td><td>7</td><td>7</td><td>3</td></tr>
+<tr><td>Fire Slime</td><td>Grunt</td><td>F</td><td>35</td><td>+2</td><td>9 / –</td><td>5</td><td>5</td><td>4</td></tr>
+<tr><td>Ghoul</td><td>Grunt</td><td>F+</td><td>25</td><td>+3</td><td>11 / 24</td><td>3</td><td>3</td><td>4</td></tr>
+<tr><td>Giant Spider</td><td>Grunt</td><td>F</td><td>30</td><td>+4</td><td>10 / 23</td><td>4</td><td>4</td><td>3</td></tr>
+<tr><td>Hobgoblin Boar Rider</td><td>Grunt</td><td>F</td><td>25</td><td>+3</td><td>10 / 23</td><td>3</td><td>3</td><td>4</td></tr>
+<tr><td>Hobgoblin Fighter</td><td>Grunt</td><td>F</td><td>25</td><td>+2</td><td>8 / 21</td><td>3</td><td>2</td><td>5</td></tr>
+<tr><td>Inkblight</td><td>Grunt</td><td>D</td><td>24</td><td>+5</td><td>12 / 25</td><td>2</td><td>2</td><td>4</td></tr>
+<tr><td>Jack of Hearts</td><td>Grunt</td><td>F</td><td>25</td><td>+4</td><td>12 / 25</td><td>2</td><td>2</td><td>4</td></tr>
+<tr><td>Landshark</td><td>Grunt</td><td>F</td><td>20</td><td>+4</td><td>10 / 23</td><td>2</td><td>2</td><td>4</td></tr>
+<tr><td>Mana Slime</td><td>Grunt</td><td>E</td><td>30</td><td>+4</td><td>10 / –</td><td>4</td><td>4</td><td>4</td></tr>
+<tr><td>Raiju</td><td>Grunt</td><td>F</td><td>25</td><td>+3</td><td>10 / 23</td><td>3</td><td>3</td><td>3</td></tr>
+<tr><td>Rhinoceros Beetle</td><td>Grunt</td><td>F</td><td>25</td><td>+4</td><td>11 / 23</td><td>2</td><td>2</td><td>4</td></tr>
+<tr><td>Rime Vermin</td><td>Grunt</td><td>F</td><td>20</td><td>+4</td><td>11 / 24</td><td>2</td><td>2</td><td>4</td></tr>
+<tr><td>Rogue</td><td>Grunt</td><td>F</td><td>15</td><td>+3</td><td>11 / 24</td><td>1</td><td>1</td><td>3</td></tr>
+<tr><td>Skeleton</td><td>Grunt</td><td>F</td><td>25</td><td>+3</td><td>8 / 21</td><td>2</td><td>2</td><td>3</td></tr>
+<tr><td>Slime</td><td>Grunt</td><td>F</td><td>40</td><td>+2</td><td>9 / –</td><td>6</td><td>6</td><td>2</td></tr>
+<tr><td>Tank</td><td>Grunt</td><td>F</td><td>40</td><td>+2</td><td>5 / 18</td><td>7</td><td>5</td><td>2</td></tr>
+<tr><td>Unstable Efreet</td><td>Grunt</td><td>F</td><td>20</td><td>+4</td><td>10 / 23</td><td>2</td><td>2</td><td>4</td></tr>
+<tr><td>Water Slime</td><td>Grunt</td><td>F</td><td>35</td><td>+3</td><td>10 / –</td><td>5</td><td>5</td><td>2</td></tr>
+<tr><td>Wight</td><td>Grunt</td><td>F+</td><td>20</td><td>+3</td><td>10 / 23</td><td>2</td><td>2</td><td>3</td></tr>
+<tr><td>Wind Slime</td><td>Grunt</td><td>F</td><td>25</td><td>+3</td><td>11 / –</td><td>3</td><td>3</td><td>3</td></tr>
+<tr><td>Wolf</td><td>Grunt</td><td>F</td><td>25</td><td>+2</td><td>10 / 23</td><td>2</td><td>3</td><td>4</td></tr>
+<tr><td>Zombies</td><td>Grunt</td><td>E</td><td>40</td><td>+3</td><td>9 / 22</td><td>6</td><td>6</td><td>5</td></tr>
+<tr><td>Alpha Wolf</td><td>Heroic</td><td>F</td><td>55</td><td>+3</td><td>12 / 25</td><td>3</td><td>3</td><td>5</td></tr>
+<tr><td>Animal Summoner</td><td>Heroic</td><td>F</td><td>65</td><td>+4</td><td>12 / 25</td><td>4</td><td>4</td><td>4</td></tr>
+<tr><td>Assassin</td><td>Heroic</td><td>E</td><td>50</td><td>+5</td><td>13 / 26</td><td>3</td><td>3</td><td>5</td></tr>
+<tr><td>Astral Tiger</td><td>Heroic</td><td>F</td><td>60</td><td>+5</td><td>14 / 27</td><td>0</td><td>4</td><td>5</td></tr>
+<tr><td>Deathcap Mushroom</td><td>Heroic</td><td>D</td><td>70</td><td>+5</td><td>12 / 25</td><td>5</td><td>5</td><td>7</td></tr>
+<tr><td>Defender</td><td>Heroic</td><td>F</td><td>95</td><td>+4</td><td>7 / 20</td><td>9</td><td>7</td><td>4</td></tr>
+<tr><td>Drake</td><td>Heroic</td><td>D</td><td>75</td><td>+5</td><td>12 / 25</td><td>6</td><td>5</td><td>6</td></tr>
+<tr><td>Dreameater</td><td>Heroic</td><td>F</td><td>240</td><td>+6</td><td>13 / 26</td><td>4</td><td>4</td><td>6</td></tr>
+<tr><td>Efreet</td><td>Heroic</td><td>F</td><td>80</td><td>+5</td><td>10 / 23</td><td>6</td><td>6</td><td>5</td></tr>
+<tr><td>Faewolf</td><td>Heroic</td><td>F</td><td>55</td><td>+5</td><td>12 / 25</td><td>3</td><td>3</td><td>5</td></tr>
+<tr><td>Fortuna</td><td>Heroic</td><td>E</td><td>40</td><td>+4</td><td>13 / 27</td><td>2</td><td>2</td><td>4</td></tr>
+<tr><td>Frost Maiden</td><td>Heroic</td><td>D</td><td>70</td><td>+6</td><td>12 / 25</td><td>5</td><td>5</td><td>6</td></tr>
+<tr><td>Gargoyle</td><td>Heroic</td><td>E</td><td>69</td><td>+5</td><td>9 / 22</td><td>7</td><td>5</td><td>5</td></tr>
+<tr><td>Ghost</td><td>Heroic</td><td>F+</td><td>60</td><td>+5</td><td>11 / 24</td><td>4</td><td>4</td><td>4</td></tr>
+<tr><td>Giant Mantis</td><td>Heroic</td><td>F+</td><td>55</td><td>+5</td><td>12 / 25</td><td>3</td><td>3</td><td>4</td></tr>
+<tr><td>Giant Prismatic Slime</td><td>Heroic</td><td>F</td><td>250</td><td>+4</td><td>15 / 25</td><td>2</td><td>4</td><td>4</td></tr>
+<tr><td>Greater Astran Magpie</td><td>Heroic</td><td>F</td><td>60</td><td>+3</td><td>12 / 25</td><td>4</td><td>4</td><td>6</td></tr>
+<tr><td>Gryphon</td><td>Heroic</td><td>E</td><td>80</td><td>+6</td><td>12 / 25</td><td>6</td><td>6</td><td>6</td></tr>
+<tr><td>Hobgoblin Tactician</td><td>Heroic</td><td>E</td><td>70</td><td>+5</td><td>10 / 23</td><td>7</td><td>5</td><td>7</td></tr>
+<tr><td>Ixilune</td><td>Heroic</td><td>E</td><td>60</td><td>+4</td><td>11 / 23</td><td>6</td><td>4</td><td>4</td></tr>
+<tr><td>Mage</td><td>Heroic</td><td>F</td><td>60</td><td>+5</td><td>12 / 25</td><td>4</td><td>4</td><td>5</td></tr>
+<tr><td>Manticore</td><td>Heroic</td><td>E</td><td>80</td><td>+5</td><td>11 / 24</td><td>6</td><td>6</td><td>5</td></tr>
+<tr><td>Minotaur</td><td>Heroic</td><td>E</td><td>90</td><td>+4</td><td>11 / 24</td><td>7</td><td>7</td><td>7</td></tr>
+<tr><td>Ogre</td><td>Heroic</td><td>D</td><td>100</td><td>+4</td><td>9 / 22</td><td>8</td><td>8</td><td>8</td></tr>
+<tr><td>Pipoltr</td><td>Heroic</td><td>E</td><td>90</td><td>+4</td><td>9 / 19</td><td>7</td><td>6</td><td>4</td></tr>
+<tr><td>Priest</td><td>Heroic</td><td>F</td><td>80</td><td>+4</td><td>9 / 22</td><td>7</td><td>6</td><td>5</td></tr>
+<tr><td>Skeletal Champion</td><td>Heroic</td><td>F</td><td>65</td><td>+4</td><td>11 / 24</td><td>4</td><td>4</td><td>4</td></tr>
+<tr><td>Sniper</td><td>Heroic</td><td>E</td><td>60</td><td>+6</td><td>11 / 24</td><td>4</td><td>4</td><td>5</td></tr>
+<tr><td>Tactician</td><td>Heroic</td><td>F</td><td>70</td><td>+4</td><td>12 / 25</td><td>5</td><td>5</td><td>4</td></tr>
+<tr><td>Troll</td><td>Heroic</td><td>E</td><td>100</td><td>+4</td><td>9 / 22</td><td>8</td><td>8</td><td>8</td></tr>
+<tr><td>Warrior</td><td>Heroic</td><td>E</td><td>75</td><td>+5</td><td>9 / 22</td><td>6</td><td>5</td><td>6</td></tr>
+<tr><td>Westrian Heavy Paladin</td><td>Heroic</td><td>F</td><td>75</td><td>+5</td><td>7 / 20</td><td>7</td><td>5</td><td>5</td></tr>
+<tr><td>Wraith</td><td>Heroic</td><td>D+</td><td>60</td><td>+6</td><td>13 / 26</td><td>4</td><td>4</td><td>6</td></tr>
+<tr><td>Alchemic Golem</td><td>Boss</td><td>E</td><td>250</td><td>+5</td><td>– / –</td><td>8</td><td>8</td><td>7</td></tr>
+<tr><td>Bandersnatch</td><td>Boss</td><td>E</td><td>320</td><td>+6</td><td>11 / 24</td><td>7</td><td>6</td><td>6</td></tr>
+<tr><td>Black Knight</td><td>Boss</td><td>F</td><td>260</td><td>+5</td><td>11 / 24</td><td>7</td><td>6</td><td>7</td></tr>
+<tr><td>Broodmother</td><td>Boss</td><td>E</td><td>300</td><td>+5</td><td>10 / 23</td><td>8</td><td>8</td><td>6</td></tr>
+<tr><td>Crystal Behemoth</td><td>Boss</td><td>F</td><td>320</td><td>+4</td><td>10 / 23</td><td>8</td><td>6</td><td>6</td></tr>
+<tr><td>Giant Astra Crab</td><td>Boss</td><td>C</td><td>330</td><td>+6</td><td>11 / 24</td><td>10</td><td>9</td><td>6</td></tr>
+<tr><td>Gravity Fiend</td><td>Boss</td><td>EX</td><td>700</td><td>+1</td><td>8 / 21</td><td>8</td><td>8</td><td>8</td></tr>
+<tr><td>Greater Manticore</td><td>Boss</td><td>E</td><td>240</td><td>+6</td><td>12 / 25</td><td>6</td><td>6</td><td>6</td></tr>
+<tr><td>Heliamphora</td><td>Boss</td><td>F</td><td>300</td><td>+6</td><td>9 / 22</td><td>6</td><td>6</td><td>6</td></tr>
+<tr><td>Hydra</td><td>Boss</td><td>F</td><td>100</td><td>+6</td><td>10 / 23</td><td>6</td><td>6</td><td>6</td></tr>
+<tr><td>Ice Queen</td><td>Boss</td><td>E</td><td>280</td><td>+7</td><td>13 / 26</td><td>5</td><td>5</td><td>6</td></tr>
+<tr><td>Skeletal Monstrosity</td><td>Boss</td><td>E</td><td>140</td><td>+6</td><td>11 / 24</td><td>7</td><td>7</td><td>7</td></tr>
+<tr><td>Wyrm (Fire)</td><td>Boss</td><td>C</td><td>400</td><td>+7</td><td>12 / 25</td><td>9</td><td>8</td><td>8</td></tr>
+</table></div>
+<p class="small">Troll's Light attack is listed at +8 (its Focus is 4; probably a typo). Slimes and the Alchemic Golem don't Dodge.</p>
+</details>
 </section>
 
 <section id="keywords" class="wide">
