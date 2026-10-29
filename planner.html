@@ -1678,7 +1678,12 @@ function renderBreak(){
       var r = BTS[b.id]; if (!r) { h += '<div class="errbox">Unknown breakthrough ' + esc(b.id) + ' <button class="small" data-rmbt="' + i + '">Remove</button></div>'; return; }
       var n = seen[b.id] || 0; seen[b.id] = n + 1;
       h += '<div class="li"><div class="top"><span class="name" data-info="bt:' + r.id + '">' + esc(r.name) + "</span>" + (n ? '<span class="tag">#' + (n + 1) + "</span>" : "") +
-        '<span class="grow"></span><span class="dim small">' + btCostAt(b.id, n) + ' EXP</span> <button class="small danger" data-rmbt="' + i + '">Remove</button></div>' + btPickHtml(r, b, i) + "</div>";
+        (C.btRedundant[i] ? '<span class="tag ' + (C.btRedundant[i].later ? "" : "warn") + '">' + (C.btRedundant[i].later ? "covered later" : C.btRedundant[i].all ? "redundant" : "overlaps") + "</span>" : "") +
+        '<span class="grow"></span><span class="dim small">' + btCostAt(b.id, n) + ' EXP</span> <button class="small danger" data-rmbt="' + i + '">Remove</button></div>' +
+        (C.btRedundant[i] ? (C.btRedundant[i].later
+            ? '<div class="small dim">Covered later: ' + esc(C.btRedundant[i].text) + "." + (C.btRedundant[i].all ? " It's still useful until then; after that it adds nothing, so skip it if you won't need the proficiency before." : "") + "</div>"
+            : '<div class="small warn">' + esc(C.btRedundant[i].all ? "Gives you nothing new: " + C.btRedundant[i].text + ". Consider removing it." : "Partly overlaps: " + C.btRedundant[i].text.replace(/^partly overlaps: /, "") + ".") + "</div>") : "") +
+        btPickHtml(r, b, i) + "</div>";
     });
   }
   h += "<h3>Add a breakthrough</h3>";
@@ -1731,12 +1736,15 @@ function drawBtList(){
     if (r.repeatable || r.costScale || r.costNote) tags += '<span class="tag">repeatable</span>';
     if (r.restricted) tags += '<span class="tag bad">restricted</span>';
     if (r.drawback) tags += '<span class="tag bad">drawback</span>';
+    var wd = btWouldDup(r);
+    if (wd) tags += '<span class="tag warn">' + (wd.all ? "you already have this" : "partly have") + "</span>";
     h += '<div class="li' + (why.length ? " locked" : "") + '"><div class="top"><span class="name" data-info="bt:' + r.id + '">' + esc(r.name) + "</span>" + tags +
       '<span class="grow"></span><span class="dim small">' + btCostAt(r.id, nth) + ' EXP</span> <button class="small" data-addbt="' + r.id + '"' +
       (why.length ? ' disabled title="' + esc(why.join(", ")) + '"' : "") + ">Add</button></div>" +
       (r.requires ? '<div class="small dim">Requires: ' + esc(r.requires) + "</div>" : "") +
       listHtml(r.summary) + (r.drawback ? '<div class="small bad">Drawback: ' + esc(r.drawback) + "</div>" : "") +
       (r.costNote ? '<div class="small dim">' + esc(r.costNote) + "</div>" : "") +
+      (wd ? '<div class="small warn">' + (wd.all ? "Wouldn't give you anything: you already have " : "You already have ") + esc(wd.text) + ".</div>" : "") +
       (why.length ? '<div class="small bad">Can\'t add: ' + esc(why.join(", ")) + "</div>" : "") + "</div>";
   });
   $("btList").innerHTML = h || '<div class="li dim">No matches.</div>';
@@ -2022,33 +2030,37 @@ function activeProfGrants(){
   PROF.grants.forEach(function(g){
     var p = g.source.split(":"), t = p[0], id = p[1];
     if (t === "race" && ids.indexOf(id) >= 0 && !(id === "demon" && B.raceChoice.demonPick === "skill"))
-      out.push({ g: g, key: g.source, label: (RACES[id] || {}).name + " (race)" });
-    if (t === "clan" && demonClans().indexOf(id) >= 0) out.push({ g: g, key: g.source, label: "Demon clan " + id });
+      out.push({ g: g, key: g.source, label: (RACES[id] || {}).name + " (race)", when: -1 });
+    if (t === "clan" && demonClans().indexOf(id) >= 0) out.push({ g: g, key: g.source, label: "Demon clan " + id, when: -1 });
     if (t === "class") {
       B.classes.forEach(function(c){
         var rec = CLASSES[c.id]; if (c.id !== id || !rec) return;
         var i = g.step ? g.step - 1 : rec.steps.map(function(s){ return s.ability; }).indexOf(g.ability);
-        if (i >= 0 && c.owned[i]) out.push({ g: g, key: g.source + (g.step ? "@" + g.step : ""), label: rec.name + " — " + (g.step ? rec.steps[i].label : (rec.abilities[g.ability] || {}).name) });
+        var w = (B.order || []).indexOf("c|" + c.id + "|" + i);
+        if (i >= 0 && c.owned[i]) out.push({ g: g, key: g.source + (g.step ? "@" + g.step : ""), label: rec.name + " — " + (g.step ? rec.steps[i].label : (rec.abilities[g.ability] || {}).name),
+                                             when: w >= 0 ? w : 1e6 + B.classes.indexOf(c) * 8 + i });
       });
     }
     if (t === "bt") {
       var n = 0;
       B.bts.forEach(function(b, idx){
         if (b.id !== id) return; n++;
-        out.push({ g: g, key: "bt:" + idx, label: (BTS[id] || {}).name + (n > 1 ? " #" + n : "") });
+        var w = (B.order || []).indexOf("b|" + b.u);
+        out.push({ g: g, key: "bt:" + idx, label: (BTS[id] || {}).name + (n > 1 ? " #" + n : ""), when: w >= 0 ? w : 1e6 + 900 + idx });
       });
     }
   });
   return out;
 }
 function calcProfs(C){
-  C.profs = {}; C.profSlots = []; C.profNotes = []; C.profOpenSlots = 0;
+  C.profs = {}; C.profSrc = {}; C.profSlots = []; C.profNotes = []; C.profOpenSlots = 0;
   var keep = {};
+  function src(n, key, label, when){ (C.profs[n] = C.profs[n] || []).push(label); (C.profSrc[n] = C.profSrc[n] || []).push({ key: key, label: label, when: when }); }
   activeProfGrants().forEach(function(a){
-    (a.g.fixed || []).forEach(function(n){ (C.profs[n] = C.profs[n] || []).push(a.label); });
+    (a.g.fixed || []).forEach(function(n){ src(n, a.key, a.label, a.when); });
     (a.g.choose || []).forEach(function(ch, j){
       var k = a.key + "#" + j, picks = (B.profPicks[k] || []).slice(0, ch.n); keep[k] = 1;
-      picks.forEach(function(n){ if (n) (C.profs[n] = C.profs[n] || []).push(a.label); });
+      picks.forEach(function(n){ if (n) src(n, k, a.label, a.when); });
       var open = ch.n - picks.filter(Boolean).length; C.profOpenSlots += open;
       C.profSlots.push({ key: k, label: a.label, text: ch.label, n: ch.n, options: profList(ch.from), picks: picks });
     });
@@ -2056,11 +2068,57 @@ function calcProfs(C){
   });
   for (var k in B.profPicks) if (!keep[k]) delete B.profPicks[k];  // forget picks from removed classes/breakthroughs
   if (C.profOpenSlots) C.warn.push(C.profOpenSlots + " proficienc" + (C.profOpenSlots > 1 ? "ies" : "y") + " still to pick (Proficiencies section).");
+  C.btRedundant = {};
+  B.bts.forEach(function(b, i){
+    var r = btRedundancy(i, C); if (!r) return; C.btRedundant[i] = r;
+    var name = (BTS[b.id] || {}).name || b.id;
+    if (!r.later) C.warn.push(r.all ? name + " gives you nothing new: " + r.text + "." : name + ": " + r.text + ".");
+  });
   B.items.forEach(function(e){
     var it = ITEMS[e.id]; if (!it || !e.equipped || !it.armor) return;
     var need = itemProf(it);
     if (need && !C.profs[need]) C.warn.push("Not proficient with " + need + " (" + it.name + "): it gives 1 less Guard (already applied).");
   });
+}
+// Who else gives proficiency n, not counting the grant with this key (or its choice slots).
+// before: only sources bought earlier than position "when" (null = any).
+function profOthers(n, key, CC, when, after){
+  return ((CC || C).profSrc[n] || []).filter(function(s){
+      if (s.key === key || s.key.indexOf(key + "#") === 0) return false;
+      if (when === undefined || when === null) return true;
+      return after ? s.when > when : s.when < when; })
+    .map(function(s){ return s.label; }).filter(function(l, i, a){ return a.indexOf(l) === i; });
+}
+// Proficiency breakthrough number i that overlaps with proficiencies you get elsewhere.
+// Returns null, or { all, later, text }. all = it gives nothing new; later = the overlap only comes from
+// something bought after it (so it's useful until then).
+function btRedundancy(i, CC){
+  var b = B.bts[i], key = "bt:" + i, g = null, CX = CC || C;
+  PROF.grants.forEach(function(x){ if (x.source === "bt:" + b.id) g = x; });
+  if (!g) return null;
+  var w = (B.order || []).indexOf("b|" + b.u); if (w < 0) w = 1e6 + 900 + i;
+  var got = [], before = [], later = [];
+  function chk(n){ if (!n) return; got.push(n);
+    var o = profOthers(n, key, CX, w); if (o.length) { before.push(n + " (already from " + o.join(", ") + ")"); return; }
+    var l = profOthers(n, key, CX, w, true); if (l.length) later.push({ n: n, from: l }); }
+  (g.fixed || []).forEach(chk);
+  (g.choose || []).forEach(function(ch, j){ (B.profPicks[key + "#" + j] || []).forEach(chk); });
+  if (before.length) {
+    var all = before.length === got.length;
+    return { all: all, text: all ? "you already have " + before.join(" and ") : "partly overlaps: " + before.join(", ") + "; the rest is still new" };
+  }
+  if (later.length) return { all: later.length === got.length, later: true,
+    text: later.map(function(x){ return x.n + " also comes from " + x.from.join(", ") + " later in your plan"; }).join("; ") };
+  return null;
+}
+// For the "Add a breakthrough" list: what it would give that you already have.
+function btWouldDup(r){
+  var g = null; PROF.grants.forEach(function(x){ if (x.source === "bt:" + r.id) g = x; });
+  if (!g || !g.fixed || hasBt(r.id)) return null;
+  var have = g.fixed.filter(function(n){ return C.profs[n]; });
+  if (!have.length) return null;
+  return { all: have.length === g.fixed.length,
+           text: have.map(function(n){ return n + " (from " + C.profs[n].filter(function(l, i, a){ return a.indexOf(l) === i; }).join(", ") + ")"; }).join(" and ") };
 }
 // Which proficiency an item needs (or null).
 function itemProf(it){
@@ -2108,8 +2166,9 @@ function renderProf(){
         var cur = sl.picks[k] || "";
         h += '<select data-profkey="' + esc(sl.key) + '" data-slot="' + k + '"><option value="">— pick —</option>' +
           sl.options.map(function(o){
-            var dup = o !== cur && sl.picks.indexOf(o) >= 0;
-            return '<option' + (o === cur ? " selected" : "") + (dup ? " disabled" : "") + ">" + esc(o) + "</option>";
+            var dup = o !== cur && sl.picks.indexOf(o) >= 0, other = profOthers(o, sl.key);
+            return '<option value="' + esc(o) + '"' + (o === cur ? " selected" : "") + (dup ? " disabled" : "") + ">" + esc(o) +
+              (other.length ? " (also from " + other.join(", ") + ")" : "") + "</option>";
           }).join("") + "</select>";
       }
       h += "</div></div>";
