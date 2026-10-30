@@ -19311,10 +19311,9 @@ function statTable(title, names, arr, grp){
     h += '<tr><td><span class="statname" data-statinfo="' + s + '" title="Tap: what ' + s + ' does">' + s + "</span></td><td><select data-grp=\"" + grp + "\" data-stat=\"" + s + "\">" +
       vals.map(function(v){ return "<option" + (B[grp][s] === v ? " selected" : "") + ">" + v + "</option>"; }).join("") + "</select></td>" +
       '<td title="' + esc(b.map(function(x){ return sign(x.n) + " " + x.why; }).join("\n")) + '">' + (bt ? '<span class="good">' + sign(bt) + "</span>" : '<span class="dim">—</span>') + "</td>" +
-      '<td class="num final' + (softCap(s).lvl ? " sc" + softCap(s).lvl : "") + '" title="' + esc(softCap(s).lines.join("\n")) + '">' + C.stat[s] +
-      (softCap(s).lvl === 2 ? ' <span class="small">cap</span>' : "") + "</td></tr>";
+      '<td class="num final' + (softCap(s).lvl ? " sc" + softCap(s).lvl : "") + '" data-statinfo="' + s + '" style="cursor:pointer" title="Tap for details">' + C.stat[s] + "</td></tr>";
   });
-  return h + "</table>" + (grp === "subArr" ? '<div class="small dim">Totals turn <span class="sc1">amber</span> at a breakpoint and <span class="sc2">green</span> at a soft cap, where extra points start paying off less (based on the official monster stat blocks; tap a stat name for details).</div>' : "");
+  return h + "</table>" + (grp === "subArr" ? '<div class="small dim">Totals turn <span class="sc1">amber</span> at a breakpoint and <span class="sc2">green</span> at a soft cap, where extra points start paying off less (based on the official monster stat blocks; tap a stat or its number for details).</div>' : "");
 }
 
 /* ---------- Classes ---------- */
