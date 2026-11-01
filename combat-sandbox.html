@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lyrian Combat Sandbox</title>
+<!--
+  Lyrian Chronicles - combat sandbox (unofficial fan tool, game version 0.13.2).
+  Runs thousands of quick, simplified fights to compare how tough two builds are.
+  Enemy numbers come from recorded community sessions (see the "Enemies" box) and Cola Bear's published enemy docs.
+  It is a rough model: no positioning, healing, initiative or class abilities. Good for "which build is tougher and by
+  roughly how much", not for exact odds. Edit in Notepad like any other page; everything is in this one file.
+-->
+<style>
+:root{
+  --bg:#1b1d22; --panel:#252830; --panel2:#2d3039; --line:#3a3e49; --text:#e6e3db; --dim:#9da1ab;
+  --gold:#c9a24a; --gold2:#e2c072; --good:#6fbf73; --bad:#e06c5e; --blue:#79a8d8; --warn:#e0b04e;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}
+a{color:var(--blue)}
+header{position:sticky;top:0;z-index:5;background:#16181c;border-bottom:1px solid var(--line);padding:10px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+header h1{font-size:18px;margin:0;color:var(--gold2);letter-spacing:.5px}
+header .dim{font-size:12px;color:var(--dim)}
+main{max-width:1150px;margin:0 auto;padding:14px 16px 40px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+section.wide{grid-column:1 / -1}
+h2{font-size:14px;margin:0 0 8px;color:var(--gold2);text-transform:uppercase;letter-spacing:1px}
+.note{font-size:12px;color:var(--dim)}
+.box{border-left:3px solid var(--gold);padding:4px 10px;margin:8px 0;background:rgba(201,162,74,.07);font-size:13px}
+textarea,input,select{background:#1f2128;border:1px solid var(--line);border-radius:6px;color:var(--text);padding:4px 7px;font:inherit}
+textarea{width:100%;font-size:12px;word-break:break-all}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px 10px;margin-top:8px}
+.grid label{display:flex;flex-direction:column;font-size:12px;color:var(--dim)}
+.grid input,.grid select{width:100%;margin-top:2px}
+button{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit}
+button.gold{background:var(--gold);color:#1b1d22;border-color:var(--gold);font-weight:600}
+button:hover{border-color:var(--gold)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:4px 6px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--dim);font-weight:600;border-top:none}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+.msg{font-size:12px;margin-top:4px}
+footer{max-width:1150px;margin:0 auto;padding:0 16px 30px;font-size:12px;color:var(--dim)}
+@media (max-width:760px){ main{grid-template-columns:1fr;padding:10px 8px 30px} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Combat Sandbox</h1>
+  <span class="dim">Lyrian Chronicles · unofficial · rough model for comparing builds</span>
+  <span style="flex:1"></span>
+  <a href="planner-all-in-one.html">Planner</a> <a href="quick-reference.html">Quick reference</a>
+</header>
+<main>
+  <section class="wide">
+    <div class="box"><b>How to use:</b> in the planner open <b>Share → Character data</b>, press <b>Copy</b>, and paste the code into Build A
+      (or type the numbers in yourself). Do the same for a second build in Build B to compare, then press <b>Run</b>.
+      Each scenario is fought a few thousand times with random dice.</div>
+    <div class="note">This is a rough model. It knows your defenses well (Evasion, Dodge, Block, Guard, RP, HP, saves) and shoots two basic attacks a round.
+      It does <b>not</b> know your class abilities, range and cover, healing, initiative or the Downed rules. Read results as
+      "which build is tougher, and by roughly how much", not as exact odds.</div>
+  </section>
+
+  <section id="slotA"></section>
+  <section id="slotB"></section>
+
+  <section class="wide">
+    <h2>Settings</h2>
+    <div class="grid">
+      <label>When to spend RP
+        <select id="pol">
+          <option value="1">On every hit</option>
+          <option value="12" selected>Hits of 12+ damage</option>
+          <option value="18">Heavy hits only (18+)</option>
+        </select></label>
+      <label>Fights per scenario<input type="number" id="nFights" value="3000" min="200" max="20000" step="500"></label>
+      <label>Round limit<input type="number" id="cap" value="8" min="2" max="20"></label>
+      <label>Grab chance (grunt light hits)<input type="number" id="grab" value="20" min="0" max="100"> </label>
+      <label>Enemy control-spell potency<input type="number" id="pot" value="17" min="10" max="25"></label>
+    </div>
+    <div class="note" style="margin-top:6px">Grabs and control spells root you: Dodge only gives half its bonus until you're free.
+      Party fights split the enemies' attacks across the party and the rest of the party removes enemy HP each round.</div>
+    <div class="row"><button class="gold" id="run">Run</button><span id="status" class="note"></span></div>
+  </section>
+
+  <section class="wide">
+    <h2>Results</h2>
+    <div id="results" class="note">Press Run.</div>
+  </section>
+
+  <section class="wide">
+    <h2>Enemies</h2>
+    <div class="note">From about 150 enemy rolls read in 8 recorded sessions (3 GMs, late 2026) and Cola Bear's published enemy docs.
+      Attack = d20 + accuracy against your Evasion (or Dodge when you react).</div>
+    <table id="enemyTable"></table>
+  </section>
+</main>
+<footer>Fan-made, not official. Game version 0.13.2. Open license (MIT), same as the planner.</footer>
+
+<script>
+/* ---------- dice ---------- */
+function d(n, s){ var t = 0; for (var i = 0; i < n; i++) t += 1 + Math.floor(Math.random() * s); return t; }
+function num(v){ var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+
+/* ---------- enemies (edit numbers here) ----------
+   acc = accuracy bonus on d20. light/heavy = damage rolls. ctrl = chance a turn is a control spell (save or be rooted). */
+var ENEMIES = {
+  grunt:  { name: "Grunt (hobgoblin, zombie)", hp: 27,  ev: 9,  dg: 19, guard: 3, acc: 0, rp: 1, ctrl: 0,
+            light: function(){ return d(1, 6) + 7; }, heavy: function(){ return d(4, 6) + 16; }, lightDesc: "8-13", heavyDesc: "20-40",
+            turn: function(o){ return Math.random() < 0.6 ? [["light", Math.random() < o.grab], ["light", false]] : [["heavy", false]]; } , turnDesc: "2 lights or 1 heavy" },
+  annwyn: { name: "Heroic (Annwyn-type)", hp: 60, ev: 12, dg: 24, guard: 7, acc: 9, rp: 6, ctrl: 0.3,
+            light: function(){ return d(2, 4) + 7; }, heavy: function(){ return d(4, 6) + 14; }, lightDesc: "9-15", heavyDesc: "18-38",
+            turn: function(){ return Math.random() < 0.6 ? [["light", false], ["light", false]] : [["heavy", false]]; }, turnDesc: "2 lights or 1 heavy; 30% of turns a control spell" },
+  leader: { name: "Leader", hp: 80, ev: 11, dg: 24, guard: 5, acc: 6, rp: 6, ctrl: 0,
+            light: function(){ return d(4, 6) + 14; }, heavy: function(){ return d(4, 6) + 14; }, lightDesc: "-", heavyDesc: "18-38",
+            turn: function(){ return [["heavy", false], ["heavy", false]]; }, turnDesc: "2 heavies" },
+  brute:  { name: "Brute (two-handed)", hp: 110, ev: 11, dg: 22, guard: 6, acc: 7, rp: 6, ctrl: 0,
+            light: function(){ return d(4, 6) + 22; }, heavy: function(){ return d(4, 6) + 22; }, lightDesc: "-", heavyDesc: "26-46",
+            turn: function(){ return [["heavy", false]]; }, turnDesc: "1 big heavy" },
+  boss:   { name: "Boss", hp: 300, ev: 11, dg: 22, guard: 7, acc: 7, rp: 6, ctrl: 0,
+            light: function(){ return d(2, 4) + 8; }, heavy: function(){ return d(4, 6) + 14; }, lightDesc: "10-16", heavyDesc: "18-38",
+            turn: function(){ return [["light", false], ["heavy", false]]; }, turnDesc: "1 light + 1 heavy" }
+};
+var ORDER = { grunt: 0, annwyn: 1, leader: 2, brute: 3, boss: 4 };
+
+/* ---------- scenarios ---------- */
+function rep(k, n){ var a = []; for (var i = 0; i < n; i++) a.push(k); return a; }
+var SCENARIOS = [
+  { name: "Party of 6 vs a hobgoblin warband", note: "12 grunts, 2 leaders, 1 brute", foes: rep("grunt", 12).concat(["leader", "leader", "brute"]), party: 6, allyDmg: 60 },
+  { name: "Party of 4 vs an Annwyn squad", note: "5 heroics", foes: rep("annwyn", 5), party: 4, allyDmg: 45 },
+  { name: "Party of 5 vs a boss", note: "boss + a party-wide save every round (10 damage on a fail)", foes: ["boss"], party: 5, allyDmg: 60, saveDmg: 10 },
+  { name: "Solo vs a patrol", note: "1 leader + 4 grunts", foes: ["leader"].concat(rep("grunt", 4)), party: 1, allyDmg: 0 },
+  { name: "Solo vs 2 heroics", note: "2 Annwyn-type", foes: rep("annwyn", 2), party: 1, allyDmg: 0 },
+  { name: "Solo vs 3 heroics", note: "3 Annwyn-type", foes: rep("annwyn", 3), party: 1, allyDmg: 0 }
+];
+
+/* ---------- one fight ---------- */
+function fight(b, sc, o){
+  var foes = sc.foes.map(function(k){ var e = ENEMIES[k]; return { k: k, e: e, hp: e.hp, rp: e.rp }; });
+  var hp = b.hp, rp = b.rp, taken = 0, rnd = 0, rooted = 0, share = 1 / sc.party;
+  var alive = function(){ return foes.filter(function(f){ return f.hp > 0; }).sort(function(x, y){ return (ORDER[x.k] - ORDER[y.k]) || (x.hp - y.hp); }); };
+  while (hp > 0 && alive().length && rnd < o.cap) {
+    rnd++;
+    // you: two attacks a round at the weakest enemy
+    for (var s = 0; s < 2; s++) {
+      var t = alive()[0]; if (!t) break;
+      if (rnd === 1 && s === 0 && b.opener) { t.hp -= (b.mode === "precise" ? 8 + b.P : 24 + 2 * b.P); continue; }   // surprise shot: can't miss, max damage
+      var roll = d(1, 20) + (b.mode === "precise" ? 2 * b.F : b.F) + (b.accDie ? d(1, b.accDie) : 0), need = t.e.ev;
+      if (t.rp > 0 && roll >= need) { t.rp--; need = t.e.dg; }
+      if (roll >= need) t.hp -= Math.max(1, (b.mode === "precise" ? d(2, 4) + b.P : (b.twoH ? d(5, 6) : d(4, 6)) + 2 * b.P) - t.e.guard);
+    }
+    // the rest of the party
+    var dmg = sc.allyDmg; alive().forEach(function(f){ if (dmg <= 0) return; var x = Math.min(dmg, f.hp); f.hp -= x; dmg -= x; });
+    // party-wide save
+    if (sc.saveDmg && hp > 0 && d(2, 10) + b.T < o.pot) { hp -= sc.saveDmg; taken += sc.saveDmg; }
+    if (rooted) rooted--;
+    // enemies
+    foes.forEach(function(f){
+      if (f.hp <= 0 || hp <= 0 || Math.random() > share) return;
+      if (f.e.ctrl && Math.random() < f.e.ctrl) { if (d(2, 10) + b.T < o.pot) rooted = 2; return; }
+      f.e.turn(o).forEach(function(a){
+        if (hp <= 0) return;
+        var roll = d(1, 20) + f.e.acc; if (roll < b.ev) return;
+        var raw = f.e[a[0]](), none = Math.max(1, raw - b.guard), x;
+        var dodge = rooted ? 20 + Math.floor((b.dodge - 20) / 2) : b.dodge;
+        if (rp > 0 && (none >= o.pol || none >= hp)) { rp--; x = roll < dodge ? 0 : Math.max(0, raw - b.block); }
+        else x = none;
+        if (x > 0 && a[1]) rooted = 2;
+        hp -= x; taken += x;
+      });
+    });
+  }
+  return { up: hp > 0, taken: taken, rp: rp, rounds: rnd };
+}
+function runScenario(b, sc, o){
+  var up = 0, tk = 0, rp = 0, r = 0;
+  for (var i = 0; i < o.n; i++) { var x = fight(b, sc, o); up += x.up ? 1 : 0; tk += x.taken; rp += x.rp; r += x.rounds; }
+  return { up: up / o.n * 100, taken: tk / o.n, rp: rp / o.n, rounds: r / o.n };
+}
+
+/* ---------- build slots ---------- */
+var FIELDS = [["name", "Name", "text"], ["F", "Focus"], ["P", "Power"], ["T", "Toughness"], ["hp", "HP"], ["rp", "RP"],
+              ["ev", "Evasion"], ["dodge", "Dodge"], ["guard", "Guard"], ["block", "Block"]];
+var DEFAULTS = {
+  A: { name: "Example: dice-proof sniper", F: 6, P: 4, T: 7, hp: 90, rp: 11, ev: 16, dodge: 29, guard: 8, block: 16, mode: "heavy", twoH: false, opener: true, accDie: 4 },
+  B: { name: "Example: glass cannon", F: 8, P: 4, T: 5, hp: 70, rp: 8, ev: 11, dodge: 24, guard: 6, block: 14, mode: "heavy", twoH: false, opener: true, accDie: 4 }
+};
+function slotHtml(id){
+  var v = DEFAULTS[id];
+  return "<h2>Build " + id + "</h2>" +
+    '<textarea id="code' + id + '" rows="2" placeholder="Paste a Character data code (LCD1:...) from the planner\'s Share window"></textarea>' +
+    '<div class="row"><button id="load' + id + '">Use this code</button><span id="msg' + id + '" class="msg note"></span></div>' +
+    '<div class="grid">' + FIELDS.map(function(f){
+      return "<label>" + f[1] + '<input id="' + id + "_" + f[0] + '" type="' + (f[2] || "number") + '" value="' + v[f[0]] + '"></label>';
+    }).join("") +
+    '<label>Attack<select id="' + id + '_mode"><option value="heavy">Heavy (d20+Focus)</option><option value="precise">Precise (d20+2×Focus)</option></select></label>' +
+    '<label>Extra accuracy die<select id="' + id + '_accDie"><option value="0">None</option><option value="4"' + (v.accDie === 4 ? " selected" : "") + '>+1d4</option><option value="6">+1d6</option></select></label>' +
+    '<label>Two-handed melee?<select id="' + id + '_twoH"><option value="0">No</option><option value="1">Yes (5d6)</option></select></label>' +
+    '<label>Surprise first shot?<select id="' + id + '_opener"><option value="1">Yes (can\'t miss, max damage)</option><option value="0">No</option></select></label>' +
+    "</div>";
+}
+function readSlot(id){
+  var b = {}; FIELDS.forEach(function(f){ var v = document.getElementById(id + "_" + f[0]).value; b[f[0]] = f[2] ? v : num(v); });
+  b.mode = document.getElementById(id + "_mode").value; b.twoH = document.getElementById(id + "_twoH").value === "1";
+  b.opener = document.getElementById(id + "_opener").value === "1"; b.accDie = num(document.getElementById(id + "_accDie").value);
+  return b;
+}
+function loadCode(id){
+  var msg = document.getElementById("msg" + id), raw = document.getElementById("code" + id).value.trim();
+  try {
+    if (/^LCP1:/.test(raw)) throw new Error("That's a build code. In the planner's Share window copy the Character data code (LCD1:...) instead.");
+    if (!/^LCD1:/.test(raw)) throw new Error("Paste a code that starts with LCD1:");
+    var c = JSON.parse(decodeURIComponent(escape(atob(raw.slice(5))))), s = c.stats || {}, dv = c.derived || {};
+    var set = function(k, v){ document.getElementById(id + "_" + k).value = v; };
+    set("name", c.name || "Unnamed"); set("F", s.Focus); set("P", s.Power); set("T", s.Toughness);
+    set("hp", dv.hp); set("rp", dv.rp); set("ev", dv.evasion); set("dodge", dv.dodge); set("guard", dv.guard); set("block", dv.blockGuard);
+    msg.textContent = "Loaded " + (c.name || "the character") + "."; msg.className = "msg good";
+  } catch (e) { msg.textContent = e.message || "Couldn't read that code."; msg.className = "msg bad"; }
+}
+
+/* ---------- results ---------- */
+function pctClass(p){ return p >= 90 ? "good" : p >= 60 ? "warn" : "bad"; }
+function run(){
+  var o = { n: Math.max(200, Math.min(20000, num(document.getElementById("nFights").value))), cap: num(document.getElementById("cap").value) || 8,
+            pol: num(document.getElementById("pol").value), grab: num(document.getElementById("grab").value) / 100, pot: num(document.getElementById("pot").value) };
+  var A = readSlot("A"), B = readSlot("B");
+  document.getElementById("status").textContent = "Running…";
+  setTimeout(function(){
+    var h = '<table><tr><th>Scenario</th><th>' + esc(A.name) + '<br><span class="note">standing · HP lost · RP left</span></th><th>' + esc(B.name) +
+            '<br><span class="note">standing · HP lost · RP left</span></th><th>Difference</th></tr>';
+    SCENARIOS.forEach(function(sc){
+      var a = runScenario(A, sc, o), b = runScenario(B, sc, o), diff = a.up - b.up;
+      var cell = function(r){ return '<td class="n"><b class="' + pctClass(r.up) + '">' + r.up.toFixed(1) + "%</b> · " + r.taken.toFixed(0) + " · " + r.rp.toFixed(1) + "</td>"; };
+      h += "<tr><td>" + esc(sc.name) + '<br><span class="note">' + esc(sc.note) + "</span></td>" + cell(a) + cell(b) +
+           '<td class="n ' + (Math.abs(diff) < 2 ? "" : diff > 0 ? "good" : "bad") + '">' + (Math.abs(diff) < 2 ? "about the same" : (diff > 0 ? "A +" : "B +") + Math.abs(diff).toFixed(1) + " pts") + "</td></tr>";
+    });
+    h += "</table><div class=\"note\" style=\"margin-top:6px\">\"Standing\" = still on their feet when the fight ends (or after " + o.cap + " rounds). " +
+         "Differences under about 2 points are dice noise. HP lost and RP left are averages per fight.</div>";
+    document.getElementById("results").innerHTML = h;
+    document.getElementById("status").textContent = o.n.toLocaleString() + " fights per scenario per build.";
+  }, 20);
+}
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+/* ---------- start ---------- */
+["A", "B"].forEach(function(id){
+  document.getElementById("slot" + id).innerHTML = slotHtml(id);
+  document.getElementById("load" + id).onclick = function(){ loadCode(id); };
+});
+document.getElementById("run").onclick = run;
+document.getElementById("enemyTable").innerHTML = "<tr><th>Enemy</th><th>HP</th><th>Accuracy</th><th>Evasion / Dodge</th><th>Guard</th><th>Light / Heavy damage</th><th>A turn</th></tr>" +
+  Object.keys(ENEMIES).map(function(k){ var e = ENEMIES[k];
+    return "<tr><td>" + esc(e.name) + "</td><td>" + e.hp + "</td><td>d20+" + e.acc + "</td><td>" + e.ev + " / " + e.dg + "</td><td>" + e.guard + "</td><td>" + e.lightDesc + " / " + e.heavyDesc + "</td><td>" + esc(e.turnDesc) + "</td></tr>"; }).join("");
+</script>
+</body>
+</html>

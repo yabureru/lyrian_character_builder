@@ -27,6 +27,8 @@ and use **Load** to open your saved character.
 
 **Quick reference for play:** [quick-reference.html](quick-reference.html) has the rules at a glance: what each stat rolls, basic actions, attacking and defending, conditions, resting, interlude and every keyword, with a search box. It also prints in black and white. ([Online](https://yabureru.github.io/lyrian_character_builder/quick-reference.html))
 
+**Combat sandbox:** [combat-sandbox.html](combat-sandbox.html) is a separate testing page. Paste two builds (the planner's Share → Character data code) and it fights a few thousand quick, simplified battles against common enemy types to show which build stays standing more often. It is a rough model of defenses and basic attacks only, not class abilities. ([Online](https://yabureru.github.io/lyrian_character_builder/combat-sandbox.html))
+
 (Prefer separate files? Download the whole repo with **Code → Download ZIP** and open `planner.html`; keep it next to the `data` folder.)
 
 ## Questions, mistakes and ideas
@@ -80,6 +82,7 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
 | `data/bonuses.js` | Race bonuses, situational (stance/aura/transformation) bonuses and notes |
 | `RULES_REFERENCE.md` | Condensed rules used for the planner's formulas |
 | `quick-reference.html` | Rules at a glance for play (keywords filled from data/keywords.js by `tools/build_quick_reference.py`) |
+| `combat-sandbox.html` | Standalone fight simulator for comparing two builds (not part of the planner) |
 | `ISSUES.md` | What's still open: GM questions, to-dos, and the rule readings the planner uses |
 | `ISSUES_ARCHIVE.md` | Full history of the data check (every fix and page oddity, by class) |
 
