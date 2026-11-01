@@ -20726,7 +20726,7 @@ function openShare(){
     "(HP, Mana, AP, RP, Guard, rolls, skills, abilities, gear), as a code or a .json file, for other tools and character sheets.</div>" +
     '<textarea id="shData" readonly rows="3" style="width:100%;word-break:break-all">' + esc(characterDataCode()) + "</textarea>" +
     '<div class="toolbar"><button id="shDataCopy">Copy</button><button id="shDataFile">Download file</button></div>' +
-    "<h3>Mirane spreadsheet</h3><div class=\"note\">For Mirane approval. In your copy of the Blank Mirane CCS (Google Sheets) use File → Download → Microsoft Excel (.xlsx), " +
+    "<h3>Mirane spreadsheet</h3><div class=\"note\">For Mirane approval. In your copy of the Blank Mirane CCS or CharacterSpreadSheet v9 (Google Sheets) use File → Download → Microsoft Excel (.xlsx), " +
     "then pick that file here. The planner fills it in from this build and gives it back. Upload it to Google with File → Import → Replace spreadsheet. " +
     "Only the sheet's input boxes are written, never its formulas.</div>" +
     '<div class="toolbar"><button id="shXl" class="gold">Fill my Mirane sheet…</button></div><div id="shXlMsg" class="small"></div>' +
@@ -20888,13 +20888,15 @@ function fillMiraneSheet(buf){
       var id = s.getAttribute("r:id") || s.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id");
       var p = target[id] || ""; paths[s.getAttribute("name")] = p.charAt(0) === "/" ? p.slice(1) : "xl/" + p.replace(/^\.\//, "");
     });
-    ["Core", "Inventory", "Breakthrough", "Abilities", "EXP & Transactions"].forEach(function(n){
-      if (!paths[n] || !byName[paths[n]]) throw new Error("This isn't the Mirane CCS: it has no \"" + n + "\" tab.");
-    });
-    var names = ["Core", "Inventory", "Mirane Locker", "Breakthrough", "Abilities", "EXP & Transactions", "Backstory"].filter(function(n){ return paths[n] && byName[paths[n]]; });
+    // Two layouts are known: the Blank Mirane CCS (has Breakthrough and EXP & Transactions tabs) and CharacterSpreadSheet v9.
+    var ok = function(n){ return paths[n] && byName[paths[n]]; };
+    var kind = ok("Breakthrough") && ok("EXP & Transactions") ? "ccs" : ok("Core") && ok("Abilities") && ok("Inventory") ? "v9" : "";
+    if (!kind) throw new Error("This isn't a sheet the planner knows: it needs the Blank Mirane CCS or CharacterSpreadSheet v9 (tabs Core, Abilities, Inventory).");
+    var names = (kind === "ccs" ? ["Core", "Inventory", "Mirane Locker", "Breakthrough", "Abilities", "EXP & Transactions", "Backstory"] :
+                 ["Core", "Abilities", "Inventory", "Leveling Planner"]).filter(ok);
     return Promise.all(names.map(function(n){ return XZ.text(byName[paths[n]]); })).then(function(xmls){
       var S = {}; names.forEach(function(n, i){ S[n] = new XSheet(xmls[i], shared); });
-      var notes = writeMirane(S);
+      var notes = kind === "ccs" ? writeMirane(S) : writeSheetV9(S);
       names.forEach(function(n){ XZ.setText(byName[paths[n]], S[n].xml()); });
       // ask Excel to recalculate everything when the file is opened (Google Sheets recalculates anyway)
       var wbx = t[0].replace(/<calcPr\b([^>]*?)\/>/, function(all, at){ return /fullCalcOnLoad/.test(at) ? all : "<calcPr" + at + ' fullCalcOnLoad="1"/>'; });
@@ -21074,6 +21076,143 @@ function writeMirane(S){
   // numbers the sheet should show, so you can check after importing
   notes.unshift("Check after importing: HP " + d.hp + ", Mana " + d.mana + ", AP " + d.ap + ", RP " + d.rp + ", Initiative " + d.init + ", Evasion " + d.evasion +
     ", Dodge " + d.dodge + ", Guard " + d.guard + ", Block " + d.blockGuard + ", Save +" + T + ", Potency " + d.potency + ", Speed " + d.speed + ".");
+  return notes;
+}
+// CharacterSpreadSheet v9: a simpler sheet. Stats are typed in as totals and it has no bonus boxes, so a few
+// numbers (like On the Draw's Initiative) can't be shown there; those are listed in the notes.
+function abText(a){ return abilityLines(a).join(" ").replace(/\s+/g, " "); }
+function abKeywords(a){ return (a.keywords || []).join(", "); }
+function writeSheetV9(S){
+  var core = S.Core, notes = [], d = C.d, st = C.stat, sd = B.sheet || {};
+  var expect = { A2: "Name", A9: "Focus", A12: "Toughness", C9: "Fitness", E8: "Skill", A14: "Class", A43: "Main Stat Array" };
+  for (var k in expect) if (core.get(k).trim() !== expect[k]) throw new Error("This sheet's Core tab is laid out differently from CharacterSpreadSheet v9 (" + k + " should say \"" + expect[k] + "\").");
+  var r = raceRec(), sr = subRec(), row;
+  core.set("B2", B.name || ""); core.set("B3", B.gender || ""); core.set("B4", sd.age || ""); core.set("B5", sd.height || ""); core.set("B6", sd.weight || "");
+  core.set("D2", r ? r.name : ""); core.set("D3", sr ? sr.name : (r ? r.name : ""));
+  // EXP: the sheet works out Spirit Core as unspent EXP + breakthrough EXP + class costs
+  core.set("D4", C.exp.unspent); core.set("D6", C.ip.left);
+  core.set("D7", Math.max(0, C.exp.btSpent - C.exp.startBt));
+  // stats are typed in as totals
+  for (row = 9; row <= 13; row++) {
+    var ms = core.get("A" + row).trim(), ss = core.get("C" + row).trim();
+    if (st[ms] !== undefined) core.set("B" + row, st[ms]);
+    if (st[ss] !== undefined) core.set("D" + row, st[ss]);
+  }
+  // creation array: which stat took which number
+  var used = {};
+  [44, 45, 46, 47].forEach(function(rw){ var v = num(core.get("A" + rw)), s = MAIN.filter(function(m){ return !used[m] && num(B.mainArr[m]) === v; })[0] || MAIN.filter(function(m){ return !used[m]; })[0]; used[s] = true; core.set("B" + rw, s); });
+  used = {};
+  [44, 45, 46, 47, 48].forEach(function(rw){ var v = num(core.get("C" + rw)), s = SUB.filter(function(m){ return !used[m] && num(B.subArr[m]) === v; })[0] || SUB.filter(function(m){ return !used[m]; })[0]; used[s] = true; core.set("D" + rw, s); });
+  // combat boxes that are plain values on this sheet
+  core.set("F5", "2d4+" + st.Power); core.set("F6", "4d6+" + 2 * st.Power);
+  core.set("H6", d.speed); core.set("H7", d.hp - (20 + 10 * st.Toughness)); core.set("J7", C.burden + " / " + d.burdenMax);
+  // classes
+  for (row = 15; row <= 30; row++) ["A", "B", "C", "D"].forEach(function(col){ core.clear(col + row); });
+  B.classes.forEach(function(c, i){
+    var rec = CLASSES[c.id]; if (!rec || i > 15) return;
+    var cost = 0; c.owned.forEach(function(o, k2){ if (o) cost += stepCost(c.id, k2); });
+    core.set("A" + (15 + i), rec.name); core.set("B" + (15 + i), rec.tier); core.set("C" + (15 + i), c.owned.filter(Boolean).length); core.set("D" + (15 + i), cost);
+  });
+  if (B.classes.length > 16) notes.push("Only the first 16 classes fit the sheet's class table.");
+  // skills: the sheet shortens some names ("Common Knw", "Animal Husb")
+  var exBy = {}; Object.keys(C.ex || {}).forEach(function(k2){ var e = C.ex[k2]; if (e.pts) (exBy[e.skill] = exBy[e.skill] || []).push(e.name + " +" + e.pts); });
+  var seen = {};
+  for (row = 9; row <= 30; row++) {
+    var lab = core.get("E" + row).trim().toLowerCase(); if (!lab) continue;
+    var sk = SKILLS.filter(function(s){ return s.kind === "main" && s.name.toLowerCase().indexOf(lab.replace(/\.$/, "")) === 0; })[0]; if (!sk) continue;
+    seen[sk.name] = true; core.set("H" + row, num((C.pts || {})[sk.name])); core.set("I" + row, (exBy[sk.name] || []).join(", "));
+  }
+  // proficiencies one per row, crafting skills in K/M
+  for (row = 9; row <= 30; row++) { core.clear("J" + row); core.clear("K" + row); core.clear("M" + row); }
+  var cr = creationRace(), langs = (cr && cr.languages) || [];
+  var pl = Object.keys(C.profs || {}).sort().concat(langs.length ? ["Languages: " + langs.join(", ")] : []).concat(elementMasteries().length ? ["Elemental mastery: " + elementMasteries().join(", ")] : []);
+  pl.slice(0, 22).forEach(function(p, i){ core.set("J" + (9 + i), p); });
+  var crow = 9;
+  SKILLS.forEach(function(s){
+    var p = num((C.pts || {})[s.name]);
+    if (s.kind === "main" && !seen[s.name] && (p || exBy[s.name])) notes.push(s.name + " (" + p + " points) has no row on the sheet: add it by hand.");
+    if (s.kind !== "main" && (p || exBy[s.name]) && crow <= 30) { core.set("K" + crow, s.name + (exBy[s.name] ? " (" + exBy[s.name].join(", ") + ")" : "")); core.set("M" + crow, p); crow++; }
+  });
+  // weapons and armor
+  for (row = 32; row <= 36; row++) ["A", "D", "E", "F", "G", "H", "I"].forEach(function(col){ core.clear(col + row); });
+  var weapons = [], armors = [];
+  B.items.forEach(function(e){ var it = ITEMS[e.id]; if (!it || itemPlace(e) !== "") return; if (it.weapon) weapons.push(it); if (it.armor && e.equipped) armors.push(it); });
+  weapons.slice(0, 5).forEach(function(it, i){
+    var two = it.weapon.hands === 2 && /^5\s*ft/.test(it.weapon.range || "");
+    core.set("A" + (32 + i), it.name); core.set("D" + (32 + i), "2d4+" + st.Power); core.set("E" + (32 + i), (two ? "5d6+" : "4d6+") + 2 * st.Power);
+  });
+  armors.slice(0, 5).forEach(function(it, i){
+    var a = it.armor || {};
+    core.set("F" + (32 + i), it.name); core.set("G" + (32 + i), num(a.guard)); core.set("H" + (32 + i), -num(a.evasion)); core.set("I" + (32 + i), num(a.block));
+  });
+  // trackers at the bottom
+  var pts = (C.sources || []).reduce(function(t2, s){ return t2 + s.points; }, 0);
+  core.set("A51", pts); core.set("B51", pts - C.skillLeft); core.set("C51", 1000 + expEarnedTotal()); core.set("D51", C.ip.total); core.set("E51", C.ip.spent);
+  core.set("A54", C.clim.start + C.clim.canon + C.clim.bonus);
+  // what this sheet can't show
+  var sheetInit = st.Agility - Math.floor(armors.reduce(function(t2, it){ return t2 - num((it.armor || {}).evasion); }, 0) / 2);
+  if (sheetInit !== d.init) notes.push("Initiative: the sheet will show " + sheetInit + " but yours is " + d.init + " (it has no box for bonuses like On the Draw). Note it for your DM.");
+  [["Evasion", 7 + st.Agility + armors.reduce(function(t2, it){ return t2 + num((it.armor || {}).evasion); }, 0), d.evasion],
+   ["Dodge", 20 + st.Agility + armors.reduce(function(t2, it){ return t2 + num((it.armor || {}).evasion); }, 0), d.dodge],
+   ["Guard", st.Toughness + armors.reduce(function(t2, it){ return t2 + num((it.armor || {}).guard); }, 0), d.guard],
+   ["Block", 2 * st.Toughness + armors.reduce(function(t2, it){ return t2 + num((it.armor || {}).block); }, 0), d.blockGuard],
+   ["Mana", 6 + st.Power, d.mana], ["RP", 2 + st.Agility, d.rp], ["Potency", 11 + st.Focus, d.potency]]
+    .forEach(function(x){ if (x[1] !== x[2]) notes.push(x[0] + ": the sheet will show " + x[1] + " but yours is " + x[2] + " (no bonus box for it). Note it for your DM."); });
+  // abilities (left) and breakthroughs (right)
+  var ab = S.Abilities, list = [], have = {};
+  abilityGroups().forEach(function(g){ g.abs.forEach(function(a){ if (a && a.name && !have[a.name]) { have[a.name] = true; list.push(a); } }); });
+  for (row = 2; row <= 200; row++) ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"].forEach(function(col){ ab.clear(col + row); });
+  list.slice(0, 199).forEach(function(a, i){
+    var rw = 2 + i;
+    ab.set("A" + rw, a.name); ab.set("B" + rw, a.cost || ""); ab.set("C" + rw, abKeywords(a)); ab.set("D" + rw, a.range || "");
+    ab.set("E" + rw, a.requires || a.requirement || ""); ab.set("F" + rw, abText(a));
+  });
+  var nth = {};
+  B.bts.forEach(function(b, i){
+    var r2 = BTS[b.id]; if (!r2) return; var rw = 2 + i, p = b.pick || {};
+    var extra = [p.stat, p.main, p.sub, p.element, p.divine, p.clan, p.text].filter(Boolean).join(", ");
+    ab.set("G" + rw, r2.name + (extra ? " (" + extra + ")" : "")); ab.set("H" + rw, btCostAt(b.id, nth[b.id] || 0)); nth[b.id] = (nth[b.id] || 0) + 1;
+    ab.set("I" + rw, r2.requires || ""); ab.set("J" + rw, (r2.summary || []).join(" "));
+  });
+  // inventory: everything (A-F), what you carry (H-I), the Alchemy Rig (L-M) and the Mirane Locker (O-R)
+  var inv = S.Inventory, ir = 2, lr = 2, rr = 2, mr = 2;
+  for (row = 2; row <= 200; row++) ["A", "B", "C", "D", "E", "F", "H", "I", "L", "M", "O", "P", "Q", "R"].forEach(function(col){ inv.clear(col + row); });
+  B.items.forEach(function(e){
+    var it = ITEMS[e.id]; if (!it) return;
+    var cost = itemCost(it); if (B.canon && e.id === MIRANE.freeKit) cost = 0;
+    var bEach = typeof it.burden === "number" ? itemBurdenFor(e, C.meld) : "", pl2 = itemPlace(e);
+    var desc = ((it.summary || [])[0] || "").replace(/\s+/g, " ");
+    if (pl2 === "locker") { inv.set("O" + mr, it.name); inv.set("P" + mr, e.qty); inv.set("Q" + mr, bEach === "" ? "" : bEach * e.qty); inv.set("R" + mr, desc); mr++; return; }
+    inv.set("A" + ir, it.name); inv.set("B" + ir, e.qty); inv.set("C" + ir, bEach); inv.set("D" + ir, desc);
+    inv.set("E" + ir, cost === null ? "" : Math.ceil(cost * e.qty)); inv.set("F" + ir, bEach === "" ? "" : bEach * e.qty); ir++;
+    if (pl2 === "") { inv.set("H" + lr, it.name + (e.qty > 1 && !it.units ? " x" + e.qty : "")); inv.set("I" + lr, bEach === "" ? "" : bEach * e.qty); lr++; }
+    if (pl2 === "rig" && rr <= 9) { inv.set("L" + rr, it.name + (e.qty > 1 ? " x" + e.qty : "")); inv.set("M" + rr, bEach === "" ? "" : bEach * e.qty); rr++; }
+    if (bEach === "") notes.push(it.name + ": the site doesn't list its Burden, so that box is left empty.");
+  });
+  // leveling planner: every purchase in roadmap order
+  var lp = S["Leveling Planner"];
+  if (lp) {
+    roadmap();
+    for (row = 2; row <= 200; row++) ["B", "C", "D", "E", "F", "G", "H", "I", "J"].forEach(function(col){ lp.clear(col + row); });
+    var n2 = 0, bnth = {};
+    (B.order || []).forEach(function(key){
+      var pr = key.split("|"), rw = 2 + n2;
+      if (pr[0] === "c") {
+        var rec = CLASSES[pr[1]], i2 = +pr[2], stp = rec && rec.steps[i2]; if (!stp) return;
+        var a2 = stp.ability && rec.abilities[stp.ability], c2 = B.classes.filter(function(c){ return c.id === pr[1]; })[0];
+        var pick = c2 && c2.picks && c2.picks[i2 + 1] ? ": " + c2.picks[i2 + 1] : "";
+        lp.set("A" + rw, n2 + 1); lp.set("B" + rw, rec.name); lp.set("C" + rw, rec.tier); lp.set("D" + rw, i2 + 1);
+        if (a2) { lp.set("E" + rw, a2.name); lp.set("F" + rw, a2.cost || ""); lp.set("G" + rw, abKeywords(a2)); lp.set("H" + rw, a2.range || ""); lp.set("I" + rw, a2.requires || ""); lp.set("J" + rw, abText(a2)); }
+        else { lp.set("E" + rw, (stp.label || "") + pick); lp.set("J" + rw, stp.summary || ""); }
+      } else {
+        var bb = B.bts.filter(function(x){ return x.u === pr[1]; })[0], r3 = bb && BTS[bb.id]; if (!r3) return;
+        lp.set("A" + rw, n2 + 1); lp.set("B" + rw, "Breakthrough"); lp.set("E" + rw, r3.name); lp.set("F" + rw, btCostAt(bb.id, bnth[bb.id] || 0) + " EXP"); bnth[bb.id] = (bnth[bb.id] || 0) + 1;
+        lp.set("I" + rw, r3.requires || ""); lp.set("J" + rw, (r3.summary || []).join(" "));
+      }
+      n2++;
+    });
+  }
+  notes.unshift("Check after importing: HP " + d.hp + ", Mana " + d.mana + ", RP " + d.rp + ", Evasion " + d.evasion + ", Dodge " + d.dodge + ", Guard " + d.guard + ", Block " + d.blockGuard + ", Potency " + d.potency + ", Spirit Core " + C.exp.spiritCore + ".");
   return notes;
 }
 function openMiraneSheet(){

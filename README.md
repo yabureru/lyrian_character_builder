@@ -59,7 +59,7 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
 - Tap any stat name to see what it does; the Skills card shows caps and highlights where points still need placing
 - **Inventory places**: keep each item carried, in your Backpack, Adventurer's Kit, Alchemy Rig or Mirane Locker; only carried items count toward combat Burden
 - **Progress log**: weekly IP, training, jobs, expeditions and Clim after creation, feeding your EXP/IP/Clim totals
-- **Fill the Mirane sheet**: Share → *Fill my Mirane sheet…* writes your build into a downloaded copy of the Blank Mirane CCS (.xlsx) for approval
+- **Fill the Mirane sheet**: Share → *Fill my Mirane sheet…* writes your build into a downloaded copy of the Blank Mirane CCS or CharacterSpreadSheet v9 (.xlsx) for approval
 
 ## What's in here
 
