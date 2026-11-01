@@ -2821,16 +2821,27 @@ function fillMiraneSheet(buf){
       // ask Excel to recalculate everything when the file is opened (Google Sheets recalculates anyway)
       var wbx = t[0].replace(/<calcPr\b([^>]*?)\/>/, function(all, at){ return /fullCalcOnLoad/.test(at) ? all : "<calcPr" + at + ' fullCalcOnLoad="1"/>'; });
       XZ.setText(byName["xl/workbook.xml"], wbx);
-      var keep = entries.filter(function(e){ return e.name !== "xl/calcChain.xml"; });   // formula order cache; rebuilt on open
-      if (byName["xl/calcChain.xml"]) {
-        var ct = byName["[Content_Types].xml"];
-        return XZ.text(ct).then(function(x){ XZ.setText(ct, x.replace(/<Override[^>]*calcChain[^>]*\/>/, ""));
-          return XZ.text(byName["xl/_rels/workbook.xml.rels"]); }).then(function(x){
-          XZ.setText(byName["xl/_rels/workbook.xml.rels"], x.replace(/<Relationship[^>]*calcChain[^>]*\/>/, ""));
-          return { blob: XZ.write(keep), notes: notes };
-        });
-      }
-      return { blob: XZ.write(keep), notes: notes };
+      // Clean-up so the sheet looks like the original after importing into Google:
+      // - drop calcChain.xml (a formula-order cache; rebuilt on open)
+      // - drop the Excel "tables" Google adds when it exports banded colours: re-imported, they show up as Table_1, Table_2...
+      //   chips. The cells keep their own colours, so nothing visible is lost.
+      var drop = function(n){ return n === "xl/calcChain.xml" || /^xl\/tables\/[^/]+\.xml$/.test(n) || /^xl\/tables\/_rels\//.test(n); };
+      var keep = entries.filter(function(e){ return !drop(e.name); });
+      var edit = function(n, fn){ var e = byName[n]; return e ? XZ.text(e).then(function(x){ XZ.setText(e, fn(x)); }) : Promise.resolve(); };
+      var jobs = [
+        edit("[Content_Types].xml", function(x){ return x.replace(/<Override[^>]*PartName="\/xl\/(calcChain|tables\/[^"]*)\.xml"[^>]*\/>/g, ""); }),
+        edit("xl/_rels/workbook.xml.rels", function(x){ return x.replace(/<Relationship[^>]*calcChain[^>]*\/>/g, ""); })
+      ];
+      entries.forEach(function(en){
+        if (/^xl\/worksheets\/_rels\/[^/]+\.rels$/.test(en.name))
+          jobs.push(edit(en.name, function(x){ return x.replace(/<Relationship[^>]*Type="[^"]*\/table"[^>]*\/>/g, ""); }));
+      });
+      // sheet XML: the ones written above are already text; the others are read once
+      keep.forEach(function(en){
+        if (!/^xl\/worksheets\/[^/]+\.xml$/.test(en.name)) return;
+        jobs.push(edit(en.name, function(x){ return x.replace(/<tableParts\b[^>]*\/>/g, "").replace(/<tableParts\b[\s\S]*?<\/tableParts>/g, ""); }));
+      });
+      return Promise.all(jobs).then(function(){ return { blob: XZ.write(keep), notes: notes }; });
     });
   });
 }
