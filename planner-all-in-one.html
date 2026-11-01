@@ -118,6 +118,7 @@ table.road td{vertical-align:middle}
 .big b{display:block;font-size:18px;color:var(--gold2)}
 .big span{font-size:11px;color:var(--dim)}
 .inv .kv{align-items:center}
+.logt{border-collapse:collapse;font-size:13px}.logt td,.logt th{padding:2px 4px;text-align:left}.logt input{max-width:100%}.logt input[type=date]{color-scheme:dark;width:130px}
 
 .ab{border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin-bottom:7px;background:var(--panel2)}
 .ab .t{font-weight:600}
@@ -18281,6 +18282,7 @@ LC.sheetMap = {"sheet":"Character Sheet 1.2","fileSize":2316411,"startxref":116,
     <section class="card" id="cardProf"></section>
     <section class="card" id="cardBreak"></section>
     <section class="card" id="cardItems"></section>
+    <section class="card" id="cardLog"></section>
   </main>
   <aside class="pane live" id="paneLive"></aside>
   <aside class="pane abil" id="paneAbil"></aside>
@@ -18351,7 +18353,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-10-28";
+var PLANNER_VERSION = "2026-11-01";
 function newBuild(){
   return {
     v: 1,
@@ -18369,6 +18371,7 @@ function newBuild(){
     toggles: {},
     order: [],          // roadmap purchase order: "c|<class>|<step index>" and "b|<breakthrough uid>"
     planAhead: false,
+    log: [],            // progress log after creation: [{d:"2026-11-01", kind:"week", text:"", exp:0, ip:1, clim:0, from:"", to:""}]
     sheet: {},          // extra character sheet text: age, height, weight, personality, appearance   // true = don't block purchases on EXP/IP (plan a long-term build)        // conditional bonuses switched on: {"class:monk/serene-water-stance": true}      // proficiency choices: {"class:fighter#0": ["Axes", ...]}
     notes: ""
   };
@@ -18415,6 +18418,11 @@ function histButtons(){
   if (u) { u.disabled = !HIST.past.length; u.title = "Undo (Ctrl+Z) - " + HIST.past.length + " step(s)"; }
   if (r) { r.disabled = !HIST.future.length; r.title = "Redo (Ctrl+Y) - " + HIST.future.length + " step(s)"; }
 }
+// Totals after creation: the number boxes in Pools plus everything in the progress log
+function logSum(k){ return (B.log || []).reduce(function(t, x){ return t + num(x[k]); }, 0); }
+function expEarnedTotal(){ return num(B.expEarned) + logSum("exp"); }
+function ipEarnedTotal(){ return num(B.ipEarned) + logSum("ip"); }
+function climAddedTotal(){ return num(B.climAdded) + logSum("clim"); }
 function fixBuild(b){ // fill in anything missing from older saves
   var d = newBuild();
   for (var k in d) if (b[k] === undefined) b[k] = d[k];
@@ -18560,6 +18568,10 @@ function chosenMods(e){
 function modSum(list, field){ return list.reduce(function(t, x){ return t + (num(x.fx[field]) || 0); }, 0); }
 function modPoints(list){ return list.reduce(function(t, x){ return t + (num(x.m.points) || 0); }, 0); }
 // Burden of one of this entry, with mods (Melding needs another artifice with the same mod in your Burden)
+// Where an inventory entry is kept: "" = carried (combat loadout), "backpack", "kit", "rig" or "locker".
+// Equipped / wielded items are always carried.
+var PLACES = [["", "Carried"], ["backpack", "Backpack"], ["kit", "Adventurer's Kit"], ["rig", "Alchemy Rig"], ["locker", "Mirane Locker"]];
+function itemPlace(e){ return e.equipped ? "" : (e.place || ""); }
 function itemBurdenFor(e, meld){
   var it = ITEMS[e.id]; if (!it) return 0;
   var ms = chosenMods(e), b = itemBurden(it) + modSum(ms, "burden");
@@ -18691,7 +18703,7 @@ function calc(){
     startClass: startClassExp,
     startBt: 300,
     human: human,
-    earned: num(B.expEarned),
+    earned: expEarnedTotal(),
     classSpent: classExp,
     btSpent: btExp,
     classOver: Math.max(0, classExp - startClassExp),
@@ -18706,7 +18718,7 @@ function calc(){
   if (C.exp.unspent < 0 && !B.planAhead) C.warn.push("You've spent " + (-C.exp.unspent) + " more EXP than you have. Add EXP earned or remove something.");
 
   // ---- IP ----
-  C.ip = { total: 3 + num(B.ipEarned), spent: ipSpent };
+  C.ip = { total: 3 + ipEarnedTotal(), spent: ipSpent };
   C.ip.left = C.ip.total - C.ip.spent;
   if (C.ip.left < 0 && !B.planAhead) C.warn.push("Not enough IP for all your classes.");
 
@@ -18721,11 +18733,25 @@ function calc(){
     C.modNotes[i] = ms.filter(function(x){ return x.fx.note; }).map(function(x){ return x.m.name + ": " + x.fx.note; });
     ms.forEach(function(x){ if (x.fx.needs && names.indexOf(x.fx.needs) < 0) C.warn.push(it.name + ": the " + x.m.name + " mod needs " + x.fx.needs + " on the same item."); });
   });
+  // Where each item is (like the Mirane sheet): carried in combat, backpack, Adventurer's Kit, Alchemy Rig or Mirane Locker.
+  // Only what you carry counts as combat Burden; the kit and the rig hold their items at 0 Burden up to their limit.
+  C.places = { carried: 0, backpack: 0, kit: 0, rig: 0, locker: 0 };
+  var has = function(id){ return B.items.some(function(x){ return x.id === id && itemPlace(x) === ""; }); };
+  var rigCap = has("alchemy-rig-deluxe") ? 5 : has("alchemy-rig") ? 2 : 0;
   B.items.forEach(function(e){
     var it = ITEMS[e.id]; if (!it) return;
     var c = itemCost(it); if (c === null) unknownCost.push(it.name); else climSpent += Math.ceil(c * e.qty);   // units: 0.5 Clim each, rounded up
-    burden += itemBurdenFor(e, meld) * e.qty;
+    var b = itemBurdenFor(e, meld) * e.qty, p = itemPlace(e);
+    C.places[p || "carried"] += b;
+    if (p === "") burden += b;
+    if (p === "kit" && !(it.category === "Adventuring Essentials" && it.tag !== "Kit" && it.tag !== "Storage"))
+      C.warn.push(it.name + " can't go in the Adventurer's Kit (it only holds Adventuring Essentials).");
+    if (p === "rig" && it.category !== "Alchemy") C.warn.push(it.name + " can't go in the Alchemy Rig (it only holds elixirs, flasks, potions, salves and poisons).");
   });
+  if (C.places.kit && !has(MIRANE.freeKit)) C.warn.push("Items are in an Adventurer's Kit, but you aren't carrying one.");
+  if (C.places.kit > 5) C.warn.push("Your Adventurer's Kit holds " + C.places.kit + " Burden, but only 5 stays combat-ready.");
+  if (C.places.rig && !rigCap) C.warn.push("Items are in an Alchemy Rig, but you aren't carrying one.");
+  else if (C.places.rig > rigCap) C.warn.push("Your Alchemy Rig holds " + C.places.rig + " Burden, but it only fits " + rigCap + ".");
   var richClim = btGrants("clim").reduce(function(t, x){ return t + x.g.clim; }, 0);
   var canonClim = B.canon ? 1000 : 0;  // Mirane: +1000 starting Clim
   var freeKit = 0;
@@ -18737,7 +18763,7 @@ function calc(){
     if (B.canon && MIRANE.bannedBts.indexOf(b.id) >= 0) C.warn.push(r.name + ": " + MIRANE.bannedNote + ".");
     else if (r.restricted && !B.canon && !B.gmRestricted) C.warn.push(r.name + " is restricted: needs GM approval (tick \"GM allows restricted\" in Identity).");
   });
-  C.clim = { start: num(B.startClim), added: num(B.climAdded), bonus: richClim, canon: canonClim, freeKit: freeKit, spent: climSpent, unknown: unknownCost };
+  C.clim = { start: num(B.startClim), added: climAddedTotal(), bonus: richClim, canon: canonClim, freeKit: freeKit, spent: climSpent, unknown: unknownCost };
   C.clim.left = C.clim.start + C.clim.added + C.clim.bonus + C.clim.canon - climSpent;
   // Kit Expert breakthrough: one kit costs 2 less Burden. The planner uses your heaviest kit.
   C.kitExpert = null;
@@ -19089,7 +19115,7 @@ function classStatus(id, C){
 var C = null;
 function render(){
   C = calc();
-  renderIdentity(); renderStats(); renderClasses(); renderRoad(); renderUnlock(); renderSkills(); renderProf(); renderBreak(); renderItems();
+  renderIdentity(); renderStats(); renderClasses(); renderRoad(); renderUnlock(); renderSkills(); renderProf(); renderBreak(); renderItems(); renderLog();
   renderLive(); renderAbil();
   $("hdrName").textContent = B.name ? "— " + B.name : "";
   saveLocal();
@@ -19152,7 +19178,7 @@ function renderIdentity(){
   }
   var sd = B.sheet || {};
   h += '<details style="margin-top:8px"><summary class="small dim" style="cursor:pointer">Character sheet details (optional)</summary>' +
-    ['age', 'height', 'weight'].map(function(k){
+    ['age', 'height', 'weight', 'worships'].map(function(k){
       return '<div class="field"><label>' + k.charAt(0).toUpperCase() + k.slice(1) + '</label><input type="text" data-sheet="' + k + '" value="' + esc(sd[k] || "") + '"></div>'; }).join("") +
     ['personality', 'appearance'].map(function(k){
       return '<div class="field" style="align-items:flex-start"><label>' + k.charAt(0).toUpperCase() + k.slice(1) + '</label><textarea data-sheet="' + k + '" rows="3" style="flex:1;background:#1f2128;border:1px solid var(--line);border-radius:6px;color:var(--text);padding:4px 7px">' + esc(sd[k] || "") + "</textarea></div>"; }).join("") +
@@ -19542,7 +19568,7 @@ function roadmap(){
   return rows;
 }
 function renderRoad(){
-  var rows = roadmap(), earned = num(B.expEarned), ipEarned = num(B.ipEarned);
+  var rows = roadmap(), earned = expEarnedTotal(), ipEarned = ipEarnedTotal();
   var h = "<h2>Build roadmap</h2>";
   h += '<div class="note">Everything you\'ve planned, in the order you\'d buy it. "EXP needed" is how much EXP you must earn after character creation ' +
        "(creation gives 1,000 class EXP and 300 breakthrough EXP). Use ▲▼ to change the order; a class's own steps always stay in order.</div>";
@@ -19895,6 +19921,52 @@ function drawItemList(){
   });
 }
 
+/* ---------- Progress log (like the Mirane sheet's "EXP & Transactions" tab) ----------
+   One row per thing that happens after creation: a week's IP, training, a job, an expedition, a sale...
+   Its EXP, IP and Clim add to the Pools totals. Items you buy go in Items instead (they're counted there). */
+var LOG_KINDS = {
+  week:  { label: "Weekly IP (in town at reset)", ip: 1, text: "Weekly IP" },
+  train: { label: "Train (spend 1 IP: +25 EXP)", ip: -1, exp: 25, text: "Train" },
+  job:   { label: "Job (spend 1 IP: +150 Clim)", ip: -1, clim: 150, text: "Job" },
+  ipuse: { label: "Other IP action (spend 1 IP)", ip: -1, text: "Crafting / Gather / Research..." },
+  expo:  { label: "Expedition (75 EXP a week, +25 with a journal)", exp: 100, text: "Expedition", lock: true },
+  sale:  { label: "Sold something / Clim reward", clim: 0, text: "Sold " },
+  spend: { label: "Paid for a service (not an item)", clim: 0, text: "Paid for " },
+  other: { label: "Other (type the amounts)", text: "" }
+};
+function todayStr(){ var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function renderLog(){
+  var L = B.log || (B.log = []), h = "<h2>Progress log</h2>";
+  h += '<div class="note">Track what happens after creation, like the Mirane sheet\'s EXP &amp; Transactions tab: weekly IP, training, jobs, expeditions and Clim. ' +
+       "Everything here adds to the EXP, IP and Clim in Pools. Items you buy go in Items (they're counted there), so only log Clim you earn or spend on services.</div>";
+  h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0"><select id="logKind">' +
+       Object.keys(LOG_KINDS).map(function(k){ return '<option value="' + k + '">' + esc(LOG_KINDS[k].label) + "</option>"; }).join("") +
+       '</select><button id="logAdd">Add</button></div>';
+  if (L.length) {
+    h += '<div style="overflow-x:auto"><table class="logt"><tr><th>Date</th><th>What</th><th title="EXP gained">EXP</th><th title="IP gained (+) or spent (-) outside classes">IP</th><th title="Clim earned (+) or spent (-), not counting items">Clim</th><th title="Expedition lockout dates">Lockout</th><th></th></tr>';
+    L.forEach(function(x, i){
+      h += '<tr><td><input type="date" data-lg="' + i + '" data-k="d" value="' + esc(x.d || "") + '"></td>' +
+           '<td><input type="text" data-lg="' + i + '" data-k="text" value="' + esc(x.text || "") + '" style="min-width:140px"></td>' +
+           ["exp", "ip", "clim"].map(function(k){ return '<td><input type="number" data-lg="' + i + '" data-k="' + k + '" value="' + num(x[k]) + '" style="width:70px"></td>'; }).join("") +
+           '<td class="small">' + (x.lock || x.from || x.to ? '<input type="date" data-lg="' + i + '" data-k="from" value="' + esc(x.from || "") + '"> to <input type="date" data-lg="' + i + '" data-k="to" value="' + esc(x.to || "") + '">' : "") + "</td>" +
+           '<td><button class="small" data-lgdel="' + i + '" title="Remove this row">✕</button></td></tr>';
+    });
+    h += '<tr><td colspan="2"><b>Totals</b></td><td><b>' + logSum("exp").toLocaleString() + "</b></td><td><b>" + logSum("ip") + "</b></td><td><b>" + logSum("clim").toLocaleString() + "</b></td><td></td><td></td></tr></table></div>";
+  } else h += '<div class="dim small">Nothing logged yet.</div>';
+  $("cardLog").innerHTML = h;
+  $("logAdd").onclick = function(){
+    var k = $("logKind").value, p = LOG_KINDS[k];
+    var row = { d: todayStr(), kind: k, text: p.text || "", exp: p.exp || 0, ip: p.ip || 0, clim: p.clim || 0 };
+    if (p.lock) { row.lock = true; row.from = todayStr(); row.to = ""; }
+    L.push(row); render();
+  };
+  document.querySelectorAll("[data-lg]").forEach(function(inp){
+    inp.onchange = function(){ var x = L[num(this.dataset.lg)], k = this.dataset.k;
+      x[k] = /^(exp|ip|clim)$/.test(k) ? num(this.value) : this.value; render(); };
+  });
+  document.querySelectorAll("[data-lgdel]").forEach(function(b){ b.onclick = function(){ L.splice(num(this.dataset.lgdel), 1); render(); }; });
+}
+
 /* ---------- Live pane (pools + combat values + inventory) ---------- */
 function renderLive(){
   var e = C.exp, d = C.d, h = "";
@@ -19910,15 +19982,18 @@ function renderLive(){
   if (C.mysticEyes && C.mysticEyes.used) h += '<div class="kv" title="Each Mystic Eye replaces one of your eyes."><span>Mystic Eye slots</span><b class="' + (C.mysticEyes.used > C.mysticEyes.slots ? "bad" : "") + '">' + C.mysticEyes.used + " / " + C.mysticEyes.slots + "</b></div>";
   if (B.canon) h += '<div class="kv" title="Mirane: Spirit Core / 500, rounded down. Staying in a zone with a higher astra level than this risks astra poisoning."><span>Astra resistance</span><b>' + Math.floor(e.spiritCore / 500) + "</b></div>";
   h += '<div class="kv"><span>EXP earned since creation</span><input type="number" id="inExp" min="0" step="25" value="' + num(B.expEarned) + '"></div>';
+  if (logSum("exp")) h += '<div class="note">Plus ' + logSum("exp").toLocaleString() + ' EXP from your progress log.</div>';
   if (e.human) h += '<div class="note">Includes Human Ambition +100 EXP.</div>';
   else if (B.race === "human" && hybrid()) h += '<div class="note">Human-Chimera hybrid: no Human Ambition +100 EXP.</div>';
   if (hasBt("slow-starter")) h += '<div class="note">Slow Starter: you get double EXP until you\'ve received 500 (1,000 doubled). Enter the EXP you actually received (already doubled). Its -200 creation class EXP is applied.</div>';
   h += '<div class="kv"><span>IP left</span><b class="' + (C.ip.left < 0 ? "bad" : "") + '">' + C.ip.left + " / " + C.ip.total + "</b></div>";
   h += '<div class="kv"><span>IP earned since creation</span><input type="number" id="inIp" min="0" value="' + num(B.ipEarned) + '"></div>';
+  if (logSum("ip")) h += '<div class="note">' + (logSum("ip") > 0 ? "Plus " : "Minus ") + Math.abs(logSum("ip")) + ' IP from your progress log.</div>';
   h += '<div class="kv"><span>Clim left</span><b class="' + (C.clim.left < 0 ? "bad" : "") + '">' + C.clim.left.toLocaleString() + "</b></div>";
   h += '<div class="kv"><span>Clim spent</span><b>' + C.clim.spent.toLocaleString() + "</b></div>";
   h += '<div class="kv"><span>Starting Clim</span><input type="number" id="inClimStart" min="0" step="100" value="' + num(B.startClim) + '"></div>';
   h += '<div class="kv"><span>Clim gained since</span><input type="number" id="inClimAdd" step="100" value="' + num(B.climAdded) + '"></div>';
+  if (logSum("clim")) h += '<div class="note">' + (logSum("clim") > 0 ? "Plus " : "Minus ") + Math.abs(logSum("clim")).toLocaleString() + ' Clim from your progress log.</div>';
   if (C.clim.canon) h += '<div class="note">Includes +1,000 Clim for the Mirane Expedition' + (C.clim.freeKit ? "; your Adventurer's Kit is free there (given on arrival)" : "") + ".</div>";
   if (B.canon) h += '<div class="note">Mirane: on arrival you also get an Arrival IP (plus that week\'s IP). Add them to "IP earned since creation" once you\'re in. Common first uses: Train (+25 EXP), a Job (150 Clim) or Rest (start your first expedition with bonus temp HP and Mana).</div>';
   if (C.clim.bonus) h += '<div class="note">Includes ' + C.clim.bonus.toLocaleString() + " Clim from breakthroughs.</div>";
@@ -19974,11 +20049,19 @@ function renderLive(){
       ": it counts as an improvised weapon (no weapon group bonus; Light 2d4, Heavy 2d6 + Power)" : ": 1 less Guard and 1 more Evasion penalty (already in your numbers)") + '">not proficient</span>';
     if (it.units) h += '<div class="kv"><span>' + esc(it.name) + '</span><span class="pm"><input type="number" class="small" data-uq="' + i + '" min="0" step="' + (it.unitStep || 10) + '" value="' + e.qty + '" style="width:76px">u</span></div>';
     else h += '<div class="kv"><span>' + esc(it.name) + " " + eq + '</span><span class="pm"><button class="small" data-q="' + i + '" data-d="-1">−</button><b>' + e.qty + '</b><button class="small" data-q="' + i + '" data-d="1">+</button></span></div>';
+    var pl = itemPlace(e);
+    h += '<div class="small dim" style="margin:-4px 0 6px 8px">Kept in: ' + (e.equipped ? "Carried (equipped)" :
+      '<select class="small" data-place="' + i + '" title="Where this is kept. Only carried items count toward combat Burden.">' +
+      PLACES.map(function(p){ return '<option value="' + p[0] + '"' + (p[0] === pl ? " selected" : "") + ">" + p[1] + "</option>"; }).join("") + "</select>") + "</div>";
     if (ms.length) h += '<div class="small dim" style="margin:-4px 0 6px 8px">' + ms.map(function(x){ return esc(x.m.name); }).join(", ") +
       " · " + modPoints(ms) + " crafting pts" + ((C.modNotes[i] || []).length ? "<br>" + C.modNotes[i].map(esc).join("<br>") : "") + "</div>";
   });
   h += '<div class="kv"><span>Burden</span><b class="bdv ' + (C.burden > C.d.burdenMax ? "bad" : "") + '" data-bd="burden" data-bdlabel="Burden limit">' + C.burden + " / " + C.d.burdenMax + "</b></div>" +
-    (C.kitExpert ? '<div class="small">Kit Expert: ' + esc(C.kitExpert.name) + " counts " + C.kitExpert.cut + " less Burden.</div>" : "") + "</div>";
+    (C.kitExpert ? '<div class="small">Kit Expert: ' + esc(C.kitExpert.name) + " counts " + C.kitExpert.cut + " less Burden.</div>" : "") +
+    (C.places.backpack || C.places.kit || C.places.rig || C.places.locker ? '<div class="small dim">Not counted in combat Burden: ' +
+      [["kit", "Adventurer's Kit", "/5"], ["rig", "Alchemy Rig", ""], ["backpack", "Backpack", ""], ["locker", "Mirane Locker", ""]]
+        .filter(function(x){ return C.places[x[0]]; }).map(function(x){ return x[1] + " " + C.places[x[0]] + x[2]; }).join(" · ") + "</div>" : "") +
+    (B.items.some(function(e){ return itemPlace(e) === "backpack"; }) ? '<div class="small dim">Getting something out of the backpack in combat costs 4 AP.</div>' : "") + "</div>";
   $("paneLive").innerHTML = h;
 
   function bindNum(id, key){ $(id).onchange = function(){ B[key] = num(this.value); render(); }; }
@@ -20003,6 +20086,9 @@ function renderLive(){
     };
   });
   document.querySelectorAll("[data-mods]").forEach(function(b){ b.onclick = function(){ openMods(num(this.dataset.mods)); }; });
+  document.querySelectorAll("[data-place]").forEach(function(s){
+    s.onchange = function(){ var e = B.items[num(this.dataset.place)]; if (this.value) e.place = this.value; else delete e.place; render(); };
+  });
 }
 
 /* ---------- Abilities pane ---------- */
@@ -20477,7 +20563,7 @@ function buildSummary(){
   var d = C.d;
   L.push("HP " + d.hp + " · Mana " + d.mana + " · AP " + d.ap + " · RP " + d.rp + " · Guard " + d.guard + " (Block " + d.blockGuard + ") · Evasion " + d.evasion +
          " (Dodge " + d.dodge + ") · Init +" + d.init + " · Speed " + d.speed + "ft · Potency " + d.potency);
-  L.push("Spirit Core " + C.exp.spiritCore.toLocaleString() + " · EXP earned " + num(B.expEarned).toLocaleString() + " · IP " + C.ip.spent + "/" + C.ip.total);
+  L.push("Spirit Core " + C.exp.spiritCore.toLocaleString() + " · EXP earned " + expEarnedTotal().toLocaleString() + " · IP " + C.ip.spent + "/" + C.ip.total);
   if (B.classes.length) {
     L.push(""); L.push("Classes:");
     B.classes.forEach(function(c){
@@ -20640,6 +20726,10 @@ function openShare(){
     "(HP, Mana, AP, RP, Guard, rolls, skills, abilities, gear), as a code or a .json file, for other tools and character sheets.</div>" +
     '<textarea id="shData" readonly rows="3" style="width:100%;word-break:break-all">' + esc(characterDataCode()) + "</textarea>" +
     '<div class="toolbar"><button id="shDataCopy">Copy</button><button id="shDataFile">Download file</button></div>' +
+    "<h3>Mirane spreadsheet</h3><div class=\"note\">For Mirane approval. In your copy of the Blank Mirane CCS (Google Sheets) use File → Download → Microsoft Excel (.xlsx), " +
+    "then pick that file here. The planner fills it in from this build and gives it back. Upload it to Google with File → Import → Replace spreadsheet. " +
+    "Only the sheet's input boxes are written, never its formulas.</div>" +
+    '<div class="toolbar"><button id="shXl" class="gold">Fill my Mirane sheet…</button></div><div id="shXlMsg" class="small"></div>' +
     "<h3>Load a build code</h3>" +
     '<textarea id="shIn" rows="3" style="width:100%" placeholder="Paste a code starting with LCP1:"></textarea>' +
     '<div class="toolbar"><button id="shLoad" class="gold">Load this build</button><span id="shMsg" class="small"></span></div>';
@@ -20649,6 +20739,7 @@ function openShare(){
   $("shSumCopy").onclick = function(){ copyText($("shSum"), this); };
   $("shCodeCopy").onclick = function(){ copyText($("shCode"), this); };
   $("shDataCopy").onclick = function(){ copyText($("shData"), this); };
+  $("shXl").onclick = openMiraneSheet;
   $("shDataFile").onclick = function(){
     var blob = new Blob([JSON.stringify(characterData(), null, 2)], { type: "application/json" });
     var a = document.createElement("a");
@@ -20662,6 +20753,343 @@ function openShare(){
   };
 }
 $("btnShare").onclick = openShare;
+
+/* ---------- Fill the Mirane spreadsheet (.xlsx) ----------
+   Mirane approval uses a Google Sheet ("Blank Mirane CCS"). Download your copy as .xlsx (File > Download > Microsoft Excel),
+   pick it here, and the planner writes this build into it and gives you the filled file to upload back to Google
+   (File > Import > Replace spreadsheet). Only the sheet's input boxes are written; its formulas are left alone.
+   An .xlsx is a zip of XML files: XZ reads/writes the zip, XS edits cells. Everything runs in your browser, offline. */
+var XZ = {
+  crcT: null,
+  crc: function(u8){
+    if (!XZ.crcT) { XZ.crcT = new Uint32Array(256); for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; XZ.crcT[n] = c >>> 0; } }
+    var crc = 0xFFFFFFFF; for (var i = 0; i < u8.length; i++) crc = XZ.crcT[(crc ^ u8[i]) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  },
+  read: function(buf){ // -> [{name, method, crc, csize, usize, data (raw, still compressed)}]
+    var u8 = new Uint8Array(buf), dv = new DataView(buf), eocd = -1;
+    for (var i = u8.length - 22; i >= Math.max(0, u8.length - 70000); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    if (eocd < 0) throw new Error("not a zip");
+    var n = dv.getUint16(eocd + 10, true), p = dv.getUint32(eocd + 16, true), out = [], td = new TextDecoder();
+    for (var k = 0; k < n; k++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) throw new Error("bad zip directory");
+      var method = dv.getUint16(p + 10, true), crc = dv.getUint32(p + 16, true), cs = dv.getUint32(p + 20, true), us = dv.getUint32(p + 24, true);
+      var nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+      var name = td.decode(u8.subarray(p + 46, p + 46 + nl));
+      var lnl = dv.getUint16(off + 26, true), lxl = dv.getUint16(off + 28, true), ds = off + 30 + lnl + lxl;
+      out.push({ name: name, method: method, crc: crc, csize: cs, usize: us, data: u8.slice(ds, ds + cs) });
+      p += 46 + nl + xl + cl;
+    }
+    return out;
+  },
+  text: function(e){ // -> Promise<string>
+    if (e.method === 0) return Promise.resolve(new TextDecoder().decode(e.data));
+    if (e.method !== 8 || typeof DecompressionStream === "undefined") return Promise.reject(new Error("can't unzip this file in this browser"));
+    var s = new Blob([e.data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+    return new Response(s).arrayBuffer().then(function(b){ return new TextDecoder().decode(b); });
+  },
+  setText: function(e, str){ var d = new TextEncoder().encode(str); e.method = 0; e.data = d; e.csize = e.usize = d.length; e.crc = XZ.crc(d); },
+  write: function(entries){ // stored entries are written as-is; changed ones are stored uncompressed
+    var parts = [], cd = [], off = 0, te = new TextEncoder();
+    entries.forEach(function(e){
+      var nm = te.encode(e.name), h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, e.method, true);
+      h.setUint32(14, e.crc, true); h.setUint32(18, e.csize, true); h.setUint32(22, e.usize, true); h.setUint16(26, nm.length, true);
+      parts.push(new Uint8Array(h.buffer), nm, e.data);
+      var c = new DataView(new ArrayBuffer(46));
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(10, e.method, true);
+      c.setUint32(16, e.crc, true); c.setUint32(20, e.csize, true); c.setUint32(24, e.usize, true); c.setUint16(28, nm.length, true); c.setUint32(42, off, true);
+      cd.push(new Uint8Array(c.buffer), nm);
+      off += 30 + nm.length + e.data.length;
+    });
+    var cdSize = cd.reduce(function(t, a){ return t + a.length; }, 0), z = new DataView(new ArrayBuffer(22));
+    z.setUint32(0, 0x06054b50, true); z.setUint16(8, entries.length, true); z.setUint16(10, entries.length, true);
+    z.setUint32(12, cdSize, true); z.setUint32(16, off, true);
+    return new Blob(parts.concat(cd, [new Uint8Array(z.buffer)]), { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  }
+};
+// One worksheet's XML, with helpers to read and write cells by their address ("B12").
+function XSheet(xml, shared){
+  this.doc = new DOMParser().parseFromString(xml, "application/xml");
+  this.ns = this.doc.documentElement.namespaceURI; this.shared = shared;
+  this.data = this.doc.getElementsByTagNameNS(this.ns, "sheetData")[0];
+}
+XSheet.colNum = function(ref){ var m = /^([A-Z]+)/.exec(ref)[1], n = 0; for (var i = 0; i < m.length; i++) n = n * 26 + m.charCodeAt(i) - 64; return n; };
+XSheet.rowNum = function(ref){ return +/(\d+)$/.exec(ref)[1]; };
+XSheet.prototype.cell = function(ref, make){
+  var rn = XSheet.rowNum(ref), cn = XSheet.colNum(ref), rows = this.data.childNodes, row = null, i;
+  for (i = 0; i < rows.length; i++) { var r = rows[i]; if (r.nodeType !== 1) continue; var n = +r.getAttribute("r"); if (n === rn) { row = r; break; } if (n > rn) break; }
+  if (!row) { if (!make) return null; row = this.doc.createElementNS(this.ns, "row"); row.setAttribute("r", rn); this.data.insertBefore(row, i < rows.length ? rows[i] : null); }
+  var cs = row.childNodes, c = null;
+  for (i = 0; i < cs.length; i++) { var x = cs[i]; if (x.nodeType !== 1) continue; var k = XSheet.colNum(x.getAttribute("r")); if (k === cn) { c = x; break; } if (k > cn) break; }
+  if (!c) { if (!make) return null; c = this.doc.createElementNS(this.ns, "c"); c.setAttribute("r", ref); row.insertBefore(c, i < cs.length ? cs[i] : null); }
+  return c;
+};
+XSheet.prototype.hasFormula = function(c){ return !!c.getElementsByTagNameNS(this.ns, "f").length; };
+XSheet.prototype.get = function(ref){ // the cell's current value as text ("" if empty)
+  var c = this.cell(ref, false); if (!c) return "";
+  var t = c.getAttribute("t"), v = c.getElementsByTagNameNS(this.ns, "v")[0];
+  if (t === "inlineStr") return Array.prototype.map.call(c.getElementsByTagNameNS(this.ns, "t"), function(x){ return x.textContent; }).join("");
+  if (!v) return "";
+  if (t === "s") return this.shared[+v.textContent] || "";
+  return v.textContent;
+};
+XSheet.prototype.set = function(ref, val, styleFrom){ // write a plain value; never touches a formula cell
+  var c = this.cell(ref, true); if (this.hasFormula(c)) return false;
+  while (c.firstChild) c.removeChild(c.firstChild);
+  c.removeAttribute("t");
+  if (styleFrom && !c.getAttribute("s")) { var sc = this.cell(styleFrom, false); if (sc && sc.getAttribute("s")) c.setAttribute("s", sc.getAttribute("s")); }
+  if (val === null || val === undefined || val === "") return true;
+  if (typeof val === "boolean") { c.setAttribute("t", "b"); this.add(c, "v", val ? "1" : "0"); }
+  else if (typeof val === "number") this.add(c, "v", String(val));
+  else { c.setAttribute("t", "inlineStr"); var is = this.add(c, "is"), t = this.add(is, "t", String(val)); t.setAttributeNS("http://www.w3.org/XML/1998/namespace", "xml:space", "preserve"); }
+  return true;
+};
+XSheet.prototype.clear = function(ref){ // empty an input cell (checkboxes become FALSE)
+  var c = this.cell(ref, false); if (!c || this.hasFormula(c)) return;
+  this.set(ref, c.getAttribute("t") === "b" ? false : "");
+};
+XSheet.prototype.add = function(parent, tag, text){ var e = this.doc.createElementNS(this.ns, tag); if (text !== undefined) e.textContent = text; parent.appendChild(e); return e; };
+XSheet.prototype.xml = function(){ return new XMLSerializer().serializeToString(this.doc); };
+function xlCols(a, b){ var out = [], s = XSheet.colNum(a), e = XSheet.colNum(b); for (var i = s; i <= e; i++) out.push(i <= 26 ? String.fromCharCode(64 + i) : String.fromCharCode(64 + Math.floor((i - 1) / 26)) + String.fromCharCode(65 + (i - 1) % 26)); return out; }
+function xlDate(s){ var m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(s || ""); return m ? Math.round((Date.UTC(+m[1], +m[2] - 1, +m[3]) - Date.UTC(1899, 11, 30)) / 864e5) : null; }
+
+// The race bonuses the sheet adds by itself, read from its own formula (IF(D2="Fae",1,0), SWITCH(D3,"Pixie",2,0), IF(OR(D3="Catfolk",...),5,0)).
+function xlRaceAdj(formula, race, sub){
+  var t = 0, m, f = formula || "", is = function(cellNo, name){ return (cellNo === "2" ? race : sub) === name; };
+  var re1 = /IF\(\s*D([23])\s*=\s*"([^"]+)"\s*,\s*(-?\d+)\s*,\s*0\s*\)/g; while ((m = re1.exec(f))) if (is(m[1], m[2])) t += +m[3];
+  var re2 = /SWITCH\(\s*D([23])\s*,([^)]*)\)/g; while ((m = re2.exec(f))) {
+    var a = m[2].split(",").map(function(x){ return x.trim().replace(/^"|"$/g, ""); });
+    for (var i = 0; i + 1 < a.length; i += 2) if (is(m[1], a[i])) t += +a[i + 1];
+  }
+  var re3 = /IF\(\s*OR\(([^)]*)\)\s*,\s*(-?\d+)\s*,\s*0\s*\)/g; while ((m = re3.exec(f))) {
+    var hit = false, re4 = /D([23])\s*=\s*"([^"]+)"/g, mm; while ((mm = re4.exec(m[1]))) if (is(mm[1], mm[2])) hit = true;
+    if (hit) t += +m[2];
+  }
+  return t;
+}
+function xlFormula(sh, ref){ var c = sh.cell(ref, false), f = c && c.getElementsByTagNameNS(sh.ns, "f")[0]; return f ? f.textContent : ""; }
+
+// Writes the current build into the Mirane CCS workbook. Returns {blob, notes} or throws with a plain message.
+function fillMiraneSheet(buf){
+  var entries = XZ.read(buf), byName = {}; entries.forEach(function(e){ byName[e.name] = e; });
+  var need = ["xl/workbook.xml", "xl/_rels/workbook.xml.rels"];
+  need.forEach(function(n){ if (!byName[n]) throw new Error("This doesn't look like an Excel (.xlsx) file."); });
+  return Promise.all([XZ.text(byName["xl/workbook.xml"]), XZ.text(byName["xl/_rels/workbook.xml.rels"]),
+                      byName["xl/sharedStrings.xml"] ? XZ.text(byName["xl/sharedStrings.xml"]) : Promise.resolve("")]).then(function(t){
+    var wb = new DOMParser().parseFromString(t[0], "application/xml"), rel = new DOMParser().parseFromString(t[1], "application/xml");
+    var shared = [];
+    if (t[2]) { var sd = new DOMParser().parseFromString(t[2], "application/xml");
+      Array.prototype.forEach.call(sd.getElementsByTagName("si"), function(si){ shared.push(Array.prototype.map.call(si.getElementsByTagName("t"), function(x){ return x.textContent; }).join("")); }); }
+    var target = {};
+    Array.prototype.forEach.call(rel.getElementsByTagName("Relationship"), function(r){ target[r.getAttribute("Id")] = r.getAttribute("Target"); });
+    var paths = {};
+    Array.prototype.forEach.call(wb.getElementsByTagName("sheet"), function(s){
+      var id = s.getAttribute("r:id") || s.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id");
+      var p = target[id] || ""; paths[s.getAttribute("name")] = p.charAt(0) === "/" ? p.slice(1) : "xl/" + p.replace(/^\.\//, "");
+    });
+    ["Core", "Inventory", "Breakthrough", "Abilities", "EXP & Transactions"].forEach(function(n){
+      if (!paths[n] || !byName[paths[n]]) throw new Error("This isn't the Mirane CCS: it has no \"" + n + "\" tab.");
+    });
+    var names = ["Core", "Inventory", "Mirane Locker", "Breakthrough", "Abilities", "EXP & Transactions", "Backstory"].filter(function(n){ return paths[n] && byName[paths[n]]; });
+    return Promise.all(names.map(function(n){ return XZ.text(byName[paths[n]]); })).then(function(xmls){
+      var S = {}; names.forEach(function(n, i){ S[n] = new XSheet(xmls[i], shared); });
+      var notes = writeMirane(S);
+      names.forEach(function(n){ XZ.setText(byName[paths[n]], S[n].xml()); });
+      // ask Excel to recalculate everything when the file is opened (Google Sheets recalculates anyway)
+      var wbx = t[0].replace(/<calcPr\b([^>]*?)\/>/, function(all, at){ return /fullCalcOnLoad/.test(at) ? all : "<calcPr" + at + ' fullCalcOnLoad="1"/>'; });
+      XZ.setText(byName["xl/workbook.xml"], wbx);
+      var keep = entries.filter(function(e){ return e.name !== "xl/calcChain.xml"; });   // formula order cache; rebuilt on open
+      if (byName["xl/calcChain.xml"]) {
+        var ct = byName["[Content_Types].xml"];
+        return XZ.text(ct).then(function(x){ XZ.setText(ct, x.replace(/<Override[^>]*calcChain[^>]*\/>/, ""));
+          return XZ.text(byName["xl/_rels/workbook.xml.rels"]); }).then(function(x){
+          XZ.setText(byName["xl/_rels/workbook.xml.rels"], x.replace(/<Relationship[^>]*calcChain[^>]*\/>/, ""));
+          return { blob: XZ.write(keep), notes: notes };
+        });
+      }
+      return { blob: XZ.write(keep), notes: notes };
+    });
+  });
+}
+
+// What goes where. Cell addresses follow the Blank Mirane CCS; labels are checked first so a changed sheet is caught.
+function writeMirane(S){
+  var core = S.Core, notes = [], d = C.d, st = C.stat;
+  var expect = { A9: "Focus", A10: "Power", A11: "Agility", A12: "Toughness", C9: "Fitness", E9: "Athletics", E8: "Skill", A14: "Class", A44: "Main Stat Array" };
+  for (var k in expect) if (core.get(k).trim() !== expect[k]) throw new Error("This sheet's Core tab is laid out differently from the Mirane CCS the planner knows (" + k + " should say \"" + expect[k] + "\"). Use the current Blank Mirane CCS.");
+  var r = raceRec(), sr = subRec(), raceName = r ? r.name : "", subName = sr ? sr.name : "", sd = B.sheet || {};
+  // ---- personal info ----
+  [["A2", "Name", "B2", B.name], ["A3", "Gender", "B3", B.gender], ["A4", "Age", "B4", sd.age], ["A5", "Height", "B5", sd.height], ["A6", "Weight", "B6", sd.weight]]
+    .forEach(function(x){ core.set(x[0], x[1]); core.set(x[2], x[3] || ""); });
+  if (sd.worships) { core.set("A7", "Worships"); core.set("B7", sd.worships); }
+  core.set("D2", raceName); core.set("D3", subName || raceName);
+  // ---- stat arrays: which stat took which array number, then the extra bonuses (the sheet adds race bonuses itself) ----
+  var mainRows = [45, 46, 47, 48], used = {};
+  mainRows.forEach(function(row){
+    var v = num(core.get("A" + row)), s = MAIN.filter(function(m){ return !used[m] && num(B.mainArr[m]) === v; })[0];
+    if (!s) { s = MAIN.filter(function(m){ return !used[m]; })[0]; notes.push("Your main stat array doesn't match the sheet's (5/4/4/3): check the Stat Choice boxes."); }
+    used[s] = true; core.set("B" + row, s);
+  });
+  var subRows = [45, 46, 47, 48, 49]; used = {};
+  subRows.forEach(function(row){
+    var v = num(core.get("C" + row)), s = SUB.filter(function(m){ return !used[m] && num(B.subArr[m]) === v; })[0];
+    if (!s) { s = SUB.filter(function(m){ return !used[m]; })[0]; notes.push("Your sub stat array doesn't match the sheet's (5/4/3/2/1): check the Sub-stat Choice boxes."); }
+    used[s] = true; core.set("D" + row, s);
+  });
+  var statCell = { Focus: "B9", Power: "B10", Agility: "B11", Toughness: "B12", Fitness: "D9", Cunning: "D10", Reason: "D11", Awareness: "D12", Presence: "D13" };
+  var bonusCell = { Focus: "F45", Power: "F46", Agility: "F47", Toughness: "F48", Fitness: "H45", Cunning: "H46", Reason: "H47", Awareness: "H48", Presence: "H49" };
+  MAIN.concat(SUB).forEach(function(s){
+    var arr = MAIN.indexOf(s) >= 0 ? num(B.mainArr[s]) : num(B.subArr[s]);
+    var b = st[s] - arr - xlRaceAdj(xlFormula(core, statCell[s]), raceName, subName);
+    if (b < 0) notes.push(s + ": the sheet adds a bigger race bonus than the planner (" + b + "); check " + statCell[s] + ".");
+    core.set(bonusCell[s], Math.max(0, b));
+  });
+  // ---- classes ----
+  for (var row = 15; row <= 35; row++) { core.clear("A" + row); core.clear("C" + row); core.clear("D" + row); }
+  B.classes.forEach(function(c, i){
+    var rec = CLASSES[c.id]; if (!rec || i > 20) return;
+    var lvl = c.owned.filter(Boolean).length, cost = 0;
+    c.owned.forEach(function(o, k){ if (o) cost += stepCost(c.id, k); });
+    core.set("A" + (15 + i), rec.name); core.set("C" + (15 + i), lvl); core.set("D" + (15 + i), cost);
+  });
+  if (B.classes.length > 21) notes.push("Only the first 21 classes fit the sheet's class table.");
+  // ---- skills, expertise and crafting skills ----
+  var exBy = {}; Object.keys(C.ex || {}).forEach(function(k){ var e = C.ex[k]; if (e.pts) (exBy[e.skill] = exBy[e.skill] || []).push(e.name + " +" + e.pts); });
+  var seen = {};
+  for (row = 9; row <= 29; row++) {
+    var sk = core.get("E" + row).trim(); if (!SKILL[sk]) continue;
+    seen[sk] = true; core.set("H" + row, num((C.pts || {})[sk])); core.set("I" + row, (exBy[sk] || []).join(", "));
+  }
+  for (row = 9; row <= 30; row++) { core.clear("N" + row); core.clear("P" + row); }
+  var crow = 9;
+  SKILLS.forEach(function(s){
+    var p = num((C.pts || {})[s.name]);
+    if (s.kind === "main" && !seen[s.name] && (p || exBy[s.name])) notes.push(s.name + " (" + p + " points" + (exBy[s.name] ? ", " + exBy[s.name].join(", ") : "") + ") has no row on the sheet: add it by hand.");
+    if (s.kind !== "main" && (p || exBy[s.name]) && crow <= 30) { core.set("N" + crow, s.name + (exBy[s.name] ? " (" + exBy[s.name].join(", ") + ")" : "")); core.set("P" + crow, p); crow++; }
+  });
+  // ---- proficiencies and languages ----
+  var profs = Object.keys(C.profs || {}).sort(), armor = [], weap = [], other = [];
+  profs.forEach(function(p){ if (/armor|shield/i.test(p)) armor.push(p); else if (/kit|tool|multitool|instrument/i.test(p)) other.push(p); else weap.push(p); });
+  var cr = creationRace(), langs = (cr && cr.languages) || [];
+  core.set("K10", armor.join(", ")); core.set("K14", weap.join(", ")); core.set("K18", elementMasteries().join(", "));
+  core.set("K22", (langs.length ? langs : ["Common"]).join(", ")); core.set("K26", other.join(", "));
+  // ---- weapons and worn armor (the table under the skills) ----
+  for (row = 37; row <= 42; row++) { ["A", "F", "G", "H", "I", "J", "K", "L", "M"].forEach(function(col){ core.clear(col + row); }); }
+  var weapons = [], armors = [];
+  B.items.forEach(function(e){ var it = ITEMS[e.id]; if (!it || itemPlace(e) !== "") return; if (it.weapon) weapons.push(it); if (it.armor && e.equipped) armors.push(it); });
+  weapons.slice(0, 6).forEach(function(it, i){
+    core.set("A" + (37 + i), it.name);
+    core.set("F" + (37 + i), !!(it.weapon.hands === 2 && /^5\s*ft/.test(it.weapon.range || "")));
+  });
+  var eq = { H: 0, I: 0, J: 0, K: 0, L: 0 };
+  armors.slice(0, 6).forEach(function(it, i){
+    var a = it.armor || {};
+    core.set("G" + (37 + i), it.name); core.set("H" + (37 + i), num(a.guard)); core.set("I" + (37 + i), num(a.evasion)); core.set("J" + (37 + i), num(a.evasion));
+    core.set("K" + (37 + i), num(a.block)); core.set("L" + (37 + i), num(a.initiative)); core.set("M" + (37 + i), true);
+    eq.H += num(a.guard); eq.I += num(a.evasion); eq.J += num(a.evasion); eq.K += num(a.block); eq.L += num(a.initiative);
+  });
+  // ---- the Bonuses box: whatever the sheet's own formulas don't already give (planner number minus the sheet's base) ----
+  var A = st.Agility, T = st.Toughness, P = st.Power, F = st.Focus;
+  var base = {
+    M2: 7 + A + eq.I + xlRaceAdj(xlFormula(core, "H2"), raceName, subName),  O2: 20 + A + eq.J + xlRaceAdj(xlFormula(core, "K2"), raceName, subName),
+    M3: T + eq.H + xlRaceAdj(xlFormula(core, "H3"), raceName, subName),      O3: 2 * T + eq.K + xlRaceAdj(xlFormula(core, "K3"), raceName, subName),
+    M4: T, O4: A + eq.L, M5: 11 + F, O5: 20 + xlRaceAdj(xlFormula(core, "H6"), raceName, subName),
+    M6: 20 + 10 * T, O6: 2 + A, M7: 6 + P, O7: 10
+  };
+  var mine = { M2: d.evasion, O2: d.dodge, M3: d.guard, O3: d.blockGuard, M4: T, O4: d.init, M5: d.potency, O5: d.speed, M6: d.hp, O6: d.rp, M7: d.mana, O7: d.burdenMax };
+  for (var bk in base) core.set(bk, mine[bk] - base[bk]);
+  // ---- skill points gained, starter IP, checkboxes ----
+  var src = (C.sources || []).map(function(s){
+    var a = B.alloc[s.id] || { sk: {}, ex: [] }, bits = [];
+    for (var k2 in a.sk) if (a.sk[k2]) bits.push(k2 + " " + a.sk[k2]);
+    (a.ex || []).forEach(function(e){ bits.push(e.skill + " (" + e.name + ") +" + e.pts + " exp"); });
+    return bits.length ? s.label + " (" + s.points + "): " + bits.join(", ") : "";
+  }).filter(Boolean);
+  core.set("C51", src.join("; "));
+  [55, 56, 57].forEach(function(rw){ core.clear("A" + rw); });
+  for (var n = 0; n < Math.min(3, C.ip.spent, B.classes.length); n++) core.set("A" + (55 + n), "Learn Class");
+  core.set("B52", !!B.canon);
+  core.set("B50", hasBt("slow-starter")); core.set("B49", !!(C.exp && C.exp.human));
+  // ---- breakthroughs (the first 300 EXP of them are the free starter ones) ----
+  var bt = S.Breakthrough, spentStart = 0, nth = {};
+  for (row = 2; row <= 37; row++) { bt.clear("A" + row); bt.clear("B" + row); bt.clear("E" + row); }
+  B.bts.forEach(function(b, i){
+    var r2 = BTS[b.id]; if (!r2 || i > 35) return;
+    var cost = btCostAt(b.id, nth[b.id] || 0), starter = spentStart + cost <= 300;
+    nth[b.id] = (nth[b.id] || 0) + 1;
+    if (starter) spentStart += cost;
+    bt.set("A" + (2 + i), r2.name); bt.set("B" + (2 + i), cost); bt.set("E" + (2 + i), starter);
+  });
+  // ---- abilities: active ones (they cost AP/RP/MP) and passive ones ----
+  var ab = S.Abilities, act = [], pas = [], have = {};
+  abilityGroups().forEach(function(g){ g.abs.forEach(function(a){
+    if (!a || !a.name || have[a.name]) return; have[a.name] = true;
+    (/\b(AP|RP|MP)\b/.test(a.cost || "") ? act : pas).push(a.name);
+  }); });
+  for (row = 2; row <= 58; row++) ab.clear("A" + row);
+  for (row = 60; row <= 80; row++) ab.clear("A" + row);
+  act.slice(0, 57).forEach(function(nm, i){ ab.set("A" + (2 + i), nm); });
+  pas.slice(0, 21).forEach(function(nm, i){ ab.set("A" + (60 + i), nm); });
+  if (act.length > 57 || pas.length > 21) notes.push("Some abilities didn't fit the Abilities tab.");
+  // ---- inventory and the Mirane Locker ----
+  var inv = S.Inventory, lk = S["Mirane Locker"], where = { "": "Combat Loadout", backpack: "Backpack", kit: "Adventurers Kit", rig: "Alchemy Rig" };
+  for (row = 2; row <= 137; row++) { ["A", "B", "C", "D", "E", "G"].forEach(function(col){ inv.clear(col + row); }); if (lk) ["A", "B", "C", "D", "F"].forEach(function(col){ lk.clear(col + row); }); }
+  var ir = 2, lr = 2;
+  var lockType = function(it){ return it.weapon ? "Weapon" : it.armor ? "Armor" : it.category === "Alchemy" ? "Alchemy" : it.category === "Artifice" ? "Artifice" : it.tag === "Kit" ? "Kits" : /food/i.test(it.name) ? "Food" : "Other"; };
+  B.items.forEach(function(e){
+    var it = ITEMS[e.id]; if (!it) return;
+    var cost = itemCost(it); if (B.canon && e.id === MIRANE.freeKit) cost = 0;
+    var desc = ((it.summary || [])[0] || "").replace(/\s+/g, " ");
+    if (itemPlace(e) === "locker" && lk) {
+      lk.set("A" + lr, it.name); lk.set("B" + lr, e.qty); lk.set("C" + lr, lockType(it)); lk.set("D" + lr, cost === null ? "" : cost); lk.set("F" + lr, desc); lr++;
+      return;
+    }
+    if (itemPlace(e) === "locker") notes.push(it.name + " is in your Mirane Locker, but this sheet has no Mirane Locker tab.");
+    inv.set("A" + ir, it.name); inv.set("B" + ir, where[itemPlace(e)] || "Combat Loadout"); inv.set("C" + ir, e.qty);
+    if (typeof it.burden === "number") inv.set("D" + ir, itemBurdenFor(e, C.meld)); else notes.push(it.name + ": the site doesn't list its Burden, so that box is left empty.");
+    inv.set("E" + ir, cost === null ? "" : cost); inv.set("G" + ir, desc); ir++;
+  });
+  // ---- EXP & Transactions: purchases, then your progress log ----
+  var ex = S["EXP & Transactions"];
+  ex.set("H4", -C.clim.spent);
+  for (row = 6; row <= 166; row++) ["A", "B", "C", "D", "E", "G", "H"].forEach(function(col){ ex.clear(col + row); });
+  (B.log || []).forEach(function(x, i){
+    var rw = 6 + i; if (rw > 166) return;
+    var ipTxt = num(x.ip) ? " (" + (num(x.ip) > 0 ? "+" : "") + num(x.ip) + " IP)" : "";
+    ex.set("A" + rw, (x.text || (LOG_KINDS[x.kind] || {}).text || "Entry") + ipTxt);
+    if (xlDate(x.d) !== null) ex.set("B" + rw, xlDate(x.d), "B3");
+    if (xlDate(x.from) !== null) ex.set("C" + rw, xlDate(x.from), "C3");
+    if (xlDate(x.to) !== null) ex.set("D" + rw, xlDate(x.to), "D3");
+    if (num(x.exp)) ex.set("E" + rw, num(x.exp));
+    if (num(x.clim)) { ex.set("G" + rw, x.text || "Clim"); ex.set("H" + rw, num(x.clim)); }
+  });
+  // ---- backstory tab ----
+  var bs = S.Backstory;
+  if (bs) {
+    var lines = [["Appearance", sd.appearance], ["Personality", sd.personality], ["Backstory", B.notes]].filter(function(x){ return x[1]; });
+    for (row = 1; row <= 12; row++) bs.clear("A" + row);
+    lines.forEach(function(x, i){ bs.set("A" + (1 + i * 3), x[0]); bs.set("A" + (2 + i * 3), x[1]); });
+  }
+  // numbers the sheet should show, so you can check after importing
+  notes.unshift("Check after importing: HP " + d.hp + ", Mana " + d.mana + ", AP " + d.ap + ", RP " + d.rp + ", Initiative " + d.init + ", Evasion " + d.evasion +
+    ", Dodge " + d.dodge + ", Guard " + d.guard + ", Block " + d.blockGuard + ", Save +" + T + ", Potency " + d.potency + ", Speed " + d.speed + ".");
+  return notes;
+}
+function openMiraneSheet(){
+  var inp = document.createElement("input"); inp.type = "file"; inp.accept = ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  inp.onchange = function(){
+    var f = inp.files[0]; if (!f) return;
+    var msg = $("shXlMsg"); if (msg) { msg.textContent = "Filling…"; msg.className = "small"; }
+    f.arrayBuffer().then(fillMiraneSheet).then(function(res){
+      var a = document.createElement("a"); a.href = URL.createObjectURL(res.blob);
+      a.download = (B.name || "Character").replace(/[^a-z0-9]+/gi, "_") + "_Mirane_CCS.xlsx";
+      document.body.appendChild(a); a.click(); a.remove();
+      if (msg) { msg.innerHTML = "Done: your filled sheet is downloading.<br>" + res.notes.map(esc).join("<br>"); msg.className = "small"; }
+    }).catch(function(e){ if (msg) { msg.textContent = (e && e.message) || "Couldn't fill that file."; msg.className = "small bad"; } });
+  };
+  inp.click();
+}
 
 /* ---------- Compare two builds ----------
    "Pin" the current build, change things, then open Compare to see before vs now.
@@ -21111,7 +21539,7 @@ function fullSizePages(){
 // The character as she is now: only the roadmap purchases your earned EXP/IP already reach.
 // Returns null when everything planned is already reachable.
 function buildNow(){
-  var rows = roadmap(), earned = num(B.expEarned), ipE = num(B.ipEarned), cut = -1;
+  var rows = roadmap(), earned = expEarnedTotal(), ipE = ipEarnedTotal(), cut = -1;
   for (var i = 0; i < rows.length; i++) if (!(rows[i].needEarned <= earned && rows[i].ipNeed <= ipE)) { cut = i; break; }
   if (cut < 0) return null;
   var nb = JSON.parse(JSON.stringify(B)), drop = rows.slice(cut).map(function(r){ return r.key; });
