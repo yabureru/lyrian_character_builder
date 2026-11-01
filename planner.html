@@ -273,7 +273,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-01";
+var PLANNER_VERSION = "2026-11-01b";
 function newBuild(){
   return {
     v: 1,
@@ -2827,6 +2827,8 @@ function fillMiraneSheet(buf){
       //   chips. The cells keep their own colours, so nothing visible is lost.
       var drop = function(n){ return n === "xl/calcChain.xml" || /^xl\/tables\/[^/]+\.xml$/.test(n) || /^xl\/tables\/_rels\//.test(n); };
       var keep = entries.filter(function(e){ return !drop(e.name); });
+      var nTables = entries.filter(function(e){ return /^xl\/tables\/[^/]+\.xml$/.test(e.name); }).length;
+      if (nTables) notes.push("Removed " + nTables + " table banners (Table_1, Table_2...) that Google adds when it downloads a sheet.");
       var edit = function(n, fn){ var e = byName[n]; return e ? XZ.text(e).then(function(x){ XZ.setText(e, fn(x)); }) : Promise.resolve(); };
       var jobs = [
         edit("[Content_Types].xml", function(x){ return x.replace(/<Override[^>]*PartName="\/xl\/(calcChain|tables\/[^"]*)\.xml"[^>]*\/>/g, ""); }),
