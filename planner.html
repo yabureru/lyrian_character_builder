@@ -273,7 +273,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-07a";
+var PLANNER_VERSION = "2026-11-07b";
 function newBuild(){
   return {
     v: 1,
@@ -2819,7 +2819,11 @@ function fillMiraneSheet(buf){
       var notes = kind === "ccs" ? writeMirane(S) : writeSheetV9(S);
       names.forEach(function(n){ XZ.setText(byName[paths[n]], S[n].xml()); });
       // ask Excel to recalculate everything when the file is opened (Google Sheets recalculates anyway)
-      var wbx = t[0].replace(/<calcPr\b([^>]*?)\/>/, function(all, at){ return /fullCalcOnLoad/.test(at) ? all : "<calcPr" + at + ' fullCalcOnLoad="1"/>'; });
+      // fullCalcOnLoad: recalculate on open. iterate: the Mirane CCS has a deliberate self-referencing cell (the Tengu box at E30)
+      // that only works with iterative calculation on; Google doesn't keep that setting in its download, so turn it back on.
+      var wbx = t[0].replace(/<calcPr\b([^>]*?)\/>/, function(all, at){
+        at = at.replace(/\s(fullCalcOnLoad|iterate|iterateCount)="[^"]*"/g, "");
+        return "<calcPr" + at + ' fullCalcOnLoad="1"' + (kind === "ccs" ? ' iterate="1" iterateCount="100"' : "") + "/>"; });
       XZ.setText(byName["xl/workbook.xml"], wbx);
       // Clean-up so the sheet looks like the original after importing into Google:
       // - drop calcChain.xml (a formula-order cache; rebuilt on open)
