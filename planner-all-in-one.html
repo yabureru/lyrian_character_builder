@@ -18353,7 +18353,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-01b";
+var PLANNER_VERSION = "2026-11-07a";
 function newBuild(){
   return {
     v: 1,
@@ -20986,6 +20986,7 @@ function writeMirane(S){
   // ---- proficiencies and languages ----
   var profs = Object.keys(C.profs || {}).sort(), armor = [], weap = [], other = [];
   profs.forEach(function(p){ if (/armor|shield/i.test(p)) armor.push(p); else if (/kit|tool|multitool|instrument/i.test(p)) other.push(p); else weap.push(p); });
+  (C.profNotes || []).forEach(function(t){ var m = /Also the ([^.]+)\./.exec(t); if (m && other.indexOf(m[1]) < 0) other.push(m[1]); });
   var cr = creationRace(), langs = (cr && cr.languages) || [];
   core.set("K10", armor.join(", ")); core.set("K14", weap.join(", ")); core.set("K18", elementMasteries().join(", "));
   core.set("K22", (langs.length ? langs : ["Common"]).join(", ")); core.set("K26", other.join(", "));
@@ -21028,13 +21029,14 @@ function writeMirane(S){
   core.set("B50", hasBt("slow-starter")); core.set("B49", !!(C.exp && C.exp.human));
   // ---- breakthroughs (the first 300 EXP of them are the free starter ones) ----
   var bt = S.Breakthrough, spentStart = 0, nth = {};
-  for (row = 2; row <= 37; row++) { bt.clear("A" + row); bt.clear("B" + row); bt.clear("E" + row); }
+  // column E only has "Starter?" checkboxes on rows 2-10; below that it's the sheet's own note (a merged box)
+  for (row = 2; row <= 37; row++) { bt.clear("A" + row); bt.clear("B" + row); if (row <= 10) bt.clear("E" + row); }
   B.bts.forEach(function(b, i){
     var r2 = BTS[b.id]; if (!r2 || i > 35) return;
     var cost = btCostAt(b.id, nth[b.id] || 0), starter = spentStart + cost <= 300;
     nth[b.id] = (nth[b.id] || 0) + 1;
     if (starter) spentStart += cost;
-    bt.set("A" + (2 + i), r2.name); bt.set("B" + (2 + i), cost); bt.set("E" + (2 + i), starter);
+    bt.set("A" + (2 + i), r2.name); bt.set("B" + (2 + i), cost); if (i <= 8) bt.set("E" + (2 + i), starter); else if (starter) notes.push(r2.name + " is a starter breakthrough but sits below the sheet's checkbox rows; tick it by hand.");
   });
   // ---- abilities: active ones (they cost AP/RP/MP) and passive ones ----
   var ab = S.Abilities, act = [], pas = [], have = {};
