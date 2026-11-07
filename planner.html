@@ -273,7 +273,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-07b";
+var PLANNER_VERSION = "2026-11-07c";
 function newBuild(){
   return {
     v: 1,
@@ -2966,6 +2966,7 @@ function writeMirane(S){
   var ab = S.Abilities, act = [], pas = [], have = {};
   abilityGroups().forEach(function(g){ g.abs.forEach(function(a){
     if (!a || !a.name || have[a.name]) return; have[a.name] = true;
+    if (/\(crafting abilities\)$/i.test(a.name)) return;  // the sheet looks abilities up by name; its own entry for the key ability already covers these
     (/\b(AP|RP|MP)\b/.test(a.cost || "") ? act : pas).push(a.name);
   }); });
   for (row = 2; row <= 58; row++) ab.clear("A" + row);
