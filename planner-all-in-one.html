@@ -150,6 +150,8 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
 #kwPop ul{margin:4px 0 0;padding-left:18px}
 .errbox{border:1px solid #6b3a35;background:#2c1b19;color:var(--bad);border-radius:8px;padding:6px 9px;font-size:12px;margin:6px 0}
 .statname{cursor:pointer;border-bottom:1px dotted var(--dim)}
+.xllist{border-collapse:collapse;width:100%;font-size:12px;margin-bottom:8px}.xllist td{border-top:1px solid var(--line,#3a3e49);padding:2px 5px;vertical-align:top}
+.xllist td.mono{font-family:ui-monospace,Consolas,monospace;white-space:nowrap}.xllist button{padding:1px 8px;font-size:11px}
 </style>
 
 <!-- ALL-IN-ONE VERSION: the data files are copied inside this page so it works on phones. -->
@@ -18353,7 +18355,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-07c";
+var PLANNER_VERSION = "2026-11-07d";
 function newBuild(){
   return {
     v: 1,
@@ -20726,10 +20728,11 @@ function openShare(){
     "(HP, Mana, AP, RP, Guard, rolls, skills, abilities, gear), as a code or a .json file, for other tools and character sheets.</div>" +
     '<textarea id="shData" readonly rows="3" style="width:100%;word-break:break-all">' + esc(characterDataCode()) + "</textarea>" +
     '<div class="toolbar"><button id="shDataCopy">Copy</button><button id="shDataFile">Download file</button></div>' +
-    "<h3>Mirane spreadsheet</h3><div class=\"note\">For Mirane approval. In your copy of the Blank Mirane CCS or CharacterSpreadSheet v9 (Google Sheets) use File → Download → Microsoft Excel (.xlsx), " +
-    "then pick that file here. The planner fills it in from this build and gives it back. Upload it to Google with File → Import → Replace spreadsheet. " +
-    "Only the sheet's input boxes are written, never its formulas.</div>" +
-    '<div class="toolbar"><button id="shXl" class="gold">Fill my Mirane sheet…</button></div><div id="shXlMsg" class="small"></div>' +
+    "<h3>Mirane spreadsheet</h3><div class=\"note\">For Mirane approval. Make your own copy of the Blank Mirane CCS (or CharacterSpreadSheet v9) in Google Sheets " +
+    "with File → Make a copy, then download that copy once with File → Download → Microsoft Excel (.xlsx) and pick it here. " +
+    "The planner reads the sheet's layout and lists every box to type, tab by tab: <b>type them into your Google copy</b>. " +
+    "Don't upload a filled Excel file back to Google: the conversion breaks the sheet's live links to the master sheet.</div>" +
+    '<div class="toolbar"><button id="shXl" class="gold">Make my Mirane copy-in list…</button></div><div id="shXlMsg" class="small"></div>' +
     "<h3>Load a build code</h3>" +
     '<textarea id="shIn" rows="3" style="width:100%" placeholder="Paste a code starting with LCP1:"></textarea>' +
     '<div class="toolbar"><button id="shLoad" class="gold">Load this build</button><span id="shMsg" class="small"></span></div>';
@@ -20836,6 +20839,12 @@ XSheet.prototype.get = function(ref){ // the cell's current value as text ("" if
 };
 XSheet.prototype.set = function(ref, val, styleFrom){ // write a plain value; never touches a formula cell
   var c = this.cell(ref, true); if (this.hasFormula(c)) return false;
+  if (this.log) { // remember what changed, for the copy-in list
+    // empty, 0 and an unticked box all count as "nothing there"
+    var norm = function(x){ x = String(x).trim(); if (x === "TRUE") return "1"; if (x === "FALSE" || x === "" || (!isNaN(+x) && +x === 0)) return "0"; return isNaN(+x) ? x : String(+x); };
+    var was = norm(this.get(ref)), now = norm(typeof val === "boolean" ? (val ? "1" : "0") : val == null ? "" : val);
+    if (was !== now) this.log[ref] = val; else delete this.log[ref];
+  }
   while (c.firstChild) c.removeChild(c.firstChild);
   c.removeAttribute("t");
   if (styleFrom && !c.getAttribute("s")) { var sc = this.cell(styleFrom, false); if (sc && sc.getAttribute("s")) c.setAttribute("s", sc.getAttribute("s")); }
@@ -20871,7 +20880,7 @@ function xlRaceAdj(formula, race, sub){
 function xlFormula(sh, ref){ var c = sh.cell(ref, false), f = c && c.getElementsByTagNameNS(sh.ns, "f")[0]; return f ? f.textContent : ""; }
 
 // Writes the current build into the Mirane CCS workbook. Returns {blob, notes} or throws with a plain message.
-function fillMiraneSheet(buf){
+function fillMiraneSheet(buf, listOnly){
   var entries = XZ.read(buf), byName = {}; entries.forEach(function(e){ byName[e.name] = e; });
   var need = ["xl/workbook.xml", "xl/_rels/workbook.xml.rels"];
   need.forEach(function(n){ if (!byName[n]) throw new Error("This doesn't look like an Excel (.xlsx) file."); });
@@ -20895,8 +20904,14 @@ function fillMiraneSheet(buf){
     var names = (kind === "ccs" ? ["Core", "Inventory", "Mirane Locker", "Breakthrough", "Abilities", "EXP & Transactions", "Backstory"] :
                  ["Core", "Abilities", "Inventory", "Leveling Planner"]).filter(ok);
     return Promise.all(names.map(function(n){ return XZ.text(byName[paths[n]]); })).then(function(xmls){
-      var S = {}; names.forEach(function(n, i){ S[n] = new XSheet(xmls[i], shared); });
+      var S = {}; names.forEach(function(n, i){ S[n] = new XSheet(xmls[i], shared); if (listOnly) S[n].log = {}; });
       var notes = kind === "ccs" ? writeMirane(S) : writeSheetV9(S);
+      if (listOnly) {
+        var list = [];
+        names.forEach(function(n){ Object.keys(S[n].log).sort(function(a, b){ return (XSheet.rowNum(a) - XSheet.rowNum(b)) || (XSheet.colNum(a) - XSheet.colNum(b)); })
+          .forEach(function(ref){ list.push({ tab: n, ref: ref, val: S[n].log[ref] }); }); });
+        return { kind: kind, list: list, notes: notes };
+      }
       names.forEach(function(n){ XZ.setText(byName[paths[n]], S[n].xml()); });
       // ask Excel to recalculate everything when the file is opened (Google Sheets recalculates anyway)
       // fullCalcOnLoad: recalculate on open. iterate: the Mirane CCS has a deliberate self-referencing cell (the Tengu box at E30)
@@ -21239,15 +21254,41 @@ function openMiraneSheet(){
   var inp = document.createElement("input"); inp.type = "file"; inp.accept = ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
   inp.onchange = function(){
     var f = inp.files[0]; if (!f) return;
-    var msg = $("shXlMsg"); if (msg) { msg.textContent = "Filling…"; msg.className = "small"; }
-    f.arrayBuffer().then(fillMiraneSheet).then(function(res){
-      var a = document.createElement("a"); a.href = URL.createObjectURL(res.blob);
-      a.download = (B.name || "Character").replace(/[^a-z0-9]+/gi, "_") + "_Mirane_CCS.xlsx";
-      document.body.appendChild(a); a.click(); a.remove();
-      if (msg) { msg.innerHTML = "Done: your filled sheet is downloading.<br>" + res.notes.map(esc).join("<br>"); msg.className = "small"; }
-    }).catch(function(e){ if (msg) { msg.textContent = (e && e.message) || "Couldn't fill that file."; msg.className = "small bad"; } });
+    var msg = $("shXlMsg"); if (msg) { msg.textContent = "Reading…"; msg.className = "small"; }
+    f.arrayBuffer().then(function(buf){ return fillMiraneSheet(buf, true); }).then(function(res){ if (msg) msg.innerHTML = miraneListHtml(res); wireMiraneList(res); })
+      .catch(function(e){ if (msg) { msg.textContent = (e && e.message) || "Couldn't read that file."; msg.className = "small bad"; } });
   };
   inp.click();
+}
+function xlShow(v){ return typeof v === "boolean" ? (v ? "☑ tick the box" : "☐ untick the box") : v === "" ? "(empty it)" : String(v); }
+function miraneListHtml(res){
+  var h = "<p><b>" + (res.kind === "ccs" ? "Blank Mirane CCS" : "CharacterSpreadSheet v9") + "</b>: " + res.list.length + " boxes to fill. " +
+    "In Google Sheets, click the tab, type the cell (like B2) into the box at the top left to jump there, then paste. " +
+    "Tick each row as you go (ticks are only kept while this window is open).</p>";
+  if (res.notes.length) h += "<p>" + res.notes.map(esc).join("<br>") + "</p>";
+  h += '<div class="toolbar"><button id="xlListTxt">Download as a text file</button></div>';
+  var tab = "";
+  res.list.forEach(function(x, i){
+    if (x.tab !== tab) { if (tab) h += "</table>"; tab = x.tab; h += "<h4>" + esc(tab) + ' tab</h4><table class="xllist">'; }
+    var long = typeof x.val === "string" && x.val.length > 80;
+    h += '<tr><td><input type="checkbox"></td><td class="mono">' + esc(x.ref) + "</td><td>" + esc(long ? x.val.slice(0, 80) + "…" : xlShow(x.val)) + "</td>" +
+         "<td>" + (typeof x.val === "boolean" || x.val === "" ? "" : '<button class="xlc" data-i="' + i + '">Copy</button>') + "</td></tr>";
+  });
+  if (tab) h += "</table>";
+  return h;
+}
+function wireMiraneList(res){
+  Array.prototype.forEach.call(document.querySelectorAll("button.xlc"), function(b){
+    b.onclick = function(){ var v = String(res.list[+b.getAttribute("data-i")].val), done = function(){ b.textContent = "Copied"; setTimeout(function(){ b.textContent = "Copy"; }, 1200); };
+      if (navigator.clipboard) navigator.clipboard.writeText(v).then(done, function(){ prompt("Copy this:", v); }); else prompt("Copy this:", v); };
+  });
+  var t = $("xlListTxt"); if (t) t.onclick = function(){
+    var lines = [], tab = "";
+    res.list.forEach(function(x){ if (x.tab !== tab) { tab = x.tab; lines.push("", "=== " + tab + " tab ==="); } lines.push(x.ref + "\t" + xlShow(x.val)); });
+    if (res.notes.length) lines.push("", "Notes:", res.notes.join("\n"));
+    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([lines.join("\r\n").trim()], { type: "text/plain" }));
+    a.download = (B.name || "Character").replace(/[^a-z0-9]+/gi, "_") + "_Mirane_copy-in_list.txt"; document.body.appendChild(a); a.click(); a.remove();
+  };
 }
 
 /* ---------- Compare two builds ----------
