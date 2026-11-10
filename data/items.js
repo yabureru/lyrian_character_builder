@@ -1,6 +1,7 @@
 // Lyrian Chronicles Character Planner - Item Data
 // Sources: https://lyrian.splatpass.net/items/ (unofficial static copy of Lyrian Chronicles 0.13.2), and
-//          https://rpg.angelssword.com/game/0.13.2/items (official site) for the 51 items added 2026-10-22.
+//          https://rpg.angelssword.com/game/0.13.2/items (official site) for the 51 items added 2026-10-22,
+//          and https://rpg.angelssword.com/game/0.13.3/items for 0.13.3 additions and changes (2026-11-10).
 // Built from scratch. Every record is page-checked against its own item page.
 // Records are kept in alphabetical order. Anything that did not load is marked "MISSING".
 //
@@ -556,6 +557,15 @@ IT("breaching-flask", {
   summary: [ "Throw at a locked door/window/medium entryway (Roguecraft DC 20 or less) to blast it open; anyone within 5ft behind it is knocked prone. Always loud. Thrown at creatures: they avoid it for 0 RP or are knocked back 30ft." ]
 });
 
+IT("breathing-mask", {
+  name: "Breathing Mask", url: "https://rpg.angelssword.com/game/0.13.3/items/breathing-mask",
+  checked: "2026-11-10", version: "0.13.3", category: "Artifice", tag: "Assist",
+  cost: 2000, burden: 1, activation: "1 AP",
+  fuel: { shell: "S", usage: "1 shell per day" },
+  crafting: { points: 30, discipline: "Artificing" },
+  summary: [ "New in 0.13.3. Gives the wearer a steady supply of breathable air: works where there's no air, and stops you breathing in toxic air." ]
+});
+
 IT("bull-potion", {
   name: "Bull Potion", url: "https://lyrian.splatpass.net/items/bull-potion/",
   checked: "2026-10-21", version: "0.13.2", category: "Alchemy", tag: "Potion",
@@ -768,6 +778,17 @@ IT("culinary-kit", {
   checked: "2026-10-21", version: "0.13.2", category: "Adventuring Essentials", tag: "Kit",
   cost: 500, burden: 2,
   summary: [ "Knives, pot, pan (drawable as a weapon) and preserved food. Rest Action: cook for the party at 40 food units (20 Clim) per person, giving the food benefit (2 mana) for the rest." ]
+});
+
+IT("current-fins", {
+  name: "Current Fins", url: "https://rpg.angelssword.com/game/0.13.3/items/current-fins",
+  checked: "2026-11-10", version: "0.13.3", category: "Artifice", tag: "Assist",
+  cost: 1000, burden: 1, activation: "1 AP",
+  fuel: { shell: "S", usage: "1 per day" },
+  crafting: { points: 30, discipline: "Artificing" },
+  mods: { A: [ { name: "Powerful Fins", points: 20, summary: "Swim speed when activated becomes 25ft." } ],
+          B: [ { name: "Horse Fins", points: 80, summary: "Swim speed when activated equals your movement speed." } ] },
+  summary: [ "New in 0.13.3. Diving gear: gain a 20ft Swim speed when activated." ]
 });
 
 IT("demonblood-potion", {
@@ -1114,7 +1135,7 @@ IT("grappling-hook-artifice", {
   mods: { A: [ { name: "Drive By Model", points: 10, summary: "Can't carry allies; instead you may attack at any point while reeling in (if you have actions). This movement doesn't provoke." },
                { name: "Scorpion Tip", points: 20, summary: "Range 20ft. The hook can make a Light attack for 1 full pierce damage; on hit pulls the target up to 20ft toward you." },
                { name: "Swing Engine", points: 35, summary: "Swing from the pin instead of being pulled straight; rope +20ft; pin auto-detaches and reels in at your destination." } ],
-          B: [ { name: "Emergency Escape Reel", points: 25, summary: "Can also fire it for 1 RP." },
+          B: [ { name: "Emergency Escape Reel", points: 25, summary: "Can also fire it for 1 RP, and reel yourself in for 0 RP." },
                { name: "Heavy Tow Line", points: 25, summary: "Carry one more ally." },
                { name: "Belt Attachment", points: 50, summary: "Belt-mounted with an arm switch: both hands stay free." },
                { name: "Safety Hook", points: 80, summary: "Movement with it (you and allies) counts as a sidestep." } ] },
@@ -1808,7 +1829,9 @@ IT("shepherds-sling-one-handed", {
   cost: 200, burden: 1,
   weapon: { group: "Slings", hands: 1, range: "60ft", ranged: true, property: "Giant Killer" },
   crafting: { points: 30, discipline: "Carpentry" },
-  mods: { A: [], note: "A mods: the page says \"Soon\" (none yet).",
+  mods: { A: [ { name: "Heavy Rock", points: 35, summary: "The sling gains the Bludgeoning passive (Hollow Blow)." },
+               { name: "Rock on Rope", points: 35, summary: "Make melee attacks with it dealing Physical (Piercing) damage, without provoking attacks of opportunity." } ],
+          note: "A mods added in 0.13.3 (checked 2026-11-10).",
           B: [ { name: "Anti-Goliath", points: 50, summary: "+1 Size Power bonus on attacks against Large or bigger creatures." },
                { name: "Explosive Rock", points: 80, summary: "When you overcharge, the extra damage also hits everything within 5ft of the target - as a Light damage roll for them instead of the flat 9." } ] },
   summary: [ "Giant Killer: can't be dual-wielded with another sling. Overcharge a basic Heavy attack for 1 AP to deal 9 extra damage." ]
@@ -1820,7 +1843,7 @@ IT("shield", {
   cost: 500, burden: 1,
   armor: { type: "Shield", block: "+4 (Shield bonus)" },
   crafting: { points: 30, discipline: "Armorsmithing" },
-  mods: { A: [ { name: "Spiked Shield", points: 20, summary: "Use it as a One-Handed weapon and keep the shield bonus." },
+  mods: { A: [ { name: "Spiked Shield", points: 20, summary: "Use it as a One-Handed weapon and keep the shield bonus. A silver shield applies Silver on damage; an elemental alloy (e.g. Salachar) makes it deal that damage type, like an alloyed weapon (0.13.3)." },
                { name: "Mirror Shield", points: 35, summary: "Targeted by a Mystic Eye ability: 1 RP to negate it on you and reflect it at the user." } ],
           B: [ { name: "Throwing Shield", points: 50, summary: "Ranged attack by throwing it at an enemy within 30ft; it returns to your hand." },
                { name: "Shield Formation", points: 80, summary: "+1 Guard while next to an ally with a shield or greatshield." } ] },
@@ -1833,7 +1856,7 @@ IT("shield-great", {
   cost: 1000, burden: 2,
   armor: { type: "Greatshield", guard: 1, block: "+8 (Shield bonus)", initiative: -1, evasion: -2, dodge: -2 },
   crafting: { points: 30, discipline: "Armorsmithing" },
-  mods: { A: [ { name: "Spiked Shield", points: 20, summary: "Use it as a One-Handed weapon and keep the shield bonus." },
+  mods: { A: [ { name: "Spiked Shield", points: 20, summary: "Use it as a One-Handed weapon and keep the shield bonus. A silver shield applies Silver on damage; an elemental alloy (e.g. Salachar) makes it deal that damage type, like an alloyed weapon (0.13.3)." },
                { name: "Mirror Shield", points: 35, summary: "Targeted by a Mystic Eye ability: 1 RP to negate it on you and reflect it at the user." } ],
           B: [ { name: "Tower Shield", points: 50, summary: "+1 Burden, but it counts as Low cover for you against ranged attacks." },
                { name: "Shield Formation", points: 80, summary: "+1 Guard while next to an ally with a shield or greatshield (real shields only)." } ] },
@@ -2243,7 +2266,7 @@ IT("universal-armor-mods", {
                  { name: "Franklin Badge (B, 2500 Fulgarite)", points: 50, summary: "Lightning attacks targeting an ally within 30ft (not you) get -5 accuracy." },
                  { name: "Lightning Reprisal (B, 4000 Fulgarite)", points: 80, summary: "First melee Heavy hit that damages you each round: make a Light attack against the attacker." },
                  { name: "Light Absorbing Layer (A, 300 Corvuskite)", points: 10, summary: "+5 Stealth at night (doesn't stack with a cloak)." },
-                 { name: "Bubble Flow Armor (B, 1250 Vivinthal)", points: 25, summary: "20ft swim speed; hold your breath twice as long." },
+                 { name: "Bubble Flow Armor (B, 4000 Vivinthal)", points: 80, summary: "20ft swim speed, and you can hold your breath underwater (cost raised in 0.13.3)." },
                  { name: "Galilean Latticing (B, 1250 Vivinthal)", points: 25, summary: "Walk on water." },
                  { name: "Fog Plates (B, 4000 Vivinthal)", points: 80, summary: "+4 Dodge." },
                  { name: "Permafrost Mantle (B, 2500 Glacite)", points: 50, summary: "Enemies within 5ft of you are Slowed (including when they move through)." },

@@ -1,5 +1,6 @@
 // Lyrian Chronicles Character Planner - Class Data
-// Source: https://lyrian.splatpass.net/classes/ (Static edition of Lyrian Chronicles 0.13.2)
+// Source: https://lyrian.splatpass.net/classes/ (Static edition of Lyrian Chronicles 0.13.2),
+// plus classes new in 0.13.3 from https://rpg.angelssword.com/game/0.13.3/classes/
 // Rebuilt from scratch. Every record is page-checked against the official class page.
 // Records are kept in alphabetical order. Anything that did not load is marked "MISSING".
 //
@@ -559,8 +560,90 @@ CL("aetherie", {
       name: "Spirit Circuit Crash", kind: "ultimate",
       cost: "2 AP", range: "45ft", keywords: ["Block Crush"], requires: null,
       summary: [
-        "Jam the target's Spirit Circuits: no Secret Arts or mana abilities until the end of their next turn. No roll or save.",
-        "The target can cancel it by taking damage equal to your heavy attack damage. Can be cast through a Mind Connection-linked creature. No effect on enemies without mana."
+        "Jam the target's Spirit Circuits until the end of their next turn: no Secret Arts, no abilities that need mana, and no paying mana upkeep.",
+        "The target can cancel it by taking damage equal to your heavy attack damage. Can be cast through a creature linked by Mind Connection."
+      ]
+    }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// AETHEROLOGIST  (checked 2026-11-10, site v0.13.3 - new in 0.13.3)
+// ---------------------------------------------------------------------------
+CL("aetherologist", {
+  name: "Aetherologist",
+  url: "https://rpg.angelssword.com/game/0.13.3/classes/aetherologist",
+  checked: "2026-11-10",
+  version: "0.13.3",
+  tier: 3,
+  difficulty: 4,
+  role: "Striker",
+  secondary: null,
+  requires: "Sorcerer or Mage mastered plus any tier 2 mastered.",
+  steps: [
+    { level: 1, type: "key",      label: "Unlock - Key ability", ability: "scientific-witchery" },
+    { level: 2, type: "ability",  label: "Ability 1",            ability: "ruin-formula" },
+    { level: 3, type: "skills",   label: "Skills", points: 5, expertiseTrade: true,
+      options: ["Common Knowledge", "Linguistics", "Magic", "Religion", "Appraise", "History", "Flight", "Artifice"],
+      summary: "+5 skill points among the listed skills. Any point can be traded for 2 expertise points, spent in those same skills." },
+    { level: 4, type: "ability",  label: "Ability 2",            ability: "final-theorem-unanswerable-equation" },
+    { level: 5, type: "heart",    label: "Heart", amount: 1, options: ["Reason"] },
+    { level: 6, type: "ability",  label: "Ability 3",            ability: "expand-boundary" },
+    { level: 7, type: "soul",     label: "Soul",  amount: 1, options: ["Focus", "Power"] },
+    { level: 8, type: "ultimate", label: "Ultimate ability",     ability: "eliminate-variance" }
+  ],
+  abilities: {
+    "scientific-witchery": {
+      name: "Scientific Witchery", kind: "key",
+      cost: null, range: null, keywords: [], requires: null,
+      grantsAbility: "begin-the-final-calculation",
+      summary: [ "Benefit 1: You can use Begin the Final Calculation." ]
+    },
+    "begin-the-final-calculation": {
+      name: "Begin the Final Calculation", kind: "granted", grantedBy: "scientific-witchery",
+      cost: "No listed cost", range: "Self", keywords: ["Stacking"], requires: null,
+      summary: [
+        "Start preparing the Final Theorem. The area fills with magic, so everyone in the combat is alerted.",
+        "While it's active you can't hide, and the first Thaumaturge spell you cast each turn raises a Theorem level.",
+        "You can stop preparing at any time for 0 RP, losing all stacks. Otherwise stacks last until the Final Theorem uses them or the encounter ends.",
+        "Three Theorem levels: Power, Expanse and Inevitability (raised by Ruin Formula, Expand Boundary and Eliminate Variance)."
+      ]
+    },
+    "ruin-formula": {
+      name: "Ruin Formula", kind: "ability",
+      cost: "1 AP", range: "120ft", keywords: ["Spell", "Overcharge"], requires: null,
+      summary: [
+        "Arcane-damage attack: Light (1 AP), Heavy (2 AP) or Precise (2 AP).",
+        "Raises the Final Theorem's Power level by 1.",
+        "Overcharge: pay 1 more Mana or AP to raise Power by 1 more."
+      ]
+    },
+    "final-theorem-unanswerable-equation": {
+      name: "Secret Art ~ Final Theorem: Unanswerable Equation", kind: "ability",
+      cost: "2 AP", range: "120ft", keywords: ["Spell", "Secret Art"], requires: null,
+      summary: [
+        "Release the Final Theorem: a Heavy attack dealing Arcane damage, boosted by your three Theorem levels.",
+        "Power: +1d6 damage per level, and your Power is added to the damage again for every 3 levels.",
+        "Expanse: +5ft radius per level. At 1 it becomes a 5ft-radius area aimed at a point; at 3 you can leave out allies you can see; at 5 range becomes 720ft; at 7 it ignores all cover except full cover.",
+        "Inevitability: +1 accuracy per level. At 1 it gains Half Pierce; at 3 Lock-On; at 5 Full Pierce; at 7 Sure Hit."
+      ]
+    },
+    "expand-boundary": {
+      name: "Expand Boundary", kind: "ability",
+      cost: "2 AP", range: "120ft", keywords: ["Spell", "Overcharge"], requires: null,
+      summary: [
+        "Light (2 AP) or Heavy (4 AP) Arcane-damage attack against every enemy in a 15x15ft square.",
+        "Raises the Final Theorem's Expanse level by 1.",
+        "Overcharge: pay 1 more Mana or AP to raise Expanse by 1 more."
+      ]
+    },
+    "eliminate-variance": {
+      name: "Eliminate Variance", kind: "ultimate",
+      cost: "2 AP", range: "60ft", keywords: ["Sure Hit", "Half Pierce", "Spell", "Overcharge"], requires: null,
+      summary: [
+        "Light attack dealing Arcane damage.",
+        "Raises the Final Theorem's Inevitability level by 1.",
+        "Overcharge: pay 1 more Mana or AP to raise Inevitability by 1 more."
       ]
     }
   }
@@ -1163,7 +1246,7 @@ CL("anti-mage", {
     { level: 4, type: "ability",  label: "Ability 2",            ability: "anti-shield" },
     { level: 5, type: "heart",    label: "Heart", amount: 1, options: ["Reason"] },
     { level: 6, type: "ability",  label: "Ability 3",            ability: "anti-magic-shield" },
-    { level: 7, type: "soul",     label: "Soul",  amount: 1, options: ["Focus", "Power"] },
+    { level: 7, type: "soul",     label: "Soul",  amount: 1, options: ["Focus", "Power", "Agility"] },
     { level: 8, type: "ultimate", label: "Ultimate ability",     ability: "counterspell" }
   ],
   abilities: {
@@ -1462,7 +1545,7 @@ CL("armiger", {
       name: "Full Dimensional Equip", kind: "ultimate",
       cost: "0 AP, 1 MP", range: "Self", keywords: [],
       requires: "You have a Dimensional Armory active.",
-      summary: [ "Swap your worn armor, cloak and wielded weapons with your dimensional set. What you were using becomes the new set, so you can swap back." ]
+      summary: [ "Swap your worn armor and wielded weapons with your dimensional set. What you were using becomes the new set, so you can swap back.", "Your cloak is only swapped if the set you're switching to has a cloak in it." ]
     }
   }
 });
@@ -2050,7 +2133,7 @@ CL("battlemaster", {
     "disarming-attack": {
       name: "Disarming Attack", kind: "ultimate",
       cost: "2 AP, 2 MP", range: "Melee Weapon Range", keywords: ["Disarm"], requires: null,
-      summary: [ "Light Attack. On damage, the target is Disarmed until the start of your next turn." ]
+      summary: [ "Heavy Attack. On damage, the target is Disarmed until the start of your next turn." ]
     }
   }
 });
@@ -2459,6 +2542,7 @@ CL("bodyguard", {
       summary: [
         "Redirect the attack to you. It hits you automatically; you can't Dodge, Block or similar against it.",
         "It keeps most of its targeting conditions (e.g. Full Pierce vs a downed target), and you count as standing in your VIP's spot for range. GM may apply race-based effects to you.",
+        "Redirected attacks gain Crushing against you; spend 1 Mana to stop them gaining Crushing until the end of your next turn. (Added in 0.13.3.)",
         "Doesn't work on attacks of opportunity or an attack that's already been redirected."
       ]
     },
@@ -3555,7 +3639,7 @@ CL("deadeye", {
   difficulty: 2,
   role: "Striker",
   secondary: null,
-  requires: "Marksman, Gunslinger, Scout, Harrier or Archer mastered.",
+  requires: "Marksman, Gunslinger, Scout, Harrier, Fusilier or Archer mastered.",
   steps: [
     { level: 1, type: "key",      label: "Unlock - Key ability", ability: "superior-assessment" },
     { level: 2, type: "ability",  label: "Ability 1",            ability: "disarming-shot" },
@@ -4156,23 +4240,87 @@ CL("evil-eye", {
     "cursed-evil-eye": {
       name: "Cursed Evil Eye", kind: "ability",
       cost: "1 AP, 1 MP", range: "60ft", keywords: ["Mystic Eye", "Upkeep", "Blanketing"], requires: null,
-      summary: [ "Targets in a 90-degree cone up to 60ft save vs your Potency or take Light Dark (Curse) damage. Upkeep 1 AP: repeat the attack." ]
+      summary: [ "Pick a target; everything in a 90-degree cone up to 60ft centred on it saves vs your Potency or take Light Dark (Curse) damage. Upkeep 1 AP: repeat the attack." ]
     },
     "evil-eye-of-lethargy": {
       name: "Evil Eye of Lethargy", kind: "ability",
       cost: "1 AP, 1 MP", range: "60ft", keywords: ["Mystic Eye", "Upkeep", "Slow"], requires: null,
-      summary: [ "Targets in a 90-degree cone up to 60ft are Slowed until the start of your next turn unless they spend 1 RP to resist. Upkeep 1 AP: repeat." ]
+      summary: [ "Pick a target; everything in a 90-degree cone up to 60ft centred on it is Slowed until the start of your next turn unless they spend 1 RP to resist. Upkeep 1 AP: repeat." ]
     },
     "evil-eye-of-fear": {
       name: "Evil Eye of Fear", kind: "ability",
       cost: "1 AP, 1 MP", range: "60ft", keywords: ["Mystic Eye", "Upkeep", "Fear", "Mind Affecting"], requires: null,
-      summary: [ "Targets in a 90-degree cone up to 60ft save vs your Potency or are Shaken until the start of your next turn. Upkeep 1 AP: repeat." ]
+      summary: [ "Pick a target; everything in a 90-degree cone up to 60ft centred on it saves vs your Potency or is Shaken until the start of your next turn. Upkeep 1 AP: repeat." ]
     },
     "evil-eye-of-death": {
       name: "Evil Eye of Death", kind: "ultimate",
       cost: "4 AP, 2 MP", range: "60ft", keywords: ["Mystic Eye", "Upkeep"],
       requires: "Target must be a grunt.",
       summary: [ "A single target dies instantly. Upkeep 3 AP: repeat against a new target." ]
+    }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// ENFORCER  (checked 2026-11-10, site v0.13.3 - new in 0.13.3)
+// ---------------------------------------------------------------------------
+CL("enforcer", {
+  name: "Enforcer",
+  url: "https://rpg.angelssword.com/game/0.13.3/classes/enforcer",
+  checked: "2026-11-10",
+  version: "0.13.3",
+  tier: 2,
+  difficulty: 2,
+  role: "Defender",
+  secondary: null,
+  requires: "Ranger mastered.",
+  steps: [
+    { level: 1, type: "key",      label: "Unlock - Key ability", ability: "peacekeeper" },
+    { level: 2, type: "ability",  label: "Ability 1",            ability: "intercede" },
+    { level: 3, type: "skills",   label: "Skills", points: 5, expertiseTrade: true,
+      options: ["Athletics", "Perception", "Insight", "Negotiation", "Intimidation", "Common Knowledge"],
+      summary: "+5 skill points among the listed skills. Any point can be traded for 2 expertise points, spent in those same skills." },
+    { level: 4, type: "ability",  label: "Ability 2",            ability: "shrug-it-off" },
+    { level: 5, type: "heart",    label: "Heart", amount: 1, options: ["Fitness", "Awareness", "Presence"] },
+    { level: 6, type: "ability",  label: "Ability 3",            ability: "crowd-control" },
+    { level: 7, type: "soul",     label: "Soul",  amount: 1, options: ["Focus", "Agility", "Toughness"] },
+    { level: 8, type: "ultimate", label: "Ultimate ability",     ability: "martial-law" }
+  ],
+  abilities: {
+    "peacekeeper": {
+      name: "Peacekeeper", kind: "key",
+      cost: null, range: null, keywords: [], requires: null,
+      grantsAbility: "final-warning",
+      summary: [
+        "Benefit 1: Proficiency in Shotguns.",
+        "Benefit 2: Against a target with your Challenge or Mandate, you can make Attacks of Opportunity with ranged weapons while within 10ft of it.",
+        "Benefit 3: You can use Final Warning."
+      ]
+    },
+    "final-warning": {
+      name: "Final Warning", kind: "granted", grantedBy: "peacekeeper",
+      cost: "2 AP", range: "Ranged Weapon Range", keywords: ["Challenge", "Mandate"], requires: null,
+      summary: [ "Light attack; if it deals damage, give the target your Challenge or your Mandate (your choice)." ]
+    },
+    "intercede": {
+      name: "Intercede", kind: "ability",
+      cost: "0 RP", range: "30ft", keywords: ["Rapid"], requires: "An enemy defied your mandate.",
+      summary: [ "The target of that enemy's attack gets damage reduction equal to your Toughness." ]
+    },
+    "shrug-it-off": {
+      name: "Shrug it off", kind: "ability",
+      cost: "1 MP, 0 RP", range: "Self", keywords: [], requires: "An enemy with your Mandate attacks you.",
+      summary: [ "You get damage reduction equal to your Toughness." ]
+    },
+    "crowd-control": {
+      name: "Crowd Control", kind: "ability",
+      cost: "2 AP, 1 MP", range: "30ft", keywords: ["Mandate"], requires: null,
+      summary: [ "Light attack against every enemy in a 60-degree cone out to range; each one damaged gets your Mandate." ]
+    },
+    "martial-law": {
+      name: "Secret Art: Martial Law", kind: "ultimate",
+      cost: "2 AP, 3 MP", range: "60ft", keywords: ["Mandate", "Secret Art"], requires: null,
+      summary: [ "Every enemy in range gets your Mandate. Until the start of your next turn, it isn't removed when they attack." ]
     }
   }
 });
@@ -4417,7 +4565,7 @@ CL("executor", {
     },
     "silentium": {
       name: "Silentium", kind: "ability",
-      cost: "2 AP, 1 MP", range: "Weapon Range", keywords: ["Combo", "Holy"],
+      cost: "2 AP, 1 MP", range: "Weapon Range", keywords: ["Combo", "Holy", "Divine"],
       requires: "One-handed Thrown Weapon or Sets of missiles only",
       summary: [
         "Light Attack with a sacred-infused thrown weapon dealing Light Holy damage. On damage, the target's concentration breaks and it can't use Spell abilities until it removes the lodged weapon (1 RP or 2 AP).",
@@ -4736,6 +4884,81 @@ CL("farmer", {
 });
 
 // ---------------------------------------------------------------------------
+// FATEWEAVER  (checked 2026-11-10, site v0.13.3 - new in 0.13.3)
+// ---------------------------------------------------------------------------
+CL("fateweaver", {
+  name: "Fateweaver",
+  url: "https://rpg.angelssword.com/game/0.13.3/classes/fateweaver",
+  checked: "2026-11-10",
+  version: "0.13.3",
+  tier: 2,
+  difficulty: 3,
+  role: "Healer",
+  secondary: "Support",
+  requires: "Acolyte, Mage or Medic mastered.",
+  steps: [
+    { level: 1, type: "key",      label: "Unlock - Key ability", ability: "thread-of-reprieve-key" },
+    { level: 2, type: "ability",  label: "Ability 1",            ability: "thread-of-defiance" },
+    { level: 3, type: "skills",   label: "Skills", points: 5, expertiseTrade: true,
+      options: ["Medicine", "Magic", "Religion", "History", "Negotiation", "Common Knowledge"],
+      summary: "+5 skill points among the listed skills. Any point can be traded for 2 expertise points, spent in those same skills." },
+    { level: 4, type: "ability",  label: "Ability 2",            ability: "thread-of-deliverance" },
+    { level: 5, type: "heart",    label: "Heart", amount: 1, options: ["Reason", "Presence"] },
+    { level: 6, type: "ability",  label: "Ability 3",            ability: "thread-of-triumph" },
+    { level: 7, type: "soul",     label: "Soul",  amount: 1, options: ["Focus", "Agility"] },
+    { level: 8, type: "ultimate", label: "Ultimate ability",     ability: "atropos-sever-the-thread" }
+  ],
+  abilities: {
+    "thread-of-reprieve-key": {
+      name: "Thread of Reprieve (key)", kind: "key",
+      cost: null, range: null, keywords: [], requires: null,
+      grantsAbility: "thread-of-reprieve",
+      summary: [ "Benefit 1: You can use Thread of Reprieve." ]
+    },
+    "thread-of-reprieve": {
+      name: "Thread of Reprieve", kind: "granted", grantedBy: "thread-of-reprieve-key",
+      cost: "1 AP", range: "60ft", keywords: ["Active"], requires: null,
+      summary: [
+        "Attach the Thread of Reprieve to one ally until the start of your next turn.",
+        "If they take damage while it's attached, you can spend 1 Mana to heal them 3 + Focus (no more than the damage taken)."
+      ]
+    },
+    "thread-of-defiance": {
+      name: "Thread of Defiance", kind: "ability",
+      cost: "1 AP", range: "60ft", keywords: ["Active"], requires: null,
+      summary: [
+        "Attach the Thread of Defiance to one ally until the start of your next turn: +2 to their saves.",
+        "If they fail a save while it's attached, you can spend 1 Mana to add your Focus to that save."
+      ]
+    },
+    "thread-of-deliverance": {
+      name: "Thread of Deliverance", kind: "ability",
+      cost: "1 AP", range: "60ft", keywords: ["Active", "Aid"], requires: null,
+      summary: [
+        "Attach the Thread of Deliverance to one ally until the start of your next turn: +2 Dodge and +4 Block.",
+        "The first time they Dodge and still get hit, or Block without fully blocking, you can spend 2 Mana to give them back 1 RP."
+      ]
+    },
+    "thread-of-triumph": {
+      name: "Thread of Triumph", kind: "ability",
+      cost: "1 AP", range: "60ft", keywords: ["Active", "Aid"], requires: null,
+      summary: [
+        "Attach the Thread of Triumph to one ally: their critical hit range widens by 1 (19-20) until they score a critical hit.",
+        "When they crit while it's attached, you can spend 1 RP to give them Haste."
+      ]
+    },
+    "atropos-sever-the-thread": {
+      name: "Atropos ~ Sever the Thread", kind: "ultimate",
+      cost: "2 MP, 1 RP", range: "60ft", keywords: [], requires: "An ally within range has one of your threads attached to them.",
+      summary: [
+        "Cut one of your threads off an ally to give them an effect based on which thread it was:",
+        "Reprieve: heal 6 + 2 x your Focus. Defiance: + your Focus to their next save. Deliverance: they regain 1 RP. Triumph: they gain Haste."
+      ]
+    }
+  }
+});
+
+// ---------------------------------------------------------------------------
 // FENCER  (checked 2026-10-20, site v0.13.2)
 // ---------------------------------------------------------------------------
 CL("fencer", {
@@ -4768,11 +4991,13 @@ CL("fencer", {
     },
     "parry": {
       name: "Parry", kind: "ability",
-      cost: "1 RP, 1 MP", range: null, keywords: [],
+      cost: "1 RP, 1 MP", range: null, keywords: ["Overcharge"],
       requires: "Target of a melee attack while wielding a One-Handed melee weapon.",
       summary: [
-        "Roll your Heavy Weapon Damage but add Focus instead of Power; use the result as your Block against the attack.",
-        "If it reduces the damage to 0, regain 1 RP (up to max), and on-hit effects/maces don't trigger. The attack can't crit you."
+        "Roll weapon damage but add Focus instead of Power; use the result as your Block against the attack. Against a Light attack you roll Light weapon damage; otherwise Heavy. (Changed in 0.13.3.)",
+        "If Parry reduces the damage to 0, regain 1 RP (not above max). On-hit effects and maces don't trigger when the damage is reduced to 0.",
+        "The attack can't critically hit you.",
+        "Overcharge: spend 1 more Mana to roll Heavy damage even against a Light attack."
       ]
     },
     "lunge": {
@@ -5322,7 +5547,7 @@ CL("fusilier", {
       name: "Maximum Firerate", kind: "ability",
       cost: "4 AP, 3 MP", range: "Ranged Weapon Range", keywords: ["Salvo"],
       requires: "Must use a pistol, musket or crossbow.",
-      summary: [ "8 attacks on one target, rolled in pairs (enemy reactions apply to all 8, as with a normal Salvo). After each pair you may cancel the rest; regain 1 Mana per 2 shots cancelled." ]
+      summary: [ "8 light attacks on one target, rolled in pairs (enemy reactions apply to all 8, as with a normal Salvo). After each pair you may cancel the rest; regain 1 Mana per 2 shots cancelled." ]
     },
     "suppressive-fire": {
       name: "Suppressive Fire", kind: "ultimate",
@@ -5330,7 +5555,7 @@ CL("fusilier", {
       requires: "Must use a pistol, musket or crossbow.",
       summary: [
         "5 light attacks split among enemies in a 25x25ft area.",
-        "Until the start of your next turn, each enemy you damaged counts as Blinded 2 against your ranged attacks, and whenever it makes a ranged attack you can make a ranged weapon light attack against it. Leaving the area ends this for that enemy."
+        "Until the start of your next turn, each enemy you damaged is treated as Blinded 2 when it makes ranged attacks, and each time it does you can make a ranged weapon light attack against it. Leaving the 25x25ft area ends this for that enemy."
       ]
     }
   }
@@ -6973,7 +7198,7 @@ CL("mage-knight", {
       name: "Mounted Casting", kind: "ability",
       cost: "1 RP", range: "Self", keywords: [],
       requires: "Must be mounted and taking a movement action.",
-      summary: [ "Cast a Spell with an AP cost of 2 or less." ]
+      summary: [ "Cast a Spell with an AP cost of 2 or less without paying its AP; any other costs are paid as normal." ]
     },
     "rescue": {
       name: "Rescue", kind: "ability",
@@ -7871,7 +8096,7 @@ CL("monk", {
       cost: "2 AP", range: "Melee Weapon Range", keywords: ["Combo", "Unarmed Strike"], requires: null,
       summary: [
         "Heavy Attack against the target.",
-        "Combo: after an unarmed attack misses, costs 1 AP."
+        "Combo: after an unarmed attack misses, costs 1 AP less but 1 Mana more (so 1 AP + 1 Mana)."
       ]
     },
     "serene-water-stance": {
@@ -7940,10 +8165,10 @@ CL("mycomancer", {
     },
     "poison-spore": {
       name: "Poison Spore", kind: "ability",
-      cost: "2 AP or 1 RP", range: "Self or the host of Poison Spore; 15x15ft area centered on the target", keywords: ["Concentration", "Poison", "Full Pierce"], requires: null,
+      cost: "2 AP or 1 RP", range: "Self or the host of Spore Symbiote", keywords: ["Concentration", "Poison", "Full Pierce"], requires: null,
       summary: [
-        "15x15ft spore cloud centered on you or your symbiote host, until the encounter ends (one at a time). Units ending their turn in it take Full Pierce Poison damage = Power + 2; you and the host are immune.",
-        "It stays centered on its original target as they move; if centered on the symbiote and you swap hosts, it moves with the symbiote."
+        "A cloud of poison spores 5ft around you or your Spore Symbiote host, until the encounter ends (one at a time). Units ending their turn in it take Full Pierce Poison damage = Power + 2; you and the host are immune. (Area wording changed in 0.13.3 so it fits larger creatures.)",
+        "It stays centred on its original target as they move; if centred on the symbiote and you swap hosts, it moves with the symbiote."
       ]
     },
     "amoxicillin": {
@@ -8117,27 +8342,27 @@ CL("mystic-eyes-of-petrification", {
     },
     "unpetrify": {
       name: "Unpetrify", kind: "granted", grantedBy: "petrification-eye",
-      cost: "1 AP, 1 MP", range: "60ft", keywords: [], requires: null,
+      cost: "1 AP, 1 MP", range: "60ft", keywords: ["Mystic Eye"], requires: null,
       summary: [ "Remove the Petrify condition from a target in range - including yourself, even though petrified creatures normally can't act." ]
     },
     "petrifying-gaze": {
       name: "Petrifying Gaze", kind: "ability",
-      cost: "3 AP, 2 MP", range: "60ft", keywords: ["Petrify"], requires: "Target must be a grunt.",
+      cost: "3 AP, 2 MP", range: "60ft", keywords: ["Petrify", "Mystic Eye"], requires: "Target must be a grunt.",
       summary: [ "Lock eyes with the target to petrify it immediately and permanently." ]
     },
     "medusas-glance": {
       name: "Medusa's Glance", kind: "ability",
-      cost: "1 RP", range: "Self", keywords: ["Calcification"], requires: "You are the target of a melee attack.",
+      cost: "1 RP", range: "Self", keywords: ["Calcification", "Petrify"], requires: "You are the target of a melee attack.",
       summary: [ "The attacker must avert its eyes and be Blinded 5 until the attack resolves, or begin partial petrification. Either way, it loses 1 RP and gains 1 Calcification stack." ]
     },
     "partial-petrification": {
       name: "Partial Petrification", kind: "ability",
-      cost: "2 AP, 3 MP", range: "60ft", keywords: ["Circuit", "Calcification"], requires: null,
+      cost: "2 AP, 3 MP", range: "60ft", keywords: ["Circuit", "Calcification", "Mystic Eye"], requires: null,
       summary: [ "The target saves or begins partial petrification: it loses 1 RP and gains 1 Calcification stack." ]
     },
     "petrify": {
       name: "Petrify", kind: "ultimate",
-      cost: "2 AP", range: "60ft", keywords: ["Petrify"], requires: "Target has less HP than your Focus x 2.",
+      cost: "2 AP", range: "60ft", keywords: ["Petrify", "Mystic Eye"], requires: "Target has less HP than your Focus x 2.",
       summary: [ "The target is permanently petrified." ]
     }
   }

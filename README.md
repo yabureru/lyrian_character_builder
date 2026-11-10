@@ -89,9 +89,11 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
 ## About the data
 
 - Official site: https://rpg.angelssword.com/
-- Game version **0.13.2**. The data was first read page by page from an **unofficial static copy** of the rules
+- Game version **0.13.3**. The data was first read page by page (0.13.2) from an **unofficial static copy** of the rules
   (https://lyrian.splatpass.net/), then cross-checked against the official site (same version): the full class and item lists,
   51 items only the official site had, the class steps that were blank, the monster stat blocks, and spot checks of abilities.
+  The 0.13.3 update (new classes Aetherologist, Enforcer and Fateweaver, the balance changes, new items and breakthroughs)
+  was read from the official site's 0.13.3 pages and its "Latest update" list on 2026-11-10.
   Spot-check anything important against the official site.
 - Ability and item descriptions are plain-English summaries written for this tool, not the official wording.
   Numbers, costs, ranges and keywords are exact.

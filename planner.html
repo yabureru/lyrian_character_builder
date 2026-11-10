@@ -174,7 +174,7 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
   <span id="hdrName" class="dim"></span>
   <a class="hlink" href="https://rpg.angelssword.com/" target="_blank" rel="noopener">Official site</a>
   <a class="hlink" href="quick-reference.html" target="_blank" title="Rules at a glance for play: rolls, actions, conditions, keywords">Quick reference</a>
-  <a class="hlink" href="https://lyrian.splatpass.net/" target="_blank" rel="noopener" title="Unofficial static copy of the rules. The planner's data was checked against it (v0.13.2).">Static copy (unofficial)</a>
+  <a class="hlink" href="https://lyrian.splatpass.net/" target="_blank" rel="noopener" title="Unofficial static copy of the rules (v0.13.2). The planner's data was checked against it, plus the official site for 0.13.3 changes.">Static copy (unofficial)</a>
   <span class="spacer"></span>
   <span id="dataVer" class="dim small"></span>
   <span style="display:inline-flex;gap:6px;white-space:nowrap">
@@ -275,7 +275,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-07d";
+var PLANNER_VERSION = "2026-11-10a";
 function newBuild(){
   return {
     v: 1,
@@ -637,6 +637,7 @@ function calc(){
   C.exp.generalSpent = C.exp.classOver + C.exp.btOver;
   C.exp.unspent = C.exp.general - C.exp.generalSpent;
   C.exp.spiritCore = classExp + C.exp.btOver + human;  // the 300 breakthrough EXP is not added (rulebook)
+  if (C.exp.spiritCore > 9999) C.warn.push("Spirit Core " + C.exp.spiritCore.toLocaleString() + ": going past 9,999 needs the Skybound Trial first (rulebook, 0.13.3). Until you pass it, extra EXP is stored, up to 1,000.");
   if (C.exp.unspent < 0 && !B.planAhead) C.warn.push("You've spent " + (-C.exp.unspent) + " more EXP than you have. Add EXP earned or remove something.");
 
   // ---- IP ----
@@ -2554,7 +2555,7 @@ function characterData(){
   return {
     schema: "lyrian-character/1",
     exported: new Date().toISOString(),
-    gameVersion: "0.13.2",
+    gameVersion: "0.13.3",
     name: B.name || "Unnamed",
     race: [race && race.name, sub && sub.name].filter(Boolean).join(" / "),
     classes: B.classes.filter(function(c){ return CLASSES[c.id]; }).map(function(c){
@@ -3956,8 +3957,8 @@ $("btnReset").onclick = function(){
   if (!(LC.bonuses || []).length) missing.push("data/bonuses.js");
   if (!LC.sheetMap) missing.push("data/sheet.js");
   if (missing.length) $("dataErr").innerHTML = '<div class="errbox">Couldn\'t load: ' + missing.join(", ") + '. Keep planner.html next to the "data" folder.</div>';
-  var any = Object.values(CLASSES)[0];
-  $("dataVer").textContent = "Planner " + PLANNER_VERSION + " · Data v" + (any ? any.version : "?") + " · " + Object.keys(CLASSES).length + " classes · " +
+  var GAME_VERSION = "0.13.3";
+  $("dataVer").textContent = "Planner " + PLANNER_VERSION + " · Game v" + GAME_VERSION + " · " + Object.keys(CLASSES).length + " classes · " +
     Object.keys(ITEMS).length + " items";
   render();
 })();

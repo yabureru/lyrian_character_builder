@@ -1,6 +1,6 @@
 // Lyrian Chronicles Character Planner - Class Entry Requirements & Unlock Routes
 // Built from the "Requirements" line on each class page (already page-checked in classes.js,
-// site v0.13.2, 2026-10-21). This file turns each line into rules the planner can check.
+// site v0.13.2, 2026-10-21; Aetherologist, Enforcer and Fateweaver from 0.13.3, 2026-11-10). This file turns each line into rules the planner can check.
 //
 // HOW TO READ A RECORD
 //  REQ("class-id", { text: "...exact requirement line...", routes: [ ROUTE, ROUTE, ... ] })
@@ -52,6 +52,8 @@ REQ("aeromancer", { text: "Any class mastered or Wind mastered.",
 REQ("aeromaster", { text: "Aeromancer mastered.", routes: [ [ { mastered: "aeromancer" } ] ] });
 REQ("aetherie", { text: "Any class mastered.", routes: [ [ { masteredAny: 1 } ] ],
   note: "Sheepfolk (Highly Sensitive to Magic) may enter without meeting this, for 100 EXP less." });
+REQ("aetherologist", { text: "Sorcerer or Mage mastered plus any tier 2 mastered.",
+  routes: [ [ { mastered: "sorcerer" }, { masteredTier: 2, count: 1 } ], [ { mastered: "mage" }, { masteredTier: 2, count: 1 } ] ] });
 REQ("agrarian", { text: "Farmer mastered.", routes: [ [ { mastered: "farmer" } ] ] });
 REQ("alchemeister", { text: "Alchemist mastered.", routes: [ [ { mastered: "alchemist" } ] ] });
 REQ("alkahest", { text: "Transmuter mastered.", routes: [ [ { mastered: "transmuter" } ] ] });
@@ -105,8 +107,8 @@ REQ("cutthroat", { text: "Culinarian or Rogue mastered.",
 REQ("daionmyoji", { text: "Onmyoji mastered.", routes: [ [ { mastered: "onmyoji" } ] ] });
 REQ("dark-priest", { text: "Acolyte, Mage, Sorcerer or Eremancer mastered.",
   routes: [ [ { mastered: "acolyte" } ], [ { mastered: "mage" } ], [ { mastered: "sorcerer" } ], [ { mastered: "eremancer" } ] ] });
-REQ("deadeye", { text: "Marksman, Gunslinger, Scout, Harrier or Archer mastered.",
-  routes: [ [ { mastered: "marksman" } ], [ { mastered: "gunslinger" } ], [ { mastered: "scout" } ], [ { mastered: "harrier" } ], [ { mastered: "archer" } ] ] });
+REQ("deadeye", { text: "Marksman, Gunslinger, Scout, Harrier, Fusilier or Archer mastered.",
+  routes: [ [ { mastered: "marksman" } ], [ { mastered: "gunslinger" } ], [ { mastered: "scout" } ], [ { mastered: "harrier" } ], [ { mastered: "fusilier" } ], [ { mastered: "archer" } ] ] });
 REQ("death-knight", { text: "Armorsmith or Fighter mastered and any tier 2 class mastered.",
   routes: [ [ { mastered: "armorsmith" }, { masteredTier: 2, count: 1 } ],
             [ { mastered: "fighter" }, { masteredTier: 2, count: 1 } ] ] });
@@ -122,6 +124,7 @@ REQ("electromancer", { text: "Any class mastered or have Lightning element maste
 REQ("electromaster", { text: "Electromancer mastered.", routes: [ [ { mastered: "electromancer" } ] ] });
 REQ("elementalist", { text: "Mage or Sorcerer mastered.",
   routes: [ [ { mastered: "mage" } ], [ { mastered: "sorcerer" } ] ] });
+REQ("enforcer", { text: "Ranger mastered.", routes: [ [ { mastered: "ranger" } ] ] });
 REQ("eremancer", { text: "Any class mastered or Dark Mastery.",
   routes: [ [ { masteredAny: 1 } ], [ { mastery: "Dark" } ] ] });
 REQ("evil-eye", { text: "Any class mastered. Must have at least 1 mystic eye slot open.",
@@ -137,6 +140,8 @@ REQ("fae-knight", { text: "Fae only. Any class mastered.",
 REQ("fae-knight-willow-style", { text: "Fae Knight mastered.", routes: [ [ { mastered: "fae-knight" } ] ] });
 REQ("faerie-light-eyes", { text: "Must have the 'Mystic Eyes of Faerie Light' breakthrough. Must have at least 1 mystic eye slot open.",
   routes: [ [ { breakthrough: "mystic-eyes-of-faerie-light-fae" }, { mysticEyeSlot: 1 } ] ] });
+REQ("fateweaver", { text: "Acolyte, Mage or Medic mastered.",
+  routes: [ [ { mastered: "acolyte" } ], [ { mastered: "mage" } ], [ { mastered: "medic" } ] ] });
 REQ("fencer", { text: "Any class mastered.", routes: [ [ { masteredAny: 1 } ] ] });
 REQ("five-harmonies-style", { text: "Cultivator or Martial Artist mastered.",
   routes: [ [ { mastered: "cultivator" } ], [ { mastered: "martial-artist" } ] ] });

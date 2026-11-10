@@ -716,7 +716,7 @@ RC("nio", {
   abilities: {
     "stoneskin": {
       name: "Stoneskin", cost: "No listed cost", range: null, keywords: [], requires: null,
-      summary: [ "+1 guard and +4 block, but -2 evasion and dodge." ]
+      summary: [ "+1 guard and +4 block, but -2 evasion and dodge.", "You are immune to Petrification. (Added in 0.13.3.)" ]
     },
     "eternal-vigil": {
       name: "Eternal Vigil", cost: "No listed cost", range: null, keywords: [], requires: null,
@@ -799,7 +799,7 @@ RC("pigfolk", {
       summary: [ "You can eat Junk units as food (restores mana as usual). Not with stocks." ]
     },
     "break-piggy-bank": {
-      name: "Break Piggy Bank", cost: "0 RP", range: "Self", keywords: ["Miracle"], requires: "Costs 500 Clim to use.",
+      name: "Break Piggy Bank", cost: "0 AP", range: "Self", keywords: ["Miracle"], requires: "Costs 500 Clim to use.",
       summary: [ "Gain Haste: 2 AP for the rest of this turn. A target can only be Hasted once per turn." ]
     }
   }

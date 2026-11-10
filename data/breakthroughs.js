@@ -191,7 +191,8 @@ BT("divine-luck-ii", {
   checked: "2026-10-21", version: "0.13.2",
   cost: 600, race: null, creationOnly: false, repeatable: false,
   requires: "Must have purchased Divine Luck I.",
-  summary: [ "Once per arc, automatically succeed on a check (if success is possible)." ]
+  summary: [ "Once per arc, automatically succeed on a check (if success is possible). You can decide after rolling.",
+             "On an accuracy check it sets your accuracy to the minimum needed to pass at that moment, never higher than you could actually reach. (Wording updated in 0.13.3.)" ]
 });
 
 BT("divine-s-chosen", {
@@ -429,10 +430,11 @@ BT("language-training", {
 });
 
 BT("large-specimen-nio-bullfolk-or-bearfolk", {
-  name: "Large Specimen (Nio, Bullfolk or Bearfolk)", url: "https://lyrian.splatpass.net/breakthroughs/large-specimen--nio--bullfolk-or-bearfolk-/",
-  checked: "2026-10-21", version: "0.13.2",
-  cost: 100, race: ["nio", "bullfolk", "bearfolk"], creationOnly: false, repeatable: false,
-  requires: "Must be a Nio, Bullfolk or Bearfolk.",
+  name: "Large Specimen (Nio, Bullfolk, Bearfolk or Male Oni)", url: "https://rpg.angelssword.com/game/0.13.3/breakthroughs",
+  checked: "2026-11-10", version: "0.13.3",
+  cost: 100, race: ["nio", "bullfolk", "bearfolk", "oni"], creationOnly: false, repeatable: false,
+  requires: "Must be a Nio, Bullfolk, Bearfolk or Male Oni",
+  note: "Male Oni added in 0.13.3. The planner doesn't check gender, so make sure an Oni character is male.",
   grants: { size: "Large" },
   summary: [ "Your size becomes Large." ]
 });
@@ -505,6 +507,15 @@ BT("natural-immunity-ratfolk", {
   summary: [ "When you resist or are immune to a disease or poison, you may choose to carry it anyway with no effects on you, for its normal duration or until the encounter ends (whichever is shorter). Pairs with Plaguebringer." ]
 });
 
+BT("navy-seal-selkie", {
+  name: "Navy Seal (Selkie)", url: "https://rpg.angelssword.com/game/0.13.3/breakthroughs",
+  checked: "2026-11-10", version: "0.13.3",
+  cost: 100, race: ["selkie"], creationOnly: false, repeatable: false,
+  requires: "Must be a Selkie.",
+  summary: [ "New in 0.13.3. In Seal Form you can use abilities normally and wield a One-Handed weapon (abilities needing specific armor or other physical requirements still can't be used).",
+             "You can hold your breath indefinitely in Seal Form." ]
+});
+
 BT("on-the-draw", {
   name: "On the draw", url: "https://lyrian.splatpass.net/breakthroughs/on-the-draw/",
   checked: "2026-10-21", version: "0.13.2",
@@ -535,10 +546,10 @@ BT("organized-inventory-ii", {
 BT("organized-inventory-iii", {
   name: "Organized Inventory III", url: "https://lyrian.splatpass.net/breakthroughs/organized-inventory-iii/",
   checked: "2026-10-21", version: "0.13.2",
-  cost: 300, race: null, creationOnly: false, repeatable: false,
+  cost: 300, race: null, creationOnly: false, repeatable: true,
   requires: "Must have the Organized Inventory II breakthrough",
   grants: { burden: 1 },
-  summary: [ "In-combat Burden capacity +1 more." ]
+  summary: [ "In-combat Burden capacity +1 more. Can be taken multiple times and the effects stack (since 0.13.3)." ]
 });
 
 BT("overrun-centaur", {

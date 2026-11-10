@@ -61,7 +61,7 @@ Sub stats -> skills: Fitness (Athletics, Riding); Cunning (Deception, Roguecraft
 
 ## 5. Skills
 - 10 starting points. **Expertise**: a narrow specialty under a skill; **each point spent = 2 expertise points**. Only the single highest expertise applies per roll.
-- **Caps:** 15 points per skill, 15 per expertise. At **Skybound tier (5k Spirit Core)** caps +5. At **10k Spirit Core** no cap. Bonuses from items/abilities ignore the cap.
+- **Caps:** 15 points per skill, 15 per expertise. At **5k Spirit Core** caps +5. At **Skybound tier (10k Spirit Core, since 0.13.3)** no cap. Bonuses from items/abilities ignore the cap.
 - **Artisan skills** (crafting/gathering) can't be chosen with normal skill picks unless named. Cap 10 points and 10 per expertise (only one expertise per craft). Gathering skills: cap 15, no expertises.
 - Artisan expertise options: Blacksmith (weapon groups, tools, artisan weapons); Alchemist (Flasks, Elixirs, Potions, Poisons, Salves); Farmer (Food, Alchemy units, Herbs); Carpenter (Bows, Crossbows, Staves, Wands, Slings, Whips, Buildings); Armorsmithing (Clothing, Light/Medium/Heavy armor, Shields); Artificer (Pistol, Shotgun, Musket, Sniper Rifle, Airships, Weapon/Assist/Basic Artifice).
 - DCs: 10 initiate, 15 professional, 20 expert, 25 specialist, 30 master. "Pressured task": challenge HP reduced by roll totals.
@@ -140,7 +140,7 @@ Downed: Crawl, Grit 2 AP (heal 4), Play Dead 4 AP, Throw Rock 2 AP (2 dmg, 40ft)
 
 ## 11. Keyword glossary (92 on /keywords/, condensed)
 Active (no Prepare) · Aid (allies only) · Artillery (hits over cover, from above) · Augment (one augment per attack) · Blanketing (one roll for all targets) · Bleeding (1d6 true/turn) · Blinded X (-X accuracy; 3+ no ranged without locating; 5+ no Sure Hit) · Block Crush (ignores Block's extra Guard) · Broken · Burning X (X dmg end of turn; 1 AP removes) · Calcification (-1 Agility) · Challenge (attack someone else -> challenger gets melee AoO) · Charm · **Circuit (first use per combat -1 mana; then the discount is gone for all Circuit abilities)** · Combo (bonus right after the named ability) · Concentration (one at a time) · Crushing · Daze (lose 1 AP; immune until end of next turn) · Disarm · Divine (Chosen breakthrough changes Holy to your divine's type) · Domain (one per location) · Dual Wield · Enchantment (one per weapon) · Esoteric Art · Expose X (crit threshold -X) · Fire · Flashback · Full Pierce · Half Pierce · Half Rapid · Hellfire · Hiding · Illumination X (next attack vs you +X acc) · Immovable · Instant (interrupts, resolves first) · **Isolated (no allies within 10ft AND 2+ enemies or 1 boss within 10ft)** · Killing Blow · Lock On (ignores Dodge bonus) · Lockstep · Mandate · Miracle (one per encounter) · Mystic Eye · Ninjutsu (two free hands) · Offstep · Opener (first action of turn) · Opportunistic (replaces your AoO) · **Overcharge (pay extra AP/Mana for more power)** · Pass · Persist X (dispel costs +X) · Petrify · Pinpoint (ignore Guard = Focus) · Presence Concealment (spirit core reads 0; +5 Stealth) · Prone · Quick (second Quick ability in a turn +1 AP) · Rage (usable in Rage Stance) · Rapid (more than once per turn) · Regrowth · Root (can't move; Dodge 13 + Agility) · Safe (no AoO) · Salvo · Sanctify (attackers who hit you heal an enemy 3 + applier's Focus, -1 stack) · Scatter (separate rolls per target) · Secret Art · **Setup (finish next turn; you're Trick-Attackable while charging)** · Shaken (-1 max AP) · Shieldbreaker · Sickened · Sidestep (no AoO) · Slow (half speed) · Soaked X (+X Lightning damage taken) · Song (one at a time) · Sound · Spell (provokes AoO) · Stacking · Stagger X (-X Evasion) · Stance (one at a time) · Static X · Stealth (doesn't break Hiding) · Strafe · Stun · **Summon (max 2 active)** · Sunder X (-X Guard) · Sure Hit · Teleport · Toxic (1d6 Full Pierce poison/turn) · Transformation (one at a time) · **Trick Attack (target pays double RP to react)** · Type (one at a time) · Unarmed Strike · Unbalanced · **Upkeep (pay at start of turn or it ends)** · Weakened (max 2 AP, 1 RP).
-Not on the glossary but used on pages: Tipsy, Haste, Wounded, Spirit Core tiers beyond "Skybound 5k" - still unknown.
+Not on the glossary but used on pages: Tipsy, Haste, Wounded - still unknown.
 
 ## 12. What this means for the planner
 - Build budget tracker: breakthrough EXP (300, separate pool), class EXP, IP, skill points, Clim, Spirit Core.
@@ -149,3 +149,13 @@ Not on the glossary but used on pages: Tipsy, Haste, Wounded, Spirit Core tiers 
 - Skill panel: 10 base points + race + class L3 steps; expertise at 2:1; caps 15 (artisan 10); enforce "best single expertise".
 - Damage preview: Light/Heavy/Precise formulas with Power/Focus; weapon group modifiers.
 - Track masteries (element list) because many class requirements use them.
+
+
+## 13. Skybound Trial (official rulebook, v0.13.3, read 2026-11-10)
+- Skybound tier is now **10,000 Spirit Core** (was 5,000). The skill-cap rise at 5,000 is unchanged.
+- To spend EXP past **9,999** you must first pass a **Skybound Trial**: a deadly challenge, usually in a group, run like normal combat and tuned to the takers' level. It can be taken before 9,999 but isn't recommended.
+- Until you pass, EXP can't be spent past 9,999; extra EXP is stored, up to **1,000**.
+- A failed trial can be retried after about a month (or whenever the GM thinks enough time has passed); the trial may change.
+- Guild-run trials give official recognition (and official access to the astra line); a trial taken elsewhere may need repeating at an official location.
+- Characters above 10,000 Spirit Core may not help.
+- Other 0.13.3 rulebook changes (wording only, not modelled by the planner): kit-storage rules for picked-up kits, fall damage knocks you prone based on damage taken rather than distance, and the escaping-the-map rules no longer forbid defensive actions before escaping.

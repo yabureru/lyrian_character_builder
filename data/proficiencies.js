@@ -123,6 +123,7 @@ LC.profGrants = [
   { source: "class:culinarian", ability: "culinary-basics", fixed: ["Small Weapons"], note: "Frying Pan counts as a Light Bludgeoning weapon you're proficient with." },
   { source: "class:cultivator", ability: "cultivators-journey", fixed: ["Unarmed", "Light Armor", "Light Swords"],
     choose: [{ n: 1, from: "ANY_WEAPON", label: "One additional weapon of your choice" }] },
+  { source: "class:enforcer", ability: "peacekeeper", fixed: ["Shotguns"] },
   { source: "class:farmer", ability: "farming-basics", fixed: ["Scythes", "Sickles"] },
   { source: "class:fencer", ability: "fancy-footwork", fixed: ["Dueling Weapons"] },
   { source: "class:fighter", ability: "fighters-journey", fixed: ["Light Armor", "Medium Armor", "Shields"],
