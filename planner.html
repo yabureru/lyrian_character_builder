@@ -39,6 +39,20 @@ table.cmp td{padding:3px 6px;border-top:1px solid var(--line)} table.cmp tr.cmpD
 header{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);background:#16181c;position:sticky;top:0;z-index:5}
 header .spacer{flex:1}
 header .reset{margin-left:18px}
+details.more{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}details.more>summary{cursor:pointer;color:var(--gold2)}
+details.menu{position:relative}
+details.menu>summary{list-style:none;cursor:pointer;padding:5px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel2,#2d3039)}
+details.menu>summary::-webkit-details-marker{display:none}
+details.menu .menulist{position:absolute;right:0;top:calc(100% + 4px);z-index:20;background:var(--panel,#252830);border:1px solid var(--line);border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:4px;min-width:240px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+details.menu .menulist button,details.menu .menulist a{text-align:left;width:100%;display:block;padding:5px 9px;border-radius:6px}
+details.menu .menulist a{color:var(--text);text-decoration:none}details.menu .menulist a:hover{background:var(--panel2,#2d3039)}
+details.menu hr{border:0;border-top:1px solid var(--line);margin:3px 0;width:100%}
+/* collapsible sections: click a section's title to fold it */
+.card>h2{cursor:pointer;user-select:none}
+.card>h2::after{content:" ▾";font-size:11px;color:var(--dim)}
+.card.folded>h2::after{content:" ▸ (click to open)";text-transform:none;letter-spacing:0}
+.card.folded>h2{margin-bottom:0}
+.card.folded>*:not(h2){display:none!important}
 
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 300px 360px;gap:14px;padding:14px 16px;align-items:start}
 .pane{position:sticky;top:62px;max-height:calc(100vh - 76px);overflow:auto}
@@ -172,9 +186,7 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
 <header>
   <h1>Lyrian Chronicles Planner</h1>
   <span id="hdrName" class="dim"></span>
-  <a class="hlink" href="https://rpg.angelssword.com/" target="_blank" rel="noopener">Official site</a>
   <a class="hlink" href="quick-reference.html" target="_blank" title="Rules at a glance for play: rolls, actions, conditions, keywords">Quick reference</a>
-  <a class="hlink" href="https://lyrian.splatpass.net/" target="_blank" rel="noopener" title="Unofficial static copy of the rules (v0.13.2). The planner's data was checked against it, plus the official site for 0.13.3 changes.">Static copy (unofficial)</a>
   <span class="spacer"></span>
   <span id="dataVer" class="dim small"></span>
   <span style="display:inline-flex;gap:6px;white-space:nowrap">
@@ -184,8 +196,15 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
   <button id="btnSave" class="gold">Save</button>
   <button id="btnLoad">Load</button>
   <button id="btnShare">Share</button>
-  <button id="btnCompare">Compare</button>
-  <button id="btnSheet">Print sheet</button>
+  <details class="menu" id="moreMenu"><summary>More ▾</summary><div class="menulist">
+    <button id="btnCompare">Compare two builds</button>
+    <button id="btnSheet">Print character sheet</button>
+    <button id="btnCards">Expand all sections</button>
+    <hr>
+    <a href="combat-sandbox.html" target="_blank">Combat sandbox (test two builds)</a>
+    <a href="https://rpg.angelssword.com/" target="_blank" rel="noopener">Official site</a>
+    <a href="https://lyrian.splatpass.net/" target="_blank" rel="noopener" title="Unofficial static copy of the rules (v0.13.2).">Static copy of the rules (unofficial)</a>
+  </div></details>
   <input id="fileLoad" type="file" accept=".json,.txt,application/json,text/plain" hidden>
   <button id="btnReset" class="reset danger">Reset</button>
 </header>
@@ -275,7 +294,8 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-10a";
+var PLANNER_VERSION = "2026-11-10b";
+var GAME_VERSION = "0.13.3";   // the game version the data matches
 function newBuild(){
   return {
     v: 1,
@@ -1044,6 +1064,28 @@ function render(){
   saveLocal();
 }
 function renderSome(list){ C = calc(); list.forEach(function(f){ f(); }); renderLive(); saveLocal(); }
+// Folded sections are a per-browser preference (not part of the build), remembered in localStorage.
+var FOLDED = {};
+try { FOLDED = JSON.parse(localStorage.getItem("lcp-folded") || "{}") || {}; } catch (e) { FOLDED = {}; }
+function foldKey(card){ var h = card.querySelector(":scope > h2"); return card.id || (h ? "pane:" + h.textContent.replace(/[▾▸].*$/, "").trim() : ""); }
+function applyFolds(){
+  document.querySelectorAll("main .card, aside .card").forEach(function(card){
+    var k = foldKey(card); if (!k) return;
+    card.classList.toggle("folded", !!FOLDED[k]);
+  });
+  var b = $("btnCards"), t = Object.keys(FOLDED).length ? "Expand all sections" : "Fold all sections";
+  if (b && b.textContent !== t) b.textContent = t;  // only touch it when it changes (the page watches for changes)
+}
+document.addEventListener("click", function(e){
+  var h = e.target.closest && e.target.closest(".card > h2"); if (!h) return;
+  if (e.target.closest("button,input,select,a,label")) return;
+  var card = h.parentElement, k = foldKey(card); if (!k) return;
+  if (FOLDED[k]) delete FOLDED[k]; else FOLDED[k] = true;
+  try { localStorage.setItem("lcp-folded", JSON.stringify(FOLDED)); } catch (err) {}
+  applyFolds();
+});
+new MutationObserver(function(){ applyFolds(); }).observe(document.body, { childList: true, subtree: true });
+document.addEventListener("click", function(e){ var m = $("moreMenu"); if (m && m.open && !m.contains(e.target)) m.open = false; });
 
 /* ---------- Identity ---------- */
 function renderIdentity(){
@@ -2478,7 +2520,7 @@ window.addEventListener("scroll", hideKw, true);
 /* ---------- Share: text summary + build code ---------- */
 function buildSummary(){
   var L = [], r = raceRec(), s = subRec();
-  L.push("== " + (B.name || "Unnamed character") + " ==  (Lyrian Chronicles planner " + PLANNER_VERSION + ", data v" + ((Object.values(CLASSES)[0] || {}).version || "?") + ")");
+  L.push("== " + (B.name || "Unnamed character") + " ==  (Lyrian Chronicles planner " + PLANNER_VERSION + ", game v" + GAME_VERSION + ")");
   L.push("Race: " + (r ? r.name : "—") + (s ? " / " + s.name : "") + (B.race === "demon" && B.raceChoice.clan ? " (clan " + B.raceChoice.clan + ")" : "") +
          (B.raceChoice.element ? " (" + B.raceChoice.element + ")" : "") + (B.gender ? " · " + B.gender : "") + (B.canon ? " · Mirane Expedition" : ""));
   L.push("Main: " + MAIN.map(function(k){ return k + " " + C.stat[k]; }).join(", "));
@@ -2555,7 +2597,7 @@ function characterData(){
   return {
     schema: "lyrian-character/1",
     exported: new Date().toISOString(),
-    gameVersion: "0.13.3",
+    gameVersion: GAME_VERSION,
     name: B.name || "Unnamed",
     race: [race && race.name, sub && sub.name].filter(Boolean).join(" / "),
     classes: B.classes.filter(function(c){ return CLASSES[c.id]; }).map(function(c){
@@ -2645,6 +2687,7 @@ function openShare(){
     "<h3>Build code</h3><div class=\"note\">One line that holds the whole build. Paste it below (in your own planner or a friend's) to load it.</div>" +
     '<textarea id="shCode" readonly rows="4" style="width:100%;word-break:break-all">' + esc(buildCode()) + "</textarea>" +
     '<div class="toolbar"><button id="shCodeCopy">Copy</button></div>' +
+    '<details class="more"><summary><b>More: character data for other tools, Mirane spreadsheet, load a code</b></summary>' +
     "<h3>Character data</h3><div class=\"note\">The whole character with every number worked out " +
     "(HP, Mana, AP, RP, Guard, rolls, skills, abilities, gear), as a code or a .json file, for other tools and character sheets.</div>" +
     '<textarea id="shData" readonly rows="3" style="width:100%;word-break:break-all">' + esc(characterDataCode()) + "</textarea>" +
@@ -2656,7 +2699,7 @@ function openShare(){
     '<div class="toolbar"><button id="shXl" class="gold">Make my Mirane copy-in list…</button></div><div id="shXlMsg" class="small"></div>' +
     "<h3>Load a build code</h3>" +
     '<textarea id="shIn" rows="3" style="width:100%" placeholder="Paste a code starting with LCP1:"></textarea>' +
-    '<div class="toolbar"><button id="shLoad" class="gold">Load this build</button><span id="shMsg" class="small"></span></div>';
+    '<div class="toolbar"><button id="shLoad" class="gold">Load this build</button><span id="shMsg" class="small"></span></div></details>';
   $("dFoot").innerHTML = '<span class="small dim">Loading a code replaces your current build. Save first if you want to keep it.</span>';
   $("detail").classList.add("open");
   $("dClose").onclick = closeDetail;
@@ -3304,7 +3347,13 @@ function cmpTable(other){
     list("Proficiencies only in the current build", onlyIn(pN, pA)) + list("Proficiencies only in the other build", onlyIn(pA, pN));
   return h + (lists || '<p class="dim small">Same abilities, breakthroughs and proficiencies.</p>');
 }
-$("btnCompare").onclick = openCompare;
+$("btnCompare").onclick = function(){ $("moreMenu").open = false; openCompare(); };
+$("btnCards").onclick = function(){
+  if (Object.keys(FOLDED).length) FOLDED = {};
+  else document.querySelectorAll("main .card, aside .card").forEach(function(c){ var k = foldKey(c); if (k && k !== "cardIdentity") FOLDED[k] = true; });
+  try { localStorage.setItem("lcp-folded", JSON.stringify(FOLDED)); } catch (err) {}
+  applyFolds(); $("moreMenu").open = false;
+};
 $("btnUndo").onclick = undo;
 $("btnRedo").onclick = redo;
 document.addEventListener("keydown", function(e){
@@ -3879,7 +3928,7 @@ function openSheetDialog(){
     } catch (e) { $("shErr").innerHTML = '<div class="errbox">Couldn\'t fill the sheet: ' + esc(e.message) + "</div>"; }
   };
 }
-$("btnSheet").onclick = openSheetDialog;
+$("btnSheet").onclick = function(){ $("moreMenu").open = false; openSheetDialog(); };
 
 /* =====================================================================
    4. SAVE / LOAD / RESET
@@ -3957,9 +4006,8 @@ $("btnReset").onclick = function(){
   if (!(LC.bonuses || []).length) missing.push("data/bonuses.js");
   if (!LC.sheetMap) missing.push("data/sheet.js");
   if (missing.length) $("dataErr").innerHTML = '<div class="errbox">Couldn\'t load: ' + missing.join(", ") + '. Keep planner.html next to the "data" folder.</div>';
-  var GAME_VERSION = "0.13.3";
-  $("dataVer").textContent = "Planner " + PLANNER_VERSION + " · Game v" + GAME_VERSION + " · " + Object.keys(CLASSES).length + " classes · " +
-    Object.keys(ITEMS).length + " items";
+  $("dataVer").textContent = "Game v" + GAME_VERSION;
+  $("dataVer").title = "Planner " + PLANNER_VERSION + " · " + Object.keys(CLASSES).length + " classes · " + Object.keys(ITEMS).length + " items";
   render();
 })();
 </script>
