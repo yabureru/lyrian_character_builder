@@ -39,6 +39,12 @@ table.cmp td{padding:3px 6px;border-top:1px solid var(--line)} table.cmp tr.cmpD
 header{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);background:#16181c;position:sticky;top:0;z-index:5}
 header .spacer{flex:1}
 header .reset{margin-left:18px}
+.viewsw{display:inline-flex;align-items:center;gap:0;margin-left:10px;border-radius:7px;padding:2px 8px 2px 2px;font-size:12px}
+.viewsw button{padding:3px 10px;border-radius:5px;border:1px solid var(--line);background:transparent;font-size:12px}
+.viewsw button.on{background:var(--gold,#c9a24a);color:#1b1d22;border-color:var(--gold,#c9a24a);font-weight:600}
+.viewsw #viewLbl{margin-left:8px;font-weight:600}
+.viewsw.isnow{background:rgba(111,191,115,.15)}.viewsw.isnow #viewLbl{color:var(--good,#6fbf73)}
+.viewsw.isplan{background:rgba(121,168,216,.15)}.viewsw.isplan #viewLbl{color:var(--blue,#79a8d8)}
 details.more{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}details.more>summary{cursor:pointer;color:var(--gold2)}
 details.menu{position:relative}
 details.menu>summary{list-style:none;cursor:pointer;padding:5px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel2,#2d3039)}
@@ -189,6 +195,7 @@ header .hlink:hover{border-color:var(--gold);color:var(--gold2)}
 <header>
   <h1>Lyrian Chronicles Planner</h1>
   <span id="hdrName" class="dim"></span>
+  <span id="viewSw" class="viewsw" style="display:none"><button data-view="now">Now</button><button data-view="plan">Plan</button><span id="viewLbl"></span></span>
   <a class="hlink" href="quick-reference.html" target="_blank" title="Rules at a glance for play: rolls, actions, conditions, keywords">Quick reference</a>
   <span class="spacer"></span>
   <span id="dataVer" class="dim small"></span>
@@ -298,7 +305,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-14c";
+var PLANNER_VERSION = "2026-11-14d";
 var GAME_VERSION = "0.13.3";   // the game version the data matches
 function newBuild(){
   return {
@@ -1071,14 +1078,39 @@ function classStatus(id, C){
    3. DRAWING THE PAGE
    ===================================================================== */
 var C = null;
+/* ---------- Now / Plan view ----------
+   Once play has started (anything in the progress log), "Now" shows the character as they really are:
+   creation plus the roadmap purchases ticked ✓. "Plan" shows the finished build. The editing sections
+   (classes, skills, breakthroughs, roadmap) always work on the plan. The choice is remembered per browser. */
+var VIEW = null; try { VIEW = localStorage.getItem("lcp-view"); } catch (e) {}
+function playStarted(){ return !!(B.log && B.log.length); }
+function viewNow(){ return playStarted() && VIEW !== "plan"; }
+function inView(fn){
+  if (!viewNow()) return fn();
+  var nw = buildNow(); if (!nw) return fn();        // everything planned is already bought
+  return withBuild(nw.build, fn);
+}
+function renderViewSwitch(){
+  var sw = $("viewSw"); if (!sw) return;
+  sw.style.display = playStarted() ? "" : "none";
+  var now = viewNow();
+  sw.querySelectorAll("button").forEach(function(b){ b.classList.toggle("on", (b.dataset.view === "now") === now); });
+  $("viewLbl").textContent = now ? "Showing " + (B.name || "your character") + " now" : "Showing the full plan";
+  sw.className = "viewsw " + (now ? "isnow" : "isplan");
+}
 function render(){
   C = calc();
-  renderIdentity(); renderStats(); renderClasses(); renderRoad(); renderUnlock(); renderSkills(); renderProf(); renderBreak(); renderItems(); renderLog();
-  renderLive(); renderAbil();
+  renderIdentity(); inView(renderStats); renderClasses(); renderRoad(); renderUnlock(); renderSkills(); renderProf(); renderBreak(); renderItems(); renderLog();
+  inView(renderLive); inView(renderAbil); renderViewSwitch();
   $("hdrName").textContent = B.name ? "— " + B.name : "";
   saveLocal();
 }
-function renderSome(list){ C = calc(); list.forEach(function(f){ f(); }); renderLive(); saveLocal(); }
+function renderSome(list){ C = calc(); list.forEach(function(f){ f === renderStats ? inView(f) : f(); }); inView(renderLive); renderViewSwitch(); saveLocal(); }
+document.addEventListener("click", function(e){
+  var b = e.target.closest && e.target.closest("#viewSw button"); if (!b) return;
+  VIEW = b.dataset.view; try { localStorage.setItem("lcp-view", VIEW); } catch (err) {}
+  render();
+});
 // Folded sections are a per-browser preference (not part of the build), remembered in localStorage.
 var FOLDED = {};
 try { FOLDED = JSON.parse(localStorage.getItem("lcp-folded") || "{}") || {}; } catch (e) { FOLDED = {}; }
@@ -2005,7 +2037,7 @@ function renderLive(){
   if (hasBt("slow-starter")) h += '<div class="note">Slow Starter: you get double EXP until you\'ve received 500 (1,000 doubled). Enter the EXP you actually received (already doubled). Its -200 creation class EXP is applied.</div>';
   h += '<div class="kv" title="' + (C.ip.started ? "IP doesn't carry over: each week's IP is used that week (log it), and starter IP not used at creation is gone." : "3 starter IP for learning classes at creation.") +
      '"><span>IP left</span><b class="' + ((playNow ? playNow.ip : C.ip.left) < 0 ? "bad" : "") + '">' + (playNow ? playNow.ip : C.ip.left) + (C.ip.started ? "" : " / " + C.ip.total) + "</b></div>";
-  if (playNow && playNow.planned) h += '<div class="note">Stats, combat numbers and abilities show your <b>whole plan</b>. For where you are now, use Share → the "as of now" summary, which counts only what you\'ve ticked ✓ as bought.</div>';
+
   h += '<div class="kv"><span>IP earned since creation</span><input type="number" id="inIp" min="0" value="' + num(B.ipEarned) + '"></div>';
   if (logIp()) h += '<div class="note">Plus ' + logIp() + ' IP used to learn classes (progress log).</div>';
   if (C.ip.lost) h += '<div class="note">' + C.ip.lost + " starter IP wasn't used at creation and is gone (IP doesn't carry over).</div>";
