@@ -57,7 +57,7 @@ The official PDF isn't included here (it belongs to Angel's Sword Studios). Get 
 - Combat numbers with always-on bonuses; tap any number to see where it comes from
 - Toggles for situational bonuses (stances, auras, transformations)
 - **Tidy layout**: click any section title to fold it away (remembered in your browser); *More* holds Compare, Print sheet, Fold/Expand all and the links
-- **Build roadmap**: every purchase in order with the EXP/IP needed to reach it; turn on *Plan ahead* to plan past your current EXP
+- **Build roadmap**: every purchase in order with the EXP/IP needed to reach it; turn on *Plan ahead* to plan past your current EXP Once play starts (anything in the Progress log), rows you can afford are highlighted **Ready**; tick ✓ when you buy one in play, and Pools shows the EXP you have banked.
 - **What can I unlock next?**: classes available now, one step away (grouped by what you need, with the EXP cost) and two steps away
 - Details window for any class, race, breakthrough or item, and keyword pop-ups
 - **Companions**: summons, hirelings and eidolons your classes bring, with their stat blocks

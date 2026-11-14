@@ -124,6 +124,9 @@ tr.can td:first-child{color:var(--gold2)}
 .kv b{font-variant-numeric:tabular-nums}
 .big{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
 table.road tr.future td{color:#8a8e98}
+table.road tr.ready td{background:rgba(201,162,74,.12)}table.road tr.ready td:first-child{box-shadow:inset 3px 0 0 var(--gold,#c9a24a)}
+table.road tr.done td{opacity:.6}
+.readybox{border-left:3px solid var(--gold,#c9a24a);background:rgba(201,162,74,.08);padding:5px 10px;margin:6px 0;font-size:13px}
 table.road td{vertical-align:middle}
 @media (max-width:820px){table.road .pm{flex-direction:column}table.road th,table.road td{padding:3px 4px}}
 .bdv{cursor:pointer;border-bottom:1px dotted var(--dim)}
@@ -295,7 +298,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-14b";
+var PLANNER_VERSION = "2026-11-14c";
 var GAME_VERSION = "0.13.3";   // the game version the data matches
 function newBuild(){
   return {
@@ -313,6 +316,7 @@ function newBuild(){
     profPicks: {},
     toggles: {},
     order: [],          // roadmap purchase order: "c|<class>|<step index>" and "b|<breakthrough uid>"
+    done: {},           // roadmap rows bought in play (after creation): { "c|ranger|2": "2026-11-20" }
     planAhead: false,
     log: [],            // progress log after creation: [{d:"2026-11-01", kind:"train", text:"", exp:25, ip:0, clim:0, from:"", to:""}]
     sheet: {},          // extra character sheet text: age, height, weight, personality, appearance   // true = don't block purchases on EXP/IP (plan a long-term build)        // conditional bonuses switched on: {"class:monk/serene-water-stance": true}      // proficiency choices: {"class:fighter#0": ["Axes", ...]}
@@ -1539,7 +1543,17 @@ function roadmap(){
     var needEarned = Math.max(0, classExp - startClass) + Math.max(0, btExp - 300) - human;
     rows.push({ key: x.key, cls: x.cls || null, label: label, sub: sub, tag: tag, cost: cost, ip: ip,
                 needEarned: Math.max(0, needEarned), ipNeed: Math.max(0, ipUsed - 3),
-                sc: classExp + Math.max(0, btExp - 300) + human });
+                sc: classExp + Math.max(0, btExp - 300) + human, ipUsed: ipUsed });
+  });
+  // Creation purchases: the opening rows paid from the 1,000 class EXP, 300 breakthrough EXP and 3 starter IP.
+  var n0 = 0; while (n0 < rows.length && rows[n0].needEarned === 0 && rows[n0].ipUsed <= 3) { rows[n0].creation = true; n0++; }
+  // IP doesn't carry over: once play has started, starter IP not used at creation is gone.
+  var starter = (B.log && B.log.length) ? (n0 ? rows[n0 - 1].ipUsed : 0) : 3;
+  var done = B.done || {}, prevNeed = 0;
+  rows.forEach(function(r){
+    r.ipNeed = Math.max(0, r.ipUsed - starter);
+    r.done = !!(r.creation || done[r.key]);
+    r.step = r.needEarned - prevNeed; prevNeed = r.needEarned;   // EXP this row adds beyond the creation pools
   });
   return rows;
 }
@@ -1550,17 +1564,26 @@ function renderRoad(){
        "(creation gives 1,000 class EXP and 300 breakthrough EXP). Use ▲▼ to change the order; a class's own steps always stay in order.</div>";
   h += '<label class="small"><input type="checkbox" id="inPlan"' + (B.planAhead ? " checked" : "") + "> Plan ahead (don't block purchases on EXP or IP)</label>";
   if (!rows.length) { $("cardRoad").innerHTML = h + '<p class="dim">Add classes or breakthroughs to see your roadmap.</p>'; bindRoad(); return; }
-  var reachedAll = true;
-  h += '<div class="scrollx"><table class="road"><tr><th>#</th><th>Purchase</th><th class="num">Cost</th><th class="num">EXP needed</th><th class="num">IP needed</th><th class="num">Spirit Core</th><th></th></tr>';
+  var reachedAll = true, spentPlay = 0, ready = 0, ipDone = 0;
+  rows.forEach(function(r){ if (r.done && !r.creation) { spentPlay += r.step; } });
+  var banked = earned - spentPlay;
+  rows.forEach(function(r){ r.ready = !r.done && r.needEarned <= earned && r.ipNeed <= ipEarned; if (r.ready) ready++; });
+  if (B.log && B.log.length || Object.keys(B.done || {}).length) h += '<div class="readybox">' +
+    (ready ? "<b>" + ready + " ready to unlock</b> (highlighted). Tick ✓ when you've bought it in play." : "Nothing new to unlock yet.") +
+    ' <span class="dim">EXP earned ' + earned.toLocaleString() + " · spent in play " + spentPlay.toLocaleString() + " · <b>banked " + banked.toLocaleString() + "</b>" +
+    (ipEarned ? " · IP for classes " + ipEarned : "") + "</span></div>";
+  h += '<div class="scrollx"><table class="road"><tr><th title="Bought in play">✓</th><th>#</th><th>Purchase</th><th class="num">Cost</th><th class="num">EXP needed</th><th class="num">IP needed</th><th class="num">Spirit Core</th><th></th></tr>';
   rows.forEach(function(r, n){
     var reach = r.needEarned <= earned && r.ipNeed <= ipEarned;
     // can't swap two steps of the same class (they must stay in order)
     var canUp = n > 0 && !(r.cls && rows[n - 1].cls === r.cls);
     var canDown = n < rows.length - 1 && !(r.cls && rows[n + 1].cls === r.cls);
     if (!reach && reachedAll) { reachedAll = false;
-      h += '<tr><td colspan="7" class="small warn">— beyond your current ' + earned.toLocaleString() + " EXP / " + ipEarned + " IP earned —</td></tr>"; }
-    h += '<tr class="' + (reach ? "" : "future") + '"><td class="dim">' + (n + 1) + "</td>" +
-      "<td><b>" + esc(r.label) + "</b>" + (r.tag ? ' <span class="tag ' + (r.tag === "Mastered" ? "good" : "warn") + '">' + esc(r.tag) + "</span>" : "") +
+      h += '<tr><td colspan="8" class="small warn">— beyond your current ' + earned.toLocaleString() + " EXP / " + ipEarned + " IP earned —</td></tr>"; }
+    var box = r.creation ? '<span class="dim" title="Bought at character creation">✓</span>'
+      : '<input type="checkbox" data-done="' + esc(r.key) + '"' + (r.done ? " checked" : "") + (!r.done && !reach ? ' disabled title="Not affordable yet"' : ' title="Bought in play"') + ">";
+    h += '<tr class="' + (r.done ? "done" : r.ready ? "ready" : reach ? "" : "future") + '"><td>' + box + '</td><td class="dim">' + (n + 1) + "</td>" +
+      "<td><b>" + esc(r.label) + "</b>" + (r.creation ? ' <span class="tag dim">creation</span>' : r.ready ? ' <span class="tag good">Ready</span>' : "") + (r.tag ? ' <span class="tag ' + (r.tag === "Mastered" ? "good" : "warn") + '">' + esc(r.tag) + "</span>" : "") +
       '<div class="small dim">' + esc(r.sub) + "</div></td>" +
       '<td class="num">' + r.cost + (r.ip ? " + " + r.ip + " IP" : "") + "</td>" +
       '<td class="num">' + r.needEarned.toLocaleString() + "</td>" +
@@ -1577,6 +1600,10 @@ function renderRoad(){
 }
 function bindRoad(){
   $("inPlan").onchange = function(){ B.planAhead = this.checked; render(); };
+  document.querySelectorAll("[data-done]").forEach(function(cb){
+    cb.onchange = function(){ B.done = B.done || {}; var k = this.dataset.done;
+      if (this.checked) B.done[k] = todayStr(); else delete B.done[k]; render(); };
+  });
   document.querySelectorAll("[data-rmv]").forEach(function(b){
     b.onclick = function(){
       var i = num(this.dataset.rmv), j = i + num(this.dataset.dir), o = B.order;
@@ -1956,7 +1983,16 @@ function renderLive(){
   h += '<div class="card"><h2>Pools</h2>';
   h += '<div class="kv"><span>Class EXP left (creation)</span><b class="' + (e.classLeft ? "warn" : "") + '">' + e.classLeft + " / " + e.startClass + "</b></div>";
   h += '<div class="kv"><span>Breakthrough EXP left</span><b class="' + (e.btLeft ? "warn" : "") + '">' + e.btLeft + " / 300</b></div>";
-  h += '<div class="kv"><span>Unspent EXP</span><b class="' + (e.unspent < 0 ? "bad" : "") + '">' + e.unspent.toLocaleString() + "</b></div>";
+  // Once play has started, count only what's actually bought (creation + rows ticked ✓ in the roadmap), not the whole plan.
+  var playNow = null;
+  if (C.ip.started) {
+    var rr = roadmap(), spentP = 0, ipP = 0;
+    rr.forEach(function(r){ if (r.done && !r.creation) { spentP += r.step; ipP += r.ip; } });
+    playNow = { exp: expEarnedTotal() - spentP, ip: ipEarnedTotal() - ipP, planned: rr.some(function(r){ return !r.done; }) };
+  }
+  if (playNow) h += '<div class="kv" title="EXP earned since creation minus what you\'ve ticked ✓ as bought in the roadmap. Planned purchases you haven\'t bought aren\'t counted.">' +
+    '<span>EXP banked (to spend)</span><b class="' + (playNow.exp < 0 ? "bad" : "") + '">' + playNow.exp.toLocaleString() + "</b></div>";
+  else h += '<div class="kv"><span>Unspent EXP</span><b class="' + (e.unspent < 0 ? "bad" : "") + '">' + e.unspent.toLocaleString() + "</b></div>";
   h += '<div class="kv"><span>Spirit Core</span><b>' + e.spiritCore.toLocaleString() + "</b></div>";
   var genes = (C.grants || []).reduce(function(t, x){ return t + (num(x.g.geneInventory) || 0); }, 0);
   if (genes) h += '<div class="kv" title="Biochemist: genes you can store for Biohacking / Gene Activation."><span>Gene inventory</span><b>' + genes + "</b></div>";
@@ -1968,7 +2004,8 @@ function renderLive(){
   else if (B.race === "human" && hybrid()) h += '<div class="note">Human-Chimera hybrid: no Human Ambition +100 EXP.</div>';
   if (hasBt("slow-starter")) h += '<div class="note">Slow Starter: you get double EXP until you\'ve received 500 (1,000 doubled). Enter the EXP you actually received (already doubled). Its -200 creation class EXP is applied.</div>';
   h += '<div class="kv" title="' + (C.ip.started ? "IP doesn't carry over: each week's IP is used that week (log it), and starter IP not used at creation is gone." : "3 starter IP for learning classes at creation.") +
-     '"><span>IP left</span><b class="' + (C.ip.left < 0 ? "bad" : "") + '">' + C.ip.left + (C.ip.started ? "" : " / " + C.ip.total) + "</b></div>";
+     '"><span>IP left</span><b class="' + ((playNow ? playNow.ip : C.ip.left) < 0 ? "bad" : "") + '">' + (playNow ? playNow.ip : C.ip.left) + (C.ip.started ? "" : " / " + C.ip.total) + "</b></div>";
+  if (playNow && playNow.planned) h += '<div class="note">Stats, combat numbers and abilities show your <b>whole plan</b>. For where you are now, use Share → the "as of now" summary, which counts only what you\'ve ticked ✓ as bought.</div>';
   h += '<div class="kv"><span>IP earned since creation</span><input type="number" id="inIp" min="0" value="' + num(B.ipEarned) + '"></div>';
   if (logIp()) h += '<div class="note">Plus ' + logIp() + ' IP used to learn classes (progress log).</div>';
   if (C.ip.lost) h += '<div class="note">' + C.ip.lost + " starter IP wasn't used at creation and is gone (IP doesn't carry over).</div>";
@@ -3727,17 +3764,23 @@ function fullSizePages(){
 // The character as she is now: only the roadmap purchases your earned EXP/IP already reach.
 // Returns null when everything planned is already reachable.
 function buildNow(){
-  var rows = roadmap(), earned = expEarnedTotal(), ipE = ipEarnedTotal(), cut = -1;
-  for (var i = 0; i < rows.length; i++) if (!(rows[i].needEarned <= earned && rows[i].ipNeed <= ipE)) { cut = i; break; }
-  if (cut < 0) return null;
-  var nb = JSON.parse(JSON.stringify(B)), drop = rows.slice(cut).map(function(r){ return r.key; });
+  var rows = roadmap(), earned = expEarnedTotal(), ipE = ipEarnedTotal(), cut = -1, drop;
+  if (B.log && B.log.length) {   // play has started: "now" means creation plus what's ticked ✓ as bought
+    drop = rows.filter(function(r){ return !r.done; }).map(function(r){ return r.key; });
+    if (!drop.length) return null;
+  } else {
+    for (var i = 0; i < rows.length; i++) if (!(rows[i].needEarned <= earned && rows[i].ipNeed <= ipE)) { cut = i; break; }
+    if (cut < 0) return null;
+    drop = rows.slice(cut).map(function(r){ return r.key; });
+  }
+  var nb = JSON.parse(JSON.stringify(B));
   drop.forEach(function(k){
     var p = k.split("|");
     if (p[0] === "c") nb.classes.forEach(function(c){ if (c.id === p[1]) c.owned[+p[2]] = false; });
     else nb.bts = nb.bts.filter(function(b){ return String(b.u) !== p[1]; });
   });
   nb.classes = nb.classes.filter(function(c){ return c.owned.some(Boolean); });
-  return { build: nb, left: rows.length - cut };
+  return { build: nb, left: drop.length };
 }
 // Run fn with another build in place of yours (numbers and all), then put yours back.
 function withBuild(build, fn){
