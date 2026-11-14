@@ -18640,7 +18640,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-14a";
+var PLANNER_VERSION = "2026-11-14b";
 var GAME_VERSION = "0.13.3";   // the game version the data matches
 function newBuild(){
   return {
@@ -19032,6 +19032,7 @@ function calc(){
   C.places = { carried: 0, backpack: 0, kit: 0, rig: 0, locker: 0 };
   var has = function(id){ return B.items.some(function(x){ return x.id === id && itemPlace(x) === ""; }); };
   var rigCap = has("alchemy-rig-deluxe") ? 5 : has("alchemy-rig") ? 2 : 0;
+  var looseAlchemy = [];
   B.items.forEach(function(e){
     var it = ITEMS[e.id]; if (!it) return;
     var c = itemCost(it); if (c === null) unknownCost.push(it.name); else climSpent += Math.ceil(c * e.qty);   // units: 0.5 Clim each, rounded up
@@ -19041,7 +19042,11 @@ function calc(){
     if (p === "kit" && !(it.category === "Adventuring Essentials" && it.tag !== "Kit" && it.tag !== "Storage"))
       C.warn.push(it.name + " can't go in the Adventurer's Kit (it only holds Adventuring Essentials).");
     if (p === "rig" && it.category !== "Alchemy") C.warn.push(it.name + " can't go in the Alchemy Rig (it only holds elixirs, flasks, potions, salves and poisons).");
+    if (p === "" && it.category === "Alchemy" && !e.equipped) looseAlchemy.push(it.name);
   });
+  // Elixirs, flasks, potions and salves are only quick to use from an Alchemy Rig; carried loose they're a pack pull (4 AP).
+  if (looseAlchemy.length) C.warn.push(looseAlchemy.join(", ") + (looseAlchemy.length > 1 ? " are" : " is") +
+    " carried without an Alchemy Rig: getting it out in combat costs 4 AP, like the backpack. Put it in a rig (Kept in: Alchemy Rig) for quick use.");
   if (C.places.kit && !has(MIRANE.freeKit)) C.warn.push("Items are in an Adventurer's Kit, but you aren't carrying one.");
   if (C.places.kit > 5) C.warn.push("Your Adventurer's Kit holds " + C.places.kit + " Burden, but only 5 stays combat-ready.");
   if (C.places.rig && !rigCap) C.warn.push("Items are in an Alchemy Rig, but you aren't carrying one.");
