@@ -295,7 +295,7 @@ function skillOptions(opt){
    1. THE BUILD (everything that gets saved)
    ===================================================================== */
 // Planner release (date of the last update). Shown in the header and in Share summaries.
-var PLANNER_VERSION = "2026-11-10b";
+var PLANNER_VERSION = "2026-11-14a";
 var GAME_VERSION = "0.13.3";   // the game version the data matches
 function newBuild(){
   return {
@@ -314,7 +314,7 @@ function newBuild(){
     toggles: {},
     order: [],          // roadmap purchase order: "c|<class>|<step index>" and "b|<breakthrough uid>"
     planAhead: false,
-    log: [],            // progress log after creation: [{d:"2026-11-01", kind:"week", text:"", exp:0, ip:1, clim:0, from:"", to:""}]
+    log: [],            // progress log after creation: [{d:"2026-11-01", kind:"train", text:"", exp:25, ip:0, clim:0, from:"", to:""}]
     sheet: {},          // extra character sheet text: age, height, weight, personality, appearance   // true = don't block purchases on EXP/IP (plan a long-term build)        // conditional bonuses switched on: {"class:monk/serene-water-stance": true}      // proficiency choices: {"class:fighter#0": ["Axes", ...]}
     notes: ""
   };
@@ -364,7 +364,9 @@ function histButtons(){
 // Totals after creation: the number boxes in Pools plus everything in the progress log
 function logSum(k){ return (B.log || []).reduce(function(t, x){ return t + num(x[k]); }, 0); }
 function expEarnedTotal(){ return num(B.expEarned) + logSum("exp"); }
-function ipEarnedTotal(){ return num(B.ipEarned) + logSum("ip"); }
+// IP that went to learning classes after creation. Rows that just use the week's IP (and old "Weekly IP" rows) don't count.
+function logIp(){ return (B.log || []).reduce(function(t, x){ return t + (/^(week|train|job|ipuse)$/.test(x.kind) ? 0 : num(x.ip)); }, 0); }
+function ipEarnedTotal(){ return num(B.ipEarned) + logIp(); }
 function climAddedTotal(){ return num(B.climAdded) + logSum("clim"); }
 function fixBuild(b){ // fill in anything missing from older saves
   var d = newBuild();
@@ -664,6 +666,9 @@ function calc(){
   // ---- IP ----
   C.ip = { total: 3 + ipEarnedTotal(), spent: ipSpent };
   C.ip.left = C.ip.total - C.ip.spent;
+  // IP doesn't carry over: once play has started (anything in the progress log), leftover starter IP is gone.
+  C.ip.started = !!(B.log && B.log.length);
+  if (C.ip.started && C.ip.left > 0) { C.ip.lost = C.ip.left; C.ip.left = 0; }
   if (C.ip.left < 0 && !B.planAhead) C.warn.push("Not enough IP for all your classes.");
 
   // ---- Clim and burden ----
@@ -1890,11 +1895,13 @@ function drawItemList(){
 /* ---------- Progress log (like the Mirane sheet's "EXP & Transactions" tab) ----------
    One row per thing that happens after creation: a week's IP, training, a job, an expedition, a sale...
    Its EXP, IP and Clim add to the Pools totals. Items you buy go in Items instead (they're counted there). */
+// Each week's IP is used the same week (unused IP is lost at the next reset), so an IP action just uses that week's IP.
+// Only "Learn a class" puts IP towards the class purchases in your plan.
 var LOG_KINDS = {
-  week:  { label: "Weekly IP (in town at reset)", ip: 1, text: "Weekly IP" },
-  train: { label: "Train (spend 1 IP: +25 EXP)", ip: -1, exp: 25, text: "Train" },
-  job:   { label: "Job (spend 1 IP: +150 Clim)", ip: -1, clim: 150, text: "Job" },
-  ipuse: { label: "Other IP action (spend 1 IP)", ip: -1, text: "Crafting / Gather / Research..." },
+  train: { label: "Train (use the week's IP: +25 EXP)", useIp: true, exp: 25, text: "Train" },
+  job:   { label: "Job (use the week's IP: +150 Clim)", useIp: true, clim: 150, text: "Job" },
+  learn: { label: "Learn a class (use the week's IP)", ip: 1, text: "Learn class: " },
+  ipuse: { label: "Other IP action (use the week's IP)", useIp: true, text: "Crafting / Gather / Appraise..." },
   expo:  { label: "Expedition (75 EXP a week, +25 with a journal)", exp: 100, text: "Expedition", lock: true },
   sale:  { label: "Sold something / Clim reward", clim: 0, text: "Sold " },
   spend: { label: "Paid for a service (not an item)", clim: 0, text: "Paid for " },
@@ -1904,20 +1911,23 @@ function todayStr(){ var d = new Date(); return d.getFullYear() + "-" + String(d
 function renderLog(){
   var L = B.log || (B.log = []), h = "<h2>Progress log</h2>";
   h += '<div class="note">Track what happens after creation, like the Mirane sheet\'s EXP &amp; Transactions tab: weekly IP, training, jobs, expeditions and Clim. ' +
+       "Each week's IP has to be used that week (it doesn't carry over), so an IP action like Train just uses it; only Learn a class adds IP for your planned classes. " +
        "Everything here adds to the EXP, IP and Clim in Pools. Items you buy go in Items (they're counted there), so only log Clim you earn or spend on services.</div>";
   h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0"><select id="logKind">' +
        Object.keys(LOG_KINDS).map(function(k){ return '<option value="' + k + '">' + esc(LOG_KINDS[k].label) + "</option>"; }).join("") +
        '</select><button id="logAdd">Add</button></div>';
   if (L.length) {
-    h += '<div style="overflow-x:auto"><table class="logt"><tr><th>Date</th><th>What</th><th title="EXP gained">EXP</th><th title="IP gained (+) or spent (-) outside classes">IP</th><th title="Clim earned (+) or spent (-), not counting items">Clim</th><th title="Expedition lockout dates">Lockout</th><th></th></tr>';
+    h += '<div style="overflow-x:auto"><table class="logt"><tr><th>Date</th><th>What</th><th title="EXP gained">EXP</th><th title="Uses the week\'s IP. A number here is IP put towards learning a class.">IP</th><th title="Clim earned (+) or spent (-), not counting items">Clim</th><th title="Expedition lockout dates">Lockout</th><th></th></tr>';
     L.forEach(function(x, i){
       h += '<tr><td><input type="date" data-lg="' + i + '" data-k="d" value="' + esc(x.d || "") + '"></td>' +
            '<td><input type="text" data-lg="' + i + '" data-k="text" value="' + esc(x.text || "") + '" style="min-width:140px"></td>' +
-           ["exp", "ip", "clim"].map(function(k){ return '<td><input type="number" data-lg="' + i + '" data-k="' + k + '" value="' + num(x[k]) + '" style="width:70px"></td>'; }).join("") +
+           ["exp", "ip", "clim"].map(function(k){
+             if (k === "ip" && /^(week|train|job|ipuse)$/.test(x.kind)) return '<td class="small dim" title="Uses that week\'s IP">' + (x.kind === "week" ? "(old row)" : "week\'s IP") + "</td>";
+             return '<td><input type="number" data-lg="' + i + '" data-k="' + k + '" value="' + num(x[k]) + '" style="width:70px"></td>'; }).join("") +
            '<td class="small">' + (x.lock || x.from || x.to ? '<input type="date" data-lg="' + i + '" data-k="from" value="' + esc(x.from || "") + '"> to <input type="date" data-lg="' + i + '" data-k="to" value="' + esc(x.to || "") + '">' : "") + "</td>" +
            '<td><button class="small" data-lgdel="' + i + '" title="Remove this row">✕</button></td></tr>';
     });
-    h += '<tr><td colspan="2"><b>Totals</b></td><td><b>' + logSum("exp").toLocaleString() + "</b></td><td><b>" + logSum("ip") + "</b></td><td><b>" + logSum("clim").toLocaleString() + "</b></td><td></td><td></td></tr></table></div>";
+    h += '<tr><td colspan="2"><b>Totals</b></td><td><b>' + logSum("exp").toLocaleString() + "</b></td><td><b>" + (logIp() ? logIp() + " for classes" : "") + "</b></td><td><b>" + logSum("clim").toLocaleString() + "</b></td><td></td><td></td></tr></table></div>";
   } else h += '<div class="dim small">Nothing logged yet.</div>';
   $("cardLog").innerHTML = h;
   $("logAdd").onclick = function(){
@@ -1952,9 +1962,11 @@ function renderLive(){
   if (e.human) h += '<div class="note">Includes Human Ambition +100 EXP.</div>';
   else if (B.race === "human" && hybrid()) h += '<div class="note">Human-Chimera hybrid: no Human Ambition +100 EXP.</div>';
   if (hasBt("slow-starter")) h += '<div class="note">Slow Starter: you get double EXP until you\'ve received 500 (1,000 doubled). Enter the EXP you actually received (already doubled). Its -200 creation class EXP is applied.</div>';
-  h += '<div class="kv"><span>IP left</span><b class="' + (C.ip.left < 0 ? "bad" : "") + '">' + C.ip.left + " / " + C.ip.total + "</b></div>";
+  h += '<div class="kv" title="' + (C.ip.started ? "IP doesn't carry over: each week's IP is used that week (log it), and starter IP not used at creation is gone." : "3 starter IP for learning classes at creation.") +
+     '"><span>IP left</span><b class="' + (C.ip.left < 0 ? "bad" : "") + '">' + C.ip.left + (C.ip.started ? "" : " / " + C.ip.total) + "</b></div>";
   h += '<div class="kv"><span>IP earned since creation</span><input type="number" id="inIp" min="0" value="' + num(B.ipEarned) + '"></div>';
-  if (logSum("ip")) h += '<div class="note">' + (logSum("ip") > 0 ? "Plus " : "Minus ") + Math.abs(logSum("ip")) + ' IP from your progress log.</div>';
+  if (logIp()) h += '<div class="note">Plus ' + logIp() + ' IP used to learn classes (progress log).</div>';
+  if (C.ip.lost) h += '<div class="note">' + C.ip.lost + " starter IP wasn't used at creation and is gone (IP doesn't carry over).</div>";
   h += '<div class="kv"><span>Clim left</span><b class="' + (C.clim.left < 0 ? "bad" : "") + '">' + C.clim.left.toLocaleString() + "</b></div>";
   h += '<div class="kv"><span>Clim spent</span><b>' + C.clim.spent.toLocaleString() + "</b></div>";
   h += '<div class="kv"><span>Starting Clim</span><input type="number" id="inClimStart" min="0" step="100" value="' + num(B.startClim) + '"></div>';
@@ -3058,7 +3070,7 @@ function writeMirane(S){
   for (row = 6; row <= 166; row++) ["A", "B", "C", "D", "E", "G", "H"].forEach(function(col){ ex.clear(col + row); });
   (B.log || []).forEach(function(x, i){
     var rw = 6 + i; if (rw > 166) return;
-    var ipTxt = num(x.ip) ? " (" + (num(x.ip) > 0 ? "+" : "") + num(x.ip) + " IP)" : "";
+    var ipTxt = (LOG_KINDS[x.kind] || {}).useIp || x.kind === "learn" ? " (1 IP)" : "";
     ex.set("A" + rw, (x.text || (LOG_KINDS[x.kind] || {}).text || "Entry") + ipTxt);
     if (xlDate(x.d) !== null) ex.set("B" + rw, xlDate(x.d), "B3");
     if (xlDate(x.from) !== null) ex.set("C" + rw, xlDate(x.from), "C3");
